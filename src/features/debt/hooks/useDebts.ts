@@ -75,6 +75,16 @@ export function useDebtWallets(workspaceId: string | undefined) {
   });
 }
 
+async function invalidateDebtSideEffects(queryClient: ReturnType<typeof useQueryClient>, workspaceId: string | undefined) {
+  await Promise.all([
+    queryClient.invalidateQueries({ queryKey: debtKeys.list(workspaceId) }),
+    queryClient.invalidateQueries({ queryKey: ['dashboard-summary', workspaceId] }),
+    queryClient.invalidateQueries({ queryKey: ['reports', workspaceId] }),
+    queryClient.invalidateQueries({ queryKey: ['financial-health', workspaceId] }),
+    queryClient.invalidateQueries({ queryKey: ['insights', workspaceId] })
+  ]);
+}
+
 export function useCreateDebt(workspaceId: string | undefined) {
   const queryClient = useQueryClient();
 
@@ -87,7 +97,7 @@ export function useCreateDebt(workspaceId: string | undefined) {
       return DebtService.createDebt(workspaceId, input);
     },
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: debtKeys.list(workspaceId) });
+      await invalidateDebtSideEffects(queryClient, workspaceId);
     }
   });
 }
@@ -104,7 +114,7 @@ export function useUpdateDebt(workspaceId: string | undefined) {
       return DebtService.updateDebt(debtId, workspaceId, input);
     },
     onSuccess: async (debt) => {
-      await queryClient.invalidateQueries({ queryKey: debtKeys.list(workspaceId) });
+      await invalidateDebtSideEffects(queryClient, workspaceId);
       await queryClient.invalidateQueries({ queryKey: debtKeys.detail(debt.id, workspaceId) });
     }
   });
@@ -122,7 +132,7 @@ export function useDeleteDebt(workspaceId: string | undefined) {
       return DebtService.deleteDebt(debtId, workspaceId);
     },
     onSuccess: async (_data, debtId) => {
-      await queryClient.invalidateQueries({ queryKey: debtKeys.list(workspaceId) });
+      await invalidateDebtSideEffects(queryClient, workspaceId);
       await queryClient.invalidateQueries({ queryKey: debtKeys.detail(debtId, workspaceId) });
     }
   });
@@ -140,7 +150,7 @@ export function useAddDebtPayment(workspaceId: string | undefined) {
       return DebtService.addPayment(debtId, workspaceId, input);
     },
     onSuccess: async (payment) => {
-      await queryClient.invalidateQueries({ queryKey: debtKeys.list(workspaceId) });
+      await invalidateDebtSideEffects(queryClient, workspaceId);
       await queryClient.invalidateQueries({ queryKey: debtKeys.detail(payment.debt_id, workspaceId) });
       await queryClient.invalidateQueries({ queryKey: debtKeys.payments(payment.debt_id, workspaceId) });
     }

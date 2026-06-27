@@ -55,6 +55,16 @@ export function useBudgetCategories(workspaceId: string | undefined) {
   });
 }
 
+async function invalidateBudgetSideEffects(queryClient: ReturnType<typeof useQueryClient>, workspaceId: string | undefined) {
+  await Promise.all([
+    queryClient.invalidateQueries({ queryKey: budgetKeys.list(workspaceId) }),
+    queryClient.invalidateQueries({ queryKey: ['dashboard-summary', workspaceId] }),
+    queryClient.invalidateQueries({ queryKey: ['reports', workspaceId] }),
+    queryClient.invalidateQueries({ queryKey: ['financial-health', workspaceId] }),
+    queryClient.invalidateQueries({ queryKey: ['insights', workspaceId] })
+  ]);
+}
+
 export function useCreateBudget(workspaceId: string | undefined) {
   const queryClient = useQueryClient();
 
@@ -67,7 +77,7 @@ export function useCreateBudget(workspaceId: string | undefined) {
       return BudgetService.createBudget(workspaceId, input);
     },
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: budgetKeys.list(workspaceId) });
+      await invalidateBudgetSideEffects(queryClient, workspaceId);
     }
   });
 }
@@ -84,7 +94,7 @@ export function useUpdateBudget(workspaceId: string | undefined) {
       return BudgetService.updateBudget(budgetId, workspaceId, input);
     },
     onSuccess: async (budget) => {
-      await queryClient.invalidateQueries({ queryKey: budgetKeys.list(workspaceId) });
+      await invalidateBudgetSideEffects(queryClient, workspaceId);
       await queryClient.invalidateQueries({ queryKey: budgetKeys.detail(budget.id, workspaceId) });
     }
   });
@@ -102,7 +112,7 @@ export function useDeleteBudget(workspaceId: string | undefined) {
       return BudgetService.deleteBudget(budgetId, workspaceId);
     },
     onSuccess: async (_data, budgetId) => {
-      await queryClient.invalidateQueries({ queryKey: budgetKeys.list(workspaceId) });
+      await invalidateBudgetSideEffects(queryClient, workspaceId);
       await queryClient.invalidateQueries({ queryKey: budgetKeys.detail(budgetId, workspaceId) });
     }
   });

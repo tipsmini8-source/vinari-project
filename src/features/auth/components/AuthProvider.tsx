@@ -40,9 +40,34 @@ export function AuthProvider({ children }: PropsWithChildren) {
     };
   }, [setLoading, setSession]);
 
-  const login = useCallback((input: LoginInput) => AuthService.login(input), []);
-  const logout = useCallback(() => AuthService.logout(), []);
-  const register = useCallback((input: RegisterInput) => AuthService.register(input), []);
+  const login = useCallback(
+    async (input: LoginInput) => {
+      const nextSession = await AuthService.login(input);
+
+      if (nextSession) {
+        setSession(nextSession);
+      }
+
+      return nextSession;
+    },
+    [setSession]
+  );
+  const logout = useCallback(async () => {
+    await AuthService.logout();
+    setSession(null);
+  }, [setSession]);
+  const register = useCallback(
+    async (input: RegisterInput) => {
+      const nextSession = await AuthService.register(input);
+
+      if (nextSession) {
+        setSession(nextSession);
+      }
+
+      return nextSession;
+    },
+    [setSession]
+  );
   const forgotPassword = useCallback(
     (input: ForgotPasswordInput) => AuthService.forgotPassword(input),
     []

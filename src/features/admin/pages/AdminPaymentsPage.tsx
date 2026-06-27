@@ -18,9 +18,9 @@ import { useToast } from '@shared/ui/use-toast';
 
 const filters: Array<{ label: string; value: AdminPaymentStatus }> = [
   { label: 'Pending', value: 'pending' },
-  { label: 'Approved', value: 'approved' },
-  { label: 'Rejected', value: 'rejected' },
-  { label: 'All', value: 'all' }
+  { label: 'Disetujui', value: 'approved' },
+  { label: 'Ditolak', value: 'rejected' },
+  { label: 'Semua', value: 'all' }
 ];
 
 export function AdminPaymentsPage() {
@@ -34,7 +34,7 @@ export function AdminPaymentsPage() {
   const isMutating = approvePayment.isPending || rejectPayment.isPending;
 
   const handleApprove = async (request: AdminPaymentRequest) => {
-    const confirmed = window.confirm(`Approve payment request ${request.plan_code}?`);
+    const confirmed = window.confirm(`Setujui payment request ${request.plan_code}?`);
 
     if (!confirmed) {
       return;
@@ -42,10 +42,10 @@ export function AdminPaymentsPage() {
 
     try {
       await approvePayment.mutateAsync(request.id);
-      toast({ title: 'Payment request approved' });
+      toast({ title: 'Payment request disetujui' });
     } catch (error) {
       toast({
-        title: 'Gagal approve payment request',
+        title: 'Gagal menyetujui payment request',
         description: error instanceof Error ? error.message : 'Silakan coba lagi.',
         variant: 'destructive'
       });
@@ -53,7 +53,7 @@ export function AdminPaymentsPage() {
   };
 
   const handleReject = async (request: AdminPaymentRequest) => {
-    const reason = window.prompt('Alasan reject pembayaran?');
+    const reason = window.prompt('Alasan penolakan pembayaran?');
 
     if (reason === null) {
       return;
@@ -64,10 +64,10 @@ export function AdminPaymentsPage() {
         paymentRequestId: request.id,
         reason
       });
-      toast({ title: 'Payment request rejected' });
+      toast({ title: 'Payment request ditolak' });
     } catch (error) {
       toast({
-        title: 'Gagal reject payment request',
+        title: 'Gagal menolak payment request',
         description: error instanceof Error ? error.message : 'Silakan coba lagi.',
         variant: 'destructive'
       });
@@ -86,9 +86,9 @@ export function AdminPaymentsPage() {
               </Link>
             </Button>
             <p className="text-sm font-medium text-primary">Vinari Admin</p>
-            <h1 className="mt-1 text-3xl font-semibold tracking-normal">Payment Requests</h1>
+            <h1 className="mt-1 text-3xl font-semibold tracking-normal">Payment Request</h1>
             <p className="mt-2 text-sm text-muted-foreground">
-              Review dan approve/reject pembayaran premium manual.
+              Review dan setujui atau tolak pembayaran premium manual.
             </p>
           </div>
         </div>

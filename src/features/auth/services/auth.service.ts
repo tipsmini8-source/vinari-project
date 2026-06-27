@@ -14,7 +14,25 @@ function getAuthRedirectUrl(path: string) {
 
 function throwIfAuthError(error: AuthError | null) {
   if (error) {
-    throw new Error(error.message);
+    const message = error.message.toLowerCase();
+
+    if (message.includes('invalid login credentials')) {
+      throw new Error('Email atau password tidak sesuai.');
+    }
+
+    if (message.includes('email not confirmed')) {
+      throw new Error('Email belum diverifikasi. Silakan cek inbox Anda.');
+    }
+
+    if (message.includes('user already registered') || message.includes('already registered')) {
+      throw new Error('Email ini sudah terdaftar. Silakan login.');
+    }
+
+    if (message.includes('password')) {
+      throw new Error('Password belum memenuhi ketentuan atau tautan reset sudah kedaluwarsa.');
+    }
+
+    throw new Error('Permintaan autentikasi gagal. Silakan coba lagi.');
   }
 }
 
@@ -35,16 +53,18 @@ export const AuthService = {
   },
 
   async login(input: LoginInput) {
-    const { error } = await supabase.auth.signInWithPassword({
+    const { data, error } = await supabase.auth.signInWithPassword({
       email: input.email,
       password: input.password
     });
 
     throwIfAuthError(error);
+
+    return data.session;
   },
 
   async register(input: RegisterInput) {
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email: input.email,
       password: input.password,
       options: {
@@ -56,7 +76,8 @@ export const AuthService = {
     });
 
     throwIfAuthError(error);
-    await supabase.auth.signOut();
+
+    return data.session;
   },
 
   async forgotPassword(input: ForgotPasswordInput) {

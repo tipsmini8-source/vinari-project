@@ -9,6 +9,7 @@ export type Wallet = {
   name: string;
   wallet_type: string;
   initial_balance: number;
+  current_balance: number;
   currency_code: string;
   icon: string | null;
   color: string | null;
@@ -17,6 +18,5 @@ export type Wallet = {
 };
 
 export type WalletDetail = Wallet & {
-  current_balance: number;
   transaction_count: number;
 };

@@ -75,6 +75,16 @@ export function useGoalWallets(workspaceId: string | undefined) {
   });
 }
 
+async function invalidateGoalSideEffects(queryClient: ReturnType<typeof useQueryClient>, workspaceId: string | undefined) {
+  await Promise.all([
+    queryClient.invalidateQueries({ queryKey: goalKeys.list(workspaceId) }),
+    queryClient.invalidateQueries({ queryKey: ['dashboard-summary', workspaceId] }),
+    queryClient.invalidateQueries({ queryKey: ['reports', workspaceId] }),
+    queryClient.invalidateQueries({ queryKey: ['financial-health', workspaceId] }),
+    queryClient.invalidateQueries({ queryKey: ['insights', workspaceId] })
+  ]);
+}
+
 export function useCreateGoal(workspaceId: string | undefined) {
   const queryClient = useQueryClient();
 
@@ -87,7 +97,7 @@ export function useCreateGoal(workspaceId: string | undefined) {
       return GoalService.createGoal(workspaceId, input);
     },
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: goalKeys.list(workspaceId) });
+      await invalidateGoalSideEffects(queryClient, workspaceId);
     }
   });
 }
@@ -104,7 +114,7 @@ export function useUpdateGoal(workspaceId: string | undefined) {
       return GoalService.updateGoal(goalId, workspaceId, input);
     },
     onSuccess: async (goal) => {
-      await queryClient.invalidateQueries({ queryKey: goalKeys.list(workspaceId) });
+      await invalidateGoalSideEffects(queryClient, workspaceId);
       await queryClient.invalidateQueries({ queryKey: goalKeys.detail(goal.id, workspaceId) });
     }
   });
@@ -122,7 +132,7 @@ export function useDeleteGoal(workspaceId: string | undefined) {
       return GoalService.deleteGoal(goalId, workspaceId);
     },
     onSuccess: async (_data, goalId) => {
-      await queryClient.invalidateQueries({ queryKey: goalKeys.list(workspaceId) });
+      await invalidateGoalSideEffects(queryClient, workspaceId);
       await queryClient.invalidateQueries({ queryKey: goalKeys.detail(goalId, workspaceId) });
     }
   });
@@ -140,7 +150,7 @@ export function useAddGoalContribution(workspaceId: string | undefined) {
       return GoalService.addContribution(goalId, workspaceId, input);
     },
     onSuccess: async (contribution) => {
-      await queryClient.invalidateQueries({ queryKey: goalKeys.list(workspaceId) });
+      await invalidateGoalSideEffects(queryClient, workspaceId);
       await queryClient.invalidateQueries({ queryKey: goalKeys.detail(contribution.goal_id, workspaceId) });
       await queryClient.invalidateQueries({ queryKey: goalKeys.contributions(contribution.goal_id, workspaceId) });
     }

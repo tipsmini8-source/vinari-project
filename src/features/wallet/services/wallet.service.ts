@@ -6,6 +6,13 @@ type SupabaseErrorLike = {
   message?: string;
 };
 
+type WalletTransactionRow = {
+  type: string;
+  amount: number | string | null;
+  wallet_id: string | null;
+  destination_wallet_id: string | null;
+};
+
 function assertSupabaseSuccess(error: SupabaseErrorLike | null, fallbackMessage: string) {
   if (error) {
     throw new Error(error.message || fallbackMessage);
@@ -19,12 +26,56 @@ function mapWallet(row: Record<string, unknown>): Wallet {
     name: String(row.name),
     wallet_type: String(row.wallet_type),
     initial_balance: Number(row.initial_balance ?? 0),
+    current_balance: Number(row.initial_balance ?? 0),
     currency_code: typeof row.currency_code === 'string' ? row.currency_code : 'IDR',
     icon: typeof row.icon === 'string' ? row.icon : null,
     color: typeof row.color === 'string' ? row.color : null,
     is_archived: Boolean(row.is_archived),
     created_at: String(row.created_at)
   };
+}
+
+async function getWalletBalances(workspaceId: string, wallets: Wallet[]): Promise<Map<string, number>> {
+  const balances = new Map(wallets.map((wallet) => [wallet.id, wallet.initial_balance]));
+
+  if (wallets.length === 0) {
+    return balances;
+  }
+
+  const { data, error } = (await supabase
+    .from('transactions')
+    .select('type, amount, wallet_id, destination_wallet_id')
+    .eq('workspace_id', workspaceId)
+    .is('deleted_at', null)) as unknown as {
+    data: WalletTransactionRow[] | null;
+    error: SupabaseErrorLike | null;
+  };
+
+  assertSupabaseSuccess(error, 'Gagal menghitung saldo wallet.');
+
+  for (const transaction of data ?? []) {
+    const amount = Number(transaction.amount ?? 0);
+
+    if (transaction.type === 'income' && transaction.wallet_id && balances.has(transaction.wallet_id)) {
+      balances.set(transaction.wallet_id, (balances.get(transaction.wallet_id) ?? 0) + amount);
+    }
+
+    if (transaction.type === 'expense' && transaction.wallet_id && balances.has(transaction.wallet_id)) {
+      balances.set(transaction.wallet_id, (balances.get(transaction.wallet_id) ?? 0) - amount);
+    }
+
+    if (transaction.type === 'transfer' && transaction.wallet_id && transaction.destination_wallet_id) {
+      if (balances.has(transaction.wallet_id)) {
+        balances.set(transaction.wallet_id, (balances.get(transaction.wallet_id) ?? 0) - amount);
+      }
+
+      if (balances.has(transaction.destination_wallet_id)) {
+        balances.set(transaction.destination_wallet_id, (balances.get(transaction.destination_wallet_id) ?? 0) + amount);
+      }
+    }
+  }
+
+  return balances;
 }
 
 export const WalletService = {
@@ -42,7 +93,13 @@ export const WalletService = {
 
     assertSupabaseSuccess(error, 'Gagal mengambil daftar wallet.');
 
-    return (data ?? []).map(mapWallet);
+    const wallets = (data ?? []).map(mapWallet);
+    const balances = await getWalletBalances(workspaceId, wallets);
+
+    return wallets.map((wallet) => ({
+      ...wallet,
+      current_balance: balances.get(wallet.id) ?? wallet.initial_balance
+    }));
   },
 
   async getWalletDetail(walletId: string, workspaceId: string): Promise<WalletDetail> {
@@ -64,11 +121,12 @@ export const WalletService = {
     }
 
     const wallet = mapWallet(data);
+    const balances = await getWalletBalances(workspaceId, [wallet]);
     const transactionCount = await this.getTransactionCount(walletId, workspaceId);
 
     return {
       ...wallet,
-      current_balance: wallet.initial_balance,
+      current_balance: balances.get(wallet.id) ?? wallet.initial_balance,
       transaction_count: transactionCount
     };
   },
@@ -126,7 +184,13 @@ export const WalletService = {
       throw new Error('Wallet tidak ditemukan.');
     }
 
-    return mapWallet(data);
+    const wallet = mapWallet(data);
+    const balances = await getWalletBalances(workspaceId, [wallet]);
+
+    return {
+      ...wallet,
+      current_balance: balances.get(wallet.id) ?? wallet.initial_balance
+    };
   },
 
   async archiveWallet(walletId: string, workspaceId: string): Promise<void> {

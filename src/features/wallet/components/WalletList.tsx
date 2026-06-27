@@ -55,9 +55,8 @@ export function WalletList({
                   ) : null}
                 </span>
                 <span className="mt-1 block text-sm text-muted-foreground">{wallet.wallet_type}</span>
-                <span className="mt-2 block text-sm font-medium">
-                  {moneyFormatter.format(wallet.initial_balance)}
-                </span>
+                <span className="mt-2 block text-sm font-medium">{moneyFormatter.format(wallet.current_balance)}</span>
+                <span className="mt-0.5 block text-xs text-muted-foreground">Saldo saat ini</span>
               </span>
             </button>
             <div className="flex gap-2 sm:justify-end">

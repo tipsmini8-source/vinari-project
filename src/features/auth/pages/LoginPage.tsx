@@ -31,7 +31,7 @@ export function LoginPage() {
     try {
       await login(values);
       toast({ title: 'Berhasil masuk', description: 'Selamat datang kembali di Vinari.' });
-      void navigate('/onboarding', { replace: true });
+      void navigate('/app', { replace: true });
     } catch (error) {
       toast({
         title: 'Login gagal',

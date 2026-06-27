@@ -20,9 +20,9 @@ export type AuthContextValue = {
   user: AuthUser | null;
   session: AuthSession | null;
   loading: boolean;
-  login: (input: LoginInput) => Promise<void>;
+  login: (input: LoginInput) => Promise<AuthSession | null>;
   logout: () => Promise<void>;
-  register: (input: RegisterInput) => Promise<void>;
+  register: (input: RegisterInput) => Promise<AuthSession | null>;
   forgotPassword: (input: ForgotPasswordInput) => Promise<void>;
   resetPassword: (input: ResetPasswordInput) => Promise<void>;
 };

@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { CheckCircle2, Loader2 } from 'lucide-react';
 import { useState } from 'react';
-import { Link } from 'react-router';
+import { Link, useNavigate } from 'react-router';
 import { useForm } from 'react-hook-form';
 
 import { AuthFormCard } from '@features/auth/components/AuthFormCard';
@@ -14,6 +14,7 @@ import { useToast } from '@shared/ui/use-toast';
 
 export function RegisterPage() {
   const [registered, setRegistered] = useState(false);
+  const navigate = useNavigate();
   const { register: registerUser } = useAuth();
   const { toast } = useToast();
   const {
@@ -32,7 +33,17 @@ export function RegisterPage() {
 
   const onSubmit = handleSubmit(async (values) => {
     try {
-      await registerUser(values);
+      const session = await registerUser(values);
+
+      if (session) {
+        toast({
+          title: 'Registrasi berhasil',
+          description: 'Akun siap digunakan. Mari lanjut setup workspace.'
+        });
+        void navigate('/app', { replace: true });
+        return;
+      }
+
       setRegistered(true);
       toast({
         title: 'Registrasi berhasil',

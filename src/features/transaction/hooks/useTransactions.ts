@@ -78,6 +78,21 @@ export function useTransactionReferences(workspaceId: string | undefined) {
   };
 }
 
+async function invalidateTransactionSideEffects(
+  queryClient: ReturnType<typeof useQueryClient>,
+  workspaceId: string | undefined
+) {
+  await Promise.all([
+    queryClient.invalidateQueries({ queryKey: ['transactions', workspaceId] }),
+    queryClient.invalidateQueries({ queryKey: ['wallets', workspaceId] }),
+    queryClient.invalidateQueries({ queryKey: ['wallet-detail'] }),
+    queryClient.invalidateQueries({ queryKey: ['dashboard-summary', workspaceId] }),
+    queryClient.invalidateQueries({ queryKey: ['reports', workspaceId] }),
+    queryClient.invalidateQueries({ queryKey: ['financial-health', workspaceId] }),
+    queryClient.invalidateQueries({ queryKey: ['insights', workspaceId] })
+  ]);
+}
+
 export function useCreateTransaction(workspaceId: string | undefined) {
   const queryClient = useQueryClient();
 
@@ -90,7 +105,7 @@ export function useCreateTransaction(workspaceId: string | undefined) {
       return TransactionService.createTransaction(workspaceId, input);
     },
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['transactions', workspaceId] });
+      await invalidateTransactionSideEffects(queryClient, workspaceId);
     }
   });
 }
@@ -107,7 +122,7 @@ export function useUpdateTransaction(workspaceId: string | undefined) {
       return TransactionService.updateTransaction(transactionId, workspaceId, input);
     },
     onSuccess: async (transaction) => {
-      await queryClient.invalidateQueries({ queryKey: ['transactions', workspaceId] });
+      await invalidateTransactionSideEffects(queryClient, workspaceId);
       await queryClient.invalidateQueries({ queryKey: transactionKeys.detail(transaction.id, workspaceId) });
     }
   });
@@ -125,7 +140,7 @@ export function useDeleteTransaction(workspaceId: string | undefined) {
       return TransactionService.deleteTransaction(transactionId, workspaceId);
     },
     onSuccess: async (_data, transactionId) => {
-      await queryClient.invalidateQueries({ queryKey: ['transactions', workspaceId] });
+      await invalidateTransactionSideEffects(queryClient, workspaceId);
       await queryClient.invalidateQueries({ queryKey: transactionKeys.detail(transactionId, workspaceId) });
     }
   });

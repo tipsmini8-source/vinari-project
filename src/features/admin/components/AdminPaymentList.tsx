@@ -35,6 +35,18 @@ function statusClass(status: string) {
   return 'bg-destructive/10 text-destructive';
 }
 
+function statusLabel(status: string) {
+  if (status === 'approved') {
+    return 'Disetujui';
+  }
+
+  if (status === 'rejected') {
+    return 'Ditolak';
+  }
+
+  return 'Pending';
+}
+
 export function AdminPaymentList({
   isMutating,
   onApprove,
@@ -50,18 +62,18 @@ export function AdminPaymentList({
             <div className="min-w-0">
               <div className="flex flex-wrap items-center gap-2">
                 <h2 className="break-words font-semibold">{request.plan_code}</h2>
-                <span className={cn('rounded-sm px-2 py-0.5 text-xs font-medium capitalize', statusClass(request.status))}>
-                  {request.status}
+                <span className={cn('rounded-sm px-2 py-0.5 text-xs font-medium', statusClass(request.status))}>
+                  {statusLabel(request.status)}
                 </span>
               </div>
               <div className="mt-3 grid gap-2 text-sm text-muted-foreground sm:grid-cols-2 xl:grid-cols-3">
                 <p className="break-all">Workspace: {request.workspace_id}</p>
                 <p className="break-all">User: {request.user_id}</p>
-                <p>Method: {request.method ?? '-'}</p>
-                <p>Amount: {moneyFormatter.format(request.amount)}</p>
-                <p>Created: {dateFormatter.format(new Date(request.created_at))}</p>
+                <p>Metode: {request.method ?? '-'}</p>
+                <p>Nominal: {moneyFormatter.format(request.amount)}</p>
+                <p>Dibuat: {dateFormatter.format(new Date(request.created_at))}</p>
                 <p>
-                  Proof:{' '}
+                  Bukti:{' '}
                   {request.proof_url ? (
                     <span className="font-medium text-primary">Bukti tersedia</span>
                   ) : (
@@ -85,14 +97,14 @@ export function AdminPaymentList({
               ) : null}
               {request.status === 'pending' ? (
                 <>
-                <Button disabled={isMutating || !request.proof_url} onClick={() => onApprove(request)} type="button">
-                  <CheckCircle2 className="size-4" />
-                  Approve
-                </Button>
-                <Button disabled={isMutating} onClick={() => onReject(request)} type="button" variant="outline">
-                  <XCircle className="size-4" />
-                  Reject
-                </Button>
+                  <Button disabled={isMutating || !request.proof_url} onClick={() => onApprove(request)} type="button">
+                    <CheckCircle2 className="size-4" />
+                    Setujui
+                  </Button>
+                  <Button disabled={isMutating} onClick={() => onReject(request)} type="button" variant="outline">
+                    <XCircle className="size-4" />
+                    Tolak
+                  </Button>
                 </>
               ) : null}
             </div>
