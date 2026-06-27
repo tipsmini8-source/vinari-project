@@ -19,6 +19,7 @@ import { BudgetFormPage, BudgetListPage } from '@features/budget';
 import { CategoryFormPage, CategoryListPage } from '@features/category';
 import { DashboardPage } from '@features/dashboard';
 import { DebtDetailPage, DebtFormPage, DebtListPage } from '@features/debt';
+import { DecisionSimulatorPage } from '@features/decision-simulator';
 import { GoalDetailPage, GoalFormPage, GoalListPage } from '@features/goal';
 import { InsightsPage } from '@features/insight';
 import { NotificationsPage } from '@features/notification';
@@ -202,6 +203,10 @@ export const router = createBrowserRouter([
               {
                 path: 'insights',
                 element: <InsightsPage />
+              },
+              {
+                path: 'simulator',
+                element: <DecisionSimulatorPage />
               },
               {
                 path: 'notifications',

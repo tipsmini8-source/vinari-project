@@ -1,5 +1,6 @@
 import {
   BarChart3,
+  Calculator,
   CreditCard,
   Crown,
   FileText,
@@ -68,6 +69,11 @@ export const secondaryNavigation: NavigationItem[] = [
     label: 'Insights',
     href: '/app/insights',
     icon: Lightbulb
+  },
+  {
+    label: 'Simulator',
+    href: '/app/simulator',
+    icon: Calculator
   },
   {
     label: 'Recurring',
