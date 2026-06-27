@@ -1,5 +1,17 @@
 import { supabase } from '@/lib/supabase';
-import type { BillingData, PaymentRequest, Plan, PlanFeatures, WorkspaceSubscription } from '@features/premium/types/premium.types';
+import {
+  allowedProofExtensions,
+  allowedProofMimeTypes,
+  maxProofSize
+} from '@features/premium/schemas/payment-proof.schemas';
+import type {
+  BillingData,
+  PaymentProofPreview,
+  PaymentRequest,
+  Plan,
+  PlanFeatures,
+  WorkspaceSubscription
+} from '@features/premium/types/premium.types';
 
 type SupabaseErrorLike = {
   message?: string;
@@ -92,6 +104,34 @@ function mapPaymentRequest(row: Record<string, unknown>): PaymentRequest {
     rejected_reason: asOptionalString(row.rejected_reason),
     created_at: asString(row.created_at)
   };
+}
+
+function getProofObjectPath(proofUrl: string) {
+  return proofUrl.startsWith('premium-proofs/') ? proofUrl.slice('premium-proofs/'.length) : proofUrl;
+}
+
+function getFileName(path: string) {
+  return path.split('/').pop() ?? path;
+}
+
+function isImagePath(path: string) {
+  return /\.(jpg|jpeg|png|webp)$/i.test(path);
+}
+
+function isPdfPath(path: string) {
+  return /\.pdf$/i.test(path);
+}
+
+function validateProofFile(file: File) {
+  const extension = file.name.split('.').pop()?.toLowerCase() ?? '';
+
+  if (!allowedProofMimeTypes.includes(file.type) || !allowedProofExtensions.includes(extension)) {
+    throw new Error('Format file harus jpg, jpeg, png, webp, atau pdf.');
+  }
+
+  if (file.size > maxProofSize) {
+    throw new Error('Ukuran file maksimal 5MB.');
+  }
 }
 
 const planSelect =
@@ -197,5 +237,60 @@ export const PremiumService = {
     }
 
     return mapPaymentRequest(data);
+  },
+
+  async uploadPaymentProof(paymentRequest: PaymentRequest, userId: string, file: File): Promise<string> {
+    if (paymentRequest.status !== 'pending') {
+      throw new Error('Bukti hanya bisa diupload saat payment request masih pending.');
+    }
+
+    if (paymentRequest.user_id !== userId) {
+      throw new Error('Bukti hanya bisa diupload oleh pembuat payment request.');
+    }
+
+    validateProofFile(file);
+
+    const extension = file.name.split('.').pop()?.toLowerCase() ?? 'jpg';
+    const objectPath = `${userId}/${paymentRequest.id}-${Date.now()}.${extension}`;
+    const proofPath = `premium-proofs/${objectPath}`;
+    const { error: uploadError } = await supabase.storage
+      .from('premium-proofs')
+      .upload(objectPath, file, {
+        cacheControl: '3600',
+        contentType: file.type,
+        upsert: false
+      });
+
+    assertSupabaseSuccess(uploadError, 'Gagal upload bukti pembayaran.');
+
+    const { error: attachError } = await supabase.rpc('attach_payment_proof', {
+      payment_request_uuid: paymentRequest.id,
+      proof_path: proofPath
+    });
+
+    assertSupabaseSuccess(attachError, 'Gagal menyimpan bukti pembayaran.');
+
+    return proofPath;
+  },
+
+  async getPaymentProofPreview(proofUrl: string): Promise<PaymentProofPreview> {
+    const objectPath = getProofObjectPath(proofUrl);
+    const { data, error } = await supabase.storage
+      .from('premium-proofs')
+      .createSignedUrl(objectPath, 60 * 10);
+
+    assertSupabaseSuccess(error, 'Gagal membuka bukti pembayaran.');
+
+    if (!data?.signedUrl) {
+      throw new Error('Bukti pembayaran tidak ditemukan.');
+    }
+
+    return {
+      fileName: getFileName(objectPath),
+      isImage: isImagePath(objectPath),
+      isPdf: isPdfPath(objectPath),
+      path: proofUrl,
+      signedUrl: data.signedUrl
+    };
   }
 };

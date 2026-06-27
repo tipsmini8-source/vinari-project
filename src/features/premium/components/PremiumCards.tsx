@@ -1,4 +1,4 @@
-import { Check, Clock, Lock, Sparkles } from 'lucide-react';
+import { Check, Clock, Eye, FileCheck, Lock, Sparkles, Upload } from 'lucide-react';
 import { Link } from 'react-router';
 
 import type { PaymentRequest, Plan, WorkspaceSubscription } from '@features/premium/types/premium.types';
@@ -20,6 +20,8 @@ type BillingSummaryProps = {
 };
 
 type PaymentRequestListProps = {
+  onUploadProof?: (request: PaymentRequest) => void;
+  onViewProof?: (request: PaymentRequest) => void;
   requests: PaymentRequest[];
 };
 
@@ -144,7 +146,7 @@ export function ManualPaymentInstructions({ request }: { request: PaymentRequest
             <p>Plan: {request.plan_code}</p>
             <p>Amount: {moneyFormatter.format(request.amount)}</p>
             <p>Metode: Transfer manual</p>
-            <p>Upload bukti pembayaran akan disiapkan belakangan.</p>
+            <p>Upload bukti pembayaran tersedia di halaman ini atau Billing.</p>
           </div>
         </div>
       </div>
@@ -179,7 +181,7 @@ export function BillingSummary({ activePlan, subscription }: BillingSummaryProps
   );
 }
 
-export function PaymentRequestList({ requests }: PaymentRequestListProps) {
+export function PaymentRequestList({ onUploadProof, onViewProof, requests }: PaymentRequestListProps) {
   return (
     <div className="grid gap-3">
       {requests.map((request) => (
@@ -198,8 +200,30 @@ export function PaymentRequestList({ requests }: PaymentRequestListProps) {
               {request.rejected_reason ? (
                 <p className="mt-2 text-sm text-destructive">{request.rejected_reason}</p>
               ) : null}
+              {request.proof_url ? (
+                <p className="mt-2 inline-flex items-center gap-2 rounded-sm bg-primary/10 px-2 py-1 text-xs font-medium text-primary">
+                  <FileCheck className="size-3" />
+                  Bukti sudah diupload
+                </p>
+              ) : (
+                <p className="mt-2 text-sm text-muted-foreground">Bukti belum diupload</p>
+              )}
             </div>
-            <p className="font-semibold">{moneyFormatter.format(request.amount)}</p>
+            <div className="flex flex-col gap-2 sm:items-end">
+              <p className="font-semibold">{moneyFormatter.format(request.amount)}</p>
+              {request.proof_url && onViewProof ? (
+                <Button onClick={() => onViewProof(request)} size="sm" type="button" variant="outline">
+                  <Eye className="size-4" />
+                  Lihat Bukti
+                </Button>
+              ) : null}
+              {!request.proof_url && request.status === 'pending' && onUploadProof ? (
+                <Button onClick={() => onUploadProof(request)} size="sm" type="button" variant="outline">
+                  <Upload className="size-4" />
+                  Upload Bukti
+                </Button>
+              ) : null}
+            </div>
           </div>
         </article>
       ))}

@@ -21,3 +21,11 @@ export type AdminPaymentStats = {
   approved: number;
   rejected: number;
 };
+
+export type AdminPaymentProofPreview = {
+  fileName: string;
+  isImage: boolean;
+  isPdf: boolean;
+  path: string;
+  signedUrl: string;
+};

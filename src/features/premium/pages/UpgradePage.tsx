@@ -3,9 +3,15 @@ import { Link, Navigate } from 'react-router';
 
 import { useWorkspace } from '@/core/workspace';
 import { useAuth } from '@features/auth';
+import { PaymentProofPreviewPanel, PaymentProofUploadForm } from '@features/premium/components/PaymentProofUpload';
 import { ManualPaymentInstructions, PlanCard } from '@features/premium/components/PremiumCards';
 import { PremiumErrorState, PremiumSkeleton } from '@features/premium/components/PremiumStates';
-import { useBillingData, useCreatePaymentRequest } from '@features/premium/hooks/usePremium';
+import {
+  useBillingData,
+  useCreatePaymentRequest,
+  usePaymentProofPreview,
+  useUploadPaymentProof
+} from '@features/premium/hooks/usePremium';
 import type { Plan } from '@features/premium/types/premium.types';
 import { Button } from '@shared/ui/button';
 import { GlobalLoading } from '@shared/ui/global-loading';
@@ -17,6 +23,10 @@ export function UpgradePage() {
   const { toast } = useToast();
   const billingQuery = useBillingData(workspace?.id);
   const createPaymentRequest = useCreatePaymentRequest(workspace?.id, user?.id);
+  const uploadPaymentProof = useUploadPaymentProof(workspace?.id, user?.id);
+  const pendingRequest =
+    billingQuery.data?.paymentRequests.find((request) => request.status === 'pending') ?? null;
+  const proofPreviewQuery = usePaymentProofPreview(pendingRequest?.proof_url);
 
   if (loading) {
     return <GlobalLoading />;
@@ -26,19 +36,36 @@ export function UpgradePage() {
     return <Navigate replace to="/onboarding" />;
   }
 
-  const pendingRequest =
-    billingQuery.data?.paymentRequests.find((request) => request.status === 'pending') ?? null;
-
   const handleUpgrade = async (plan: Plan) => {
     try {
       await createPaymentRequest.mutateAsync(plan);
       toast({
         title: 'Payment request dibuat',
-        description: 'Silakan lanjutkan pembayaran manual. Upload bukti akan disiapkan belakangan.'
+        description: 'Silakan lanjutkan pembayaran manual lalu upload bukti pembayaran.'
       });
     } catch (error) {
       toast({
         title: 'Gagal membuat payment request',
+        description: error instanceof Error ? error.message : 'Silakan coba lagi.',
+        variant: 'destructive'
+      });
+    }
+  };
+
+  const handleUploadProof = async (file: File) => {
+    if (!pendingRequest) {
+      return;
+    }
+
+    try {
+      await uploadPaymentProof.mutateAsync({
+        file,
+        paymentRequest: pendingRequest
+      });
+      toast({ title: 'Bukti pembayaran diupload' });
+    } catch (error) {
+      toast({
+        title: 'Gagal upload bukti pembayaran',
         description: error instanceof Error ? error.message : 'Silakan coba lagi.',
         variant: 'destructive'
       });
@@ -79,6 +106,15 @@ export function UpgradePage() {
         {billingQuery.data ? (
           <div className="space-y-4">
             <ManualPaymentInstructions request={pendingRequest} />
+            {pendingRequest && !pendingRequest.proof_url ? (
+              <PaymentProofUploadForm
+                isUploading={uploadPaymentProof.isPending}
+                onSubmit={handleUploadProof}
+              />
+            ) : null}
+            {pendingRequest?.proof_url ? (
+              <PaymentProofPreviewPanel preview={proofPreviewQuery.data ?? null} />
+            ) : null}
             <div className="grid gap-4 md:grid-cols-3">
               {billingQuery.data.plans.map((plan) => (
                 <PlanCard

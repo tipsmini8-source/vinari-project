@@ -1,4 +1,4 @@
-import { CheckCircle2, XCircle } from 'lucide-react';
+import { CheckCircle2, Eye, XCircle } from 'lucide-react';
 
 import type { AdminPaymentRequest } from '@features/admin/types/admin.types';
 import { cn } from '@shared/lib/utils';
@@ -8,6 +8,7 @@ type AdminPaymentListProps = {
   isMutating: boolean;
   onApprove: (request: AdminPaymentRequest) => void;
   onReject: (request: AdminPaymentRequest) => void;
+  onViewProof: (request: AdminPaymentRequest) => void;
   requests: AdminPaymentRequest[];
 };
 
@@ -34,7 +35,13 @@ function statusClass(status: string) {
   return 'bg-destructive/10 text-destructive';
 }
 
-export function AdminPaymentList({ isMutating, onApprove, onReject, requests }: AdminPaymentListProps) {
+export function AdminPaymentList({
+  isMutating,
+  onApprove,
+  onReject,
+  onViewProof,
+  requests
+}: AdminPaymentListProps) {
   return (
     <div className="grid gap-3">
       {requests.map((request) => (
@@ -53,16 +60,32 @@ export function AdminPaymentList({ isMutating, onApprove, onReject, requests }: 
                 <p>Method: {request.method ?? '-'}</p>
                 <p>Amount: {moneyFormatter.format(request.amount)}</p>
                 <p>Created: {dateFormatter.format(new Date(request.created_at))}</p>
-                <p>Proof: {request.proof_url ?? '-'}</p>
+                <p>
+                  Proof:{' '}
+                  {request.proof_url ? (
+                    <span className="font-medium text-primary">Bukti tersedia</span>
+                  ) : (
+                    <span className="rounded-sm bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">
+                      Belum ada bukti
+                    </span>
+                  )}
+                </p>
               </div>
               {request.rejected_reason ? (
                 <p className="mt-3 text-sm text-destructive">Alasan reject: {request.rejected_reason}</p>
               ) : null}
             </div>
 
-            {request.status === 'pending' ? (
-              <div className="flex gap-2 lg:justify-end">
-                <Button disabled={isMutating} onClick={() => onApprove(request)} type="button">
+            <div className="flex flex-wrap gap-2 lg:justify-end">
+              {request.proof_url ? (
+                <Button onClick={() => onViewProof(request)} type="button" variant="outline">
+                  <Eye className="size-4" />
+                  Lihat Bukti
+                </Button>
+              ) : null}
+              {request.status === 'pending' ? (
+                <>
+                <Button disabled={isMutating || !request.proof_url} onClick={() => onApprove(request)} type="button">
                   <CheckCircle2 className="size-4" />
                   Approve
                 </Button>
@@ -70,8 +93,9 @@ export function AdminPaymentList({ isMutating, onApprove, onReject, requests }: 
                   <XCircle className="size-4" />
                   Reject
                 </Button>
-              </div>
-            ) : null}
+                </>
+              ) : null}
+            </div>
           </div>
         </article>
       ))}

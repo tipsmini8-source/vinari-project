@@ -4,6 +4,7 @@ import { AdminService } from '@features/admin/services/admin.service';
 import type { AdminPaymentStatus } from '@features/admin/types/admin.types';
 
 export const adminKeys = {
+  proofPreview: (proofUrl: string | null | undefined) => ['admin-payment-proof-preview', proofUrl] as const,
   status: ['admin-status'] as const,
   paymentRequests: (status: AdminPaymentStatus) => ['admin-payment-requests', status] as const,
   stats: ['admin-payment-stats'] as const
@@ -57,6 +58,20 @@ export function useRejectPaymentRequest() {
       AdminService.rejectPaymentRequest(paymentRequestId, reason),
     onSuccess: async () => {
       await invalidateAdminPayments(queryClient);
+    }
+  });
+}
+
+export function useAdminPaymentProofPreview(proofUrl: string | null | undefined) {
+  return useQuery({
+    enabled: Boolean(proofUrl),
+    queryKey: adminKeys.proofPreview(proofUrl),
+    queryFn: () => {
+      if (!proofUrl) {
+        throw new Error('Bukti pembayaran belum tersedia.');
+      }
+
+      return AdminService.getPaymentProofPreview(proofUrl);
     }
   });
 }

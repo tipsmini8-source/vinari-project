@@ -1,5 +1,6 @@
 import { supabase } from '@/lib/supabase';
 import type {
+  AdminPaymentProofPreview,
   AdminPaymentRequest,
   AdminPaymentStats,
   AdminPaymentStatus
@@ -39,6 +40,22 @@ function mapPaymentRequest(row: Record<string, unknown>): AdminPaymentRequest {
     rejected_reason: asOptionalString(row.rejected_reason),
     created_at: asString(row.created_at)
   };
+}
+
+function getProofObjectPath(proofUrl: string) {
+  return proofUrl.startsWith('premium-proofs/') ? proofUrl.slice('premium-proofs/'.length) : proofUrl;
+}
+
+function getFileName(path: string) {
+  return path.split('/').pop() ?? path;
+}
+
+function isImagePath(path: string) {
+  return /\.(jpg|jpeg|png|webp)$/i.test(path);
+}
+
+function isPdfPath(path: string) {
+  return /\.pdf$/i.test(path);
 }
 
 const paymentRequestSelect =
@@ -114,5 +131,26 @@ export const AdminService = {
     });
 
     assertSupabaseSuccess(error, 'Gagal reject payment request.');
+  },
+
+  async getPaymentProofPreview(proofUrl: string): Promise<AdminPaymentProofPreview> {
+    const objectPath = getProofObjectPath(proofUrl);
+    const { data, error } = await supabase.storage
+      .from('premium-proofs')
+      .createSignedUrl(objectPath, 60 * 10);
+
+    assertSupabaseSuccess(error, 'Gagal membuka bukti pembayaran.');
+
+    if (!data?.signedUrl) {
+      throw new Error('Bukti pembayaran tidak ditemukan.');
+    }
+
+    return {
+      fileName: getFileName(objectPath),
+      isImage: isImagePath(objectPath),
+      isPdf: isPdfPath(objectPath),
+      path: proofUrl,
+      signedUrl: data.signedUrl
+    };
   }
 };

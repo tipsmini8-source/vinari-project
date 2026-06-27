@@ -2,10 +2,11 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { useWorkspace } from '@/core/workspace';
 import { PremiumService } from '@features/premium/services/premium.service';
-import type { Plan } from '@features/premium/types/premium.types';
+import type { PaymentRequest, Plan } from '@features/premium/types/premium.types';
 
 export const premiumKeys = {
   billing: (workspaceId: string | undefined) => ['premium-billing', workspaceId] as const,
+  proofPreview: (proofUrl: string | null | undefined) => ['payment-proof-preview', proofUrl] as const,
   plans: ['premium-plans'] as const
 };
 
@@ -69,6 +70,44 @@ export function useCreatePaymentRequest(workspaceId: string | undefined, userId:
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: premiumKeys.billing(workspaceId) });
+    }
+  });
+}
+
+export function useUploadPaymentProof(workspaceId: string | undefined, userId: string | undefined) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ file, paymentRequest }: { file: File; paymentRequest: PaymentRequest }) => {
+      if (!workspaceId) {
+        throw new Error('Workspace aktif tidak ditemukan.');
+      }
+
+      if (!userId) {
+        throw new Error('User aktif tidak ditemukan.');
+      }
+
+      return PremiumService.uploadPaymentProof(paymentRequest, userId, file);
+    },
+    onSuccess: async (_proofPath, variables) => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: premiumKeys.billing(workspaceId) }),
+        queryClient.invalidateQueries({ queryKey: premiumKeys.proofPreview(variables.paymentRequest.proof_url) })
+      ]);
+    }
+  });
+}
+
+export function usePaymentProofPreview(proofUrl: string | null | undefined) {
+  return useQuery({
+    enabled: Boolean(proofUrl),
+    queryKey: premiumKeys.proofPreview(proofUrl),
+    queryFn: () => {
+      if (!proofUrl) {
+        throw new Error('Bukti pembayaran belum tersedia.');
+      }
+
+      return PremiumService.getPaymentProofPreview(proofUrl);
     }
   });
 }

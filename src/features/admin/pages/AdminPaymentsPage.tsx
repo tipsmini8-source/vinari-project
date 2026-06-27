@@ -3,8 +3,10 @@ import { useState } from 'react';
 import { Link } from 'react-router';
 
 import { AdminPaymentList } from '@features/admin/components/AdminPaymentList';
+import { AdminProofPreviewDialog } from '@features/admin/components/AdminProofPreview';
 import { AdminEmptyState, AdminErrorState, AdminSkeleton } from '@features/admin/components/AdminStates';
 import {
+  useAdminPaymentProofPreview,
   useAdminPaymentRequests,
   useApprovePaymentRequest,
   useRejectPaymentRequest
@@ -23,8 +25,10 @@ const filters: Array<{ label: string; value: AdminPaymentStatus }> = [
 
 export function AdminPaymentsPage() {
   const [status, setStatus] = useState<AdminPaymentStatus>('pending');
+  const [previewProofUrl, setPreviewProofUrl] = useState<string | null>(null);
   const { toast } = useToast();
   const paymentsQuery = useAdminPaymentRequests(status);
+  const proofPreviewQuery = useAdminPaymentProofPreview(previewProofUrl);
   const approvePayment = useApprovePaymentRequest();
   const rejectPayment = useRejectPaymentRequest();
   const isMutating = approvePayment.isPending || rejectPayment.isPending;
@@ -121,9 +125,16 @@ export function AdminPaymentsPage() {
             isMutating={isMutating}
             onApprove={handleApprove}
             onReject={handleReject}
+            onViewProof={(request) => setPreviewProofUrl(request.proof_url)}
             requests={paymentsQuery.data ?? []}
           />
         ) : null}
+
+        <AdminProofPreviewDialog
+          isLoading={proofPreviewQuery.isLoading}
+          onClose={() => setPreviewProofUrl(null)}
+          preview={proofPreviewQuery.data ?? null}
+        />
       </section>
     </main>
   );

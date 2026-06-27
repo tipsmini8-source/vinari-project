@@ -41,6 +41,14 @@ export type PaymentRequest = {
   created_at: string;
 };
 
+export type PaymentProofPreview = {
+  fileName: string;
+  isImage: boolean;
+  isPdf: boolean;
+  path: string;
+  signedUrl: string;
+};
+
 export type BillingData = {
   activePlan: Plan;
   paymentRequests: PaymentRequest[];
