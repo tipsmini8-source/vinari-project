@@ -18,6 +18,14 @@ import {
 import { RecentTransactions } from '@features/dashboard/components/RecentTransactions';
 import { SummaryCard } from '@features/dashboard/components/SummaryCard';
 import { useDashboardSummary } from '@features/dashboard/hooks/useDashboard';
+import {
+  FinancialHealthCard,
+  FinancialHealthEmptyState,
+  FinancialHealthErrorState,
+  FinancialHealthSkeleton,
+  isFinancialHealthDataEmpty,
+  useFinancialHealthScore
+} from '@features/financial-health';
 import { Button } from '@shared/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@shared/ui/card';
 import { GlobalLoading } from '@shared/ui/global-loading';
@@ -35,6 +43,7 @@ const dateFormatter = new Intl.DateTimeFormat('id-ID', {
 export function DashboardPage() {
   const { loading, workspace } = useWorkspace();
   const dashboardQuery = useDashboardSummary(workspace?.id);
+  const financialHealthQuery = useFinancialHealthScore(workspace?.id);
   const summary = dashboardQuery.data;
   const isEmpty = summary
     ? summary.activeWalletCount === 0 &&
@@ -117,6 +126,25 @@ export function DashboardPage() {
 
         {summary && !isEmpty ? (
           <div className="space-y-6">
+            {financialHealthQuery.isLoading ? <FinancialHealthSkeleton /> : null}
+
+            {financialHealthQuery.isError ? (
+              <FinancialHealthErrorState
+                message={
+                  financialHealthQuery.error instanceof Error
+                    ? financialHealthQuery.error.message
+                    : 'Terjadi kesalahan.'
+                }
+                onRetry={() => void financialHealthQuery.refetch()}
+              />
+            ) : null}
+
+            {financialHealthQuery.data && !isFinancialHealthDataEmpty(financialHealthQuery.data) ? (
+              <FinancialHealthCard score={financialHealthQuery.data} showDetailsLink />
+            ) : !financialHealthQuery.isLoading && !financialHealthQuery.isError ? (
+              <FinancialHealthEmptyState />
+            ) : null}
+
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
               <SummaryCard
                 icon={WalletCards}

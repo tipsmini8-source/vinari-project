@@ -14,6 +14,15 @@ import { useState } from 'react';
 import { Link, Navigate, useNavigate } from 'react-router';
 
 import { useWorkspace } from '@/core/workspace';
+import {
+  FinancialHealthCard,
+  FinancialHealthDetails,
+  FinancialHealthEmptyState,
+  FinancialHealthErrorState,
+  FinancialHealthSkeleton,
+  isFinancialHealthDataEmpty,
+  useFinancialHealthScore
+} from '@features/financial-health';
 import { usePlan } from '@features/premium';
 import { ReportFilterBar } from '@features/report/components/ReportFilterBar';
 import { getCurrentMonthFilters } from '@features/report/components/report-filter-utils';
@@ -45,6 +54,7 @@ export function ReportPage() {
   const { toast } = useToast();
   const planQuery = usePlan();
   const reportQuery = useReport(workspace?.id, filters);
+  const financialHealthQuery = useFinancialHealthScore(workspace?.id);
   const exportReport = useExportReport(workspace?.id);
   const report = reportQuery.data;
   const isEmpty = report
@@ -121,6 +131,28 @@ export function ReportPage() {
 
         <div className="space-y-6">
           <ReportFilterBar filters={filters} onChange={setFilters} />
+
+          {financialHealthQuery.isLoading ? <FinancialHealthSkeleton /> : null}
+
+          {financialHealthQuery.isError ? (
+            <FinancialHealthErrorState
+              message={
+                financialHealthQuery.error instanceof Error
+                  ? financialHealthQuery.error.message
+                  : 'Terjadi kesalahan.'
+              }
+              onRetry={() => void financialHealthQuery.refetch()}
+            />
+          ) : null}
+
+          {financialHealthQuery.data && !isFinancialHealthDataEmpty(financialHealthQuery.data) ? (
+            <div className="grid gap-3">
+              <FinancialHealthCard score={financialHealthQuery.data} />
+              <FinancialHealthDetails score={financialHealthQuery.data} />
+            </div>
+          ) : !financialHealthQuery.isLoading && !financialHealthQuery.isError ? (
+            <FinancialHealthEmptyState />
+          ) : null}
 
           {reportQuery.isLoading ? <ReportSkeleton /> : null}
 
