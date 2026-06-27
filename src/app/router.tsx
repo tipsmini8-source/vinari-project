@@ -13,6 +13,7 @@ import {
   ResetPasswordPage,
   VerifyEmailPage
 } from '@features/auth/pages';
+import { BudgetFormPage, BudgetListPage } from '@features/budget';
 import { DashboardPage } from '@features/dashboard';
 import { OnboardingPage } from '@features/onboarding';
 import { TransactionDetailPage, TransactionFormPage, TransactionListPage } from '@features/transaction';
@@ -94,6 +95,18 @@ export const router = createBrowserRouter([
           {
             path: 'app/wallets',
             element: <WalletPage />
+          },
+          {
+            path: 'app/budgets',
+            element: <BudgetListPage />
+          },
+          {
+            path: 'app/budgets/new',
+            element: <BudgetFormPage />
+          },
+          {
+            path: 'app/budgets/:id/edit',
+            element: <BudgetFormPage />
           },
           {
             path: 'app/transactions',
