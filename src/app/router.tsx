@@ -7,6 +7,7 @@ import { NotFoundPage } from '@app/pages/NotFoundPage';
 import { ProtectedRoute } from '@app/routes/ProtectedRoute';
 import { PublicRoute } from '@app/routes/PublicRoute';
 import { RouteErrorBoundary } from '@app/routes/RouteErrorBoundary';
+import { AdminDashboardPage, AdminGuard, AdminPaymentsPage } from '@features/admin';
 import {
   ForgotPasswordPage,
   LoginPage,
@@ -221,6 +222,20 @@ export const router = createBrowserRouter([
                 element: <SubscriptionFormPage />
               }
             ]
+          }
+        ]
+      },
+      {
+        path: 'admin',
+        element: <AdminGuard />,
+        children: [
+          {
+            index: true,
+            element: <AdminDashboardPage />
+          },
+          {
+            path: 'payments',
+            element: <AdminPaymentsPage />
           }
         ]
       },
