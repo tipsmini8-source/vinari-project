@@ -20,6 +20,7 @@ import { CategoryFormPage, CategoryListPage } from '@features/category';
 import { DashboardPage } from '@features/dashboard';
 import { DebtDetailPage, DebtFormPage, DebtListPage } from '@features/debt';
 import { GoalDetailPage, GoalFormPage, GoalListPage } from '@features/goal';
+import { NotificationsPage } from '@features/notification';
 import { OnboardingPage } from '@features/onboarding';
 import { BillingPage, UpgradePage } from '@features/premium';
 import {
@@ -196,6 +197,10 @@ export const router = createBrowserRouter([
               {
                 path: 'reports',
                 element: <ReportPage />
+              },
+              {
+                path: 'notifications',
+                element: <NotificationsPage />
               },
               {
                 path: 'upgrade',
