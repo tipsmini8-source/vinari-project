@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Vinari">
+  <rect width="512" height="512" rx="112" fill="#0f766e" />
+  <path
+    fill="#f8fafc"
+    d="M132 146h72l52 158 52-158h72L286 366h-60L132 146Z"
+  />
+  <circle cx="362" cy="350" r="32" fill="#a7f3d0" />
+</svg>
