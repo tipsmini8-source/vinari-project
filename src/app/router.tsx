@@ -18,6 +18,7 @@ import { DashboardPage } from '@features/dashboard';
 import { DebtDetailPage, DebtFormPage, DebtListPage } from '@features/debt';
 import { GoalDetailPage, GoalFormPage, GoalListPage } from '@features/goal';
 import { OnboardingPage } from '@features/onboarding';
+import { ReportPage } from '@features/report';
 import { TransactionDetailPage, TransactionFormPage, TransactionListPage } from '@features/transaction';
 import { WalletPage } from '@features/wallet';
 
@@ -141,6 +142,10 @@ export const router = createBrowserRouter([
           {
             path: 'app/debts/:id/edit',
             element: <DebtFormPage />
+          },
+          {
+            path: 'app/reports',
+            element: <ReportPage />
           },
           {
             path: 'app/transactions',

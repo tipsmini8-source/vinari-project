@@ -2,6 +2,7 @@ import {
   BarChart3,
   Bell,
   CircleDollarSign,
+  FileText,
   Home,
   Landmark,
   Settings,
@@ -48,6 +49,11 @@ export const secondaryNavigation: NavigationItem[] = [
     label: 'Insight',
     href: '/app/insights',
     icon: CircleDollarSign
+  },
+  {
+    label: 'Report',
+    href: '/app/reports',
+    icon: FileText
   },
   {
     label: 'Notification',
