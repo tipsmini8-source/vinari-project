@@ -30,6 +30,7 @@ import {
 } from '@features/recurring';
 import { ReportPage } from '@features/report';
 import {
+  MembersSettingsPage,
   PreferencesSettingsPage,
   ProfileSettingsPage,
   SecuritySettingsPage,
@@ -219,6 +220,10 @@ export const router = createBrowserRouter([
               {
                 path: 'settings/workspace',
                 element: <WorkspaceSettingsPage />
+              },
+              {
+                path: 'settings/members',
+                element: <MembersSettingsPage />
               },
               {
                 path: 'settings/security',

@@ -1,3 +1,4 @@
+export { MembersSettingsPage } from '@features/settings/pages/MembersSettingsPage';
 export { PreferencesSettingsPage } from '@features/settings/pages/PreferencesSettingsPage';
 export { ProfileSettingsPage } from '@features/settings/pages/ProfileSettingsPage';
 export { SecuritySettingsPage } from '@features/settings/pages/SecuritySettingsPage';

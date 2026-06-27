@@ -21,7 +21,7 @@ export function ProtectedRoute() {
     return <Navigate replace to="/app" />;
   }
 
-  if (location.pathname !== '/onboarding' && !workspace) {
+  if (location.pathname !== '/onboarding' && location.pathname !== '/app/settings/members' && !workspace) {
     return <Navigate replace to="/onboarding" />;
   }
 

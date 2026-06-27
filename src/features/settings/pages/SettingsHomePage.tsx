@@ -1,4 +1,4 @@
-import { ArrowLeft, Bell, Briefcase, CreditCard, LogOut, Palette, Shield, User } from 'lucide-react';
+import { ArrowLeft, Bell, Briefcase, CreditCard, LogOut, Palette, Shield, User, Users } from 'lucide-react';
 import { Link, Navigate, useNavigate } from 'react-router';
 
 import { useWorkspace } from '@/core/workspace';
@@ -26,6 +26,12 @@ const settingsMenu = [
     href: '/app/settings/workspace',
     icon: Briefcase,
     title: 'Workspace'
+  },
+  {
+    description: 'Invite, role, status, dan akses anggota workspace.',
+    href: '/app/settings/members',
+    icon: Users,
+    title: 'Anggota'
   },
   {
     description: 'Email akun, reset password, dan sesi login.',

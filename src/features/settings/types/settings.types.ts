@@ -1,4 +1,5 @@
 import type {
+  MemberInviteFormInput,
   PreferencesFormInput,
   ProfileFormInput,
   WorkspaceSettingsFormInput
@@ -34,6 +35,28 @@ export type WorkspaceSettings = {
   member_count: number;
 };
 
+export type WorkspaceMemberRole = 'owner' | 'partner' | 'member' | 'viewer';
+export type WorkspaceMemberStatus = 'active' | 'invited' | 'removed';
+
+export type WorkspaceMemberProfile = {
+  full_name: string | null;
+  avatar_url: string | null;
+};
+
+export type WorkspaceMember = {
+  id: string;
+  workspace_id: string;
+  user_id: string | null;
+  invite_email: string | null;
+  role: WorkspaceMemberRole;
+  status: WorkspaceMemberStatus;
+  invited_at: string | null;
+  accepted_at: string | null;
+  created_at: string;
+  profile: WorkspaceMemberProfile | null;
+};
+
 export type ProfileSubmitInput = ProfileFormInput;
 export type PreferencesSubmitInput = PreferencesFormInput;
 export type WorkspaceSettingsSubmitInput = WorkspaceSettingsFormInput;
+export type MemberInviteSubmitInput = MemberInviteFormInput;

@@ -28,6 +28,14 @@ export const workspaceSettingsSchema = z.object({
   name: z.string().trim().min(2, 'Nama workspace minimal 2 karakter.')
 });
 
+export const memberInviteSchema = z.object({
+  email: z.string().trim().email('Email undangan tidak valid.'),
+  role: z.enum(['partner', 'member', 'viewer'], {
+    message: 'Role undangan tidak valid.'
+  })
+});
+
 export type ProfileFormInput = z.infer<typeof profileSchema>;
 export type PreferencesFormInput = z.infer<typeof preferencesSchema>;
 export type WorkspaceSettingsFormInput = z.infer<typeof workspaceSettingsSchema>;
+export type MemberInviteFormInput = z.infer<typeof memberInviteSchema>;
