@@ -1,8 +1,10 @@
 import {
   BarChart3,
+  CreditCard,
   FileText,
   Home,
   Landmark,
+  Repeat,
   ReceiptText,
   Tags,
   Target,
@@ -58,6 +60,16 @@ export const secondaryNavigation: NavigationItem[] = [
     label: 'Reports',
     href: '/app/reports',
     icon: FileText
+  },
+  {
+    label: 'Recurring',
+    href: '/app/recurring',
+    icon: Repeat
+  },
+  {
+    label: 'Subscriptions',
+    href: '/app/subscriptions',
+    icon: CreditCard
   }
 ];
 

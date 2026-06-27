@@ -20,6 +20,12 @@ import { DashboardPage } from '@features/dashboard';
 import { DebtDetailPage, DebtFormPage, DebtListPage } from '@features/debt';
 import { GoalDetailPage, GoalFormPage, GoalListPage } from '@features/goal';
 import { OnboardingPage } from '@features/onboarding';
+import {
+  RecurringFormPage,
+  RecurringListPage,
+  SubscriptionFormPage,
+  SubscriptionListPage
+} from '@features/recurring';
 import { ReportPage } from '@features/report';
 import { TransactionDetailPage, TransactionFormPage, TransactionListPage } from '@features/transaction';
 import { WalletPage } from '@features/wallet';
@@ -180,6 +186,30 @@ export const router = createBrowserRouter([
               {
                 path: 'reports',
                 element: <ReportPage />
+              },
+              {
+                path: 'recurring',
+                element: <RecurringListPage />
+              },
+              {
+                path: 'recurring/new',
+                element: <RecurringFormPage />
+              },
+              {
+                path: 'recurring/:id/edit',
+                element: <RecurringFormPage />
+              },
+              {
+                path: 'subscriptions',
+                element: <SubscriptionListPage />
+              },
+              {
+                path: 'subscriptions/new',
+                element: <SubscriptionFormPage />
+              },
+              {
+                path: 'subscriptions/:id/edit',
+                element: <SubscriptionFormPage />
               }
             ]
           }
