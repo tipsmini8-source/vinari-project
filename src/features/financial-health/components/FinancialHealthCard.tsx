@@ -12,17 +12,6 @@ const statusClassName: Record<FinancialHealthStatus, string> = {
   Sehat: 'border-emerald-500/20 bg-emerald-500/10 text-emerald-700'
 };
 
-export function isFinancialHealthDataEmpty(score: FinancialHealthScore) {
-  return (
-    score.metrics.monthlyIncome === 0 &&
-    score.metrics.monthlyExpense === 0 &&
-    score.metrics.totalWalletBalance === 0 &&
-    score.metrics.activeBudgetCount === 0 &&
-    score.metrics.activeGoalCount === 0 &&
-    score.metrics.activeDebtTotal === 0
-  );
-}
-
 export function FinancialHealthSkeleton() {
   return (
     <div className="rounded-md border border-border bg-card p-5 shadow-sm">

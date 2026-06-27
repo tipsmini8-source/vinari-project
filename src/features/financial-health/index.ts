@@ -2,8 +2,7 @@ export {
   FinancialHealthCard,
   FinancialHealthEmptyState,
   FinancialHealthErrorState,
-  FinancialHealthSkeleton,
-  isFinancialHealthDataEmpty
+  FinancialHealthSkeleton
 } from '@features/financial-health/components/FinancialHealthCard';
 export { FinancialHealthDetails } from '@features/financial-health/components/FinancialHealthDetails';
 export { useFinancialHealthScore } from '@features/financial-health/hooks/useFinancialHealth';
@@ -14,3 +13,4 @@ export type {
   FinancialHealthScore,
   FinancialHealthStatus
 } from '@features/financial-health/types/financial-health.types';
+export { isFinancialHealthDataEmpty } from '@features/financial-health/utils/financial-health.utils';

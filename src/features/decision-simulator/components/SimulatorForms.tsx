@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Loader2 } from 'lucide-react';
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 
 import {
   debtSimulationSchema,
@@ -38,10 +38,10 @@ export function ExpenseSimulationForm({
   snapshot: SimulatorSnapshot;
 }) {
   const {
+    control,
     formState: { errors },
     handleSubmit,
-    register,
-    watch
+    register
   } = useForm<ExpenseSimulationInput>({
     resolver: zodResolver(expenseSimulationSchema),
     defaultValues: {
@@ -52,7 +52,7 @@ export function ExpenseSimulationForm({
       paymentMode: 'one_time'
     }
   });
-  const paymentMode = watch('paymentMode');
+  const paymentMode = useWatch({ control, name: 'paymentMode' });
 
   return (
     <form className="rounded-md border border-border bg-card p-5 shadow-sm" onSubmit={handleSubmit(onSubmit)}>
