@@ -1,6 +1,7 @@
 import { Navigate, createBrowserRouter } from 'react-router';
 
 import { AuthLayout } from '@app/layouts/AuthLayout';
+import { DashboardLayout } from '@app/layouts/DashboardLayout';
 import { RootLayout } from '@app/layouts/RootLayout';
 import { NotFoundPage } from '@app/pages/NotFoundPage';
 import { ProtectedRoute } from '@app/routes/ProtectedRoute';
@@ -93,75 +94,81 @@ export const router = createBrowserRouter([
         children: [
           {
             path: 'app',
-            element: <DashboardPage />
-          },
-          {
-            path: 'app/wallets',
-            element: <WalletPage />
-          },
-          {
-            path: 'app/budgets',
-            element: <BudgetListPage />
-          },
-          {
-            path: 'app/budgets/new',
-            element: <BudgetFormPage />
-          },
-          {
-            path: 'app/budgets/:id/edit',
-            element: <BudgetFormPage />
-          },
-          {
-            path: 'app/goals',
-            element: <GoalListPage />
-          },
-          {
-            path: 'app/goals/new',
-            element: <GoalFormPage />
-          },
-          {
-            path: 'app/goals/:id',
-            element: <GoalDetailPage />
-          },
-          {
-            path: 'app/goals/:id/edit',
-            element: <GoalFormPage />
-          },
-          {
-            path: 'app/debts',
-            element: <DebtListPage />
-          },
-          {
-            path: 'app/debts/new',
-            element: <DebtFormPage />
-          },
-          {
-            path: 'app/debts/:id',
-            element: <DebtDetailPage />
-          },
-          {
-            path: 'app/debts/:id/edit',
-            element: <DebtFormPage />
-          },
-          {
-            path: 'app/reports',
-            element: <ReportPage />
-          },
-          {
-            path: 'app/transactions',
-            element: <TransactionListPage />
-          },
-          {
-            path: 'app/transactions/new',
-            element: <TransactionFormPage />
-          },
-          {
-            path: 'app/transactions/:id',
-            element: <TransactionDetailPage />
-          },
-          {
-            path: 'app/transactions/:id/edit',
-            element: <TransactionFormPage />
+            element: <DashboardLayout />,
+            children: [
+              {
+                index: true,
+                element: <DashboardPage />
+              },
+              {
+                path: 'wallets',
+                element: <WalletPage />
+              },
+              {
+                path: 'transactions',
+                element: <TransactionListPage />
+              },
+              {
+                path: 'transactions/new',
+                element: <TransactionFormPage />
+              },
+              {
+                path: 'transactions/:id',
+                element: <TransactionDetailPage />
+              },
+              {
+                path: 'transactions/:id/edit',
+                element: <TransactionFormPage />
+              },
+              {
+                path: 'budgets',
+                element: <BudgetListPage />
+              },
+              {
+                path: 'budgets/new',
+                element: <BudgetFormPage />
+              },
+              {
+                path: 'budgets/:id/edit',
+                element: <BudgetFormPage />
+              },
+              {
+                path: 'goals',
+                element: <GoalListPage />
+              },
+              {
+                path: 'goals/new',
+                element: <GoalFormPage />
+              },
+              {
+                path: 'goals/:id',
+                element: <GoalDetailPage />
+              },
+              {
+                path: 'goals/:id/edit',
+                element: <GoalFormPage />
+              },
+              {
+                path: 'debts',
+                element: <DebtListPage />
+              },
+              {
+                path: 'debts/new',
+                element: <DebtFormPage />
+              },
+              {
+                path: 'debts/:id',
+                element: <DebtDetailPage />
+              },
+              {
+                path: 'debts/:id/edit',
+                element: <DebtFormPage />
+              },
+              {
+                path: 'reports',
+                element: <ReportPage />
+              }
+            ]
           }
         ]
       },

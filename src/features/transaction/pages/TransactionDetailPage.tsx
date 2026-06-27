@@ -75,7 +75,7 @@ export function TransactionDetailPage() {
               <div>
                 <CardTitle>{transaction.title}</CardTitle>
                 <CardDescription>
-                  {dateFormatter.format(new Date(transaction.transaction_date))} · {transaction.type}
+                  {dateFormatter.format(new Date(transaction.transaction_date))} - {transaction.type}
                 </CardDescription>
               </div>
               <div className="flex gap-2">

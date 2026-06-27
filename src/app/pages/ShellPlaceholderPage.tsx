@@ -3,13 +3,13 @@ import { useLocation } from 'react-router';
 import { PagePlaceholder } from '@shared/ui/page-placeholder';
 
 const titles: Record<string, string> = {
+  '/app': 'Dashboard',
   '/app/wallets': 'Wallet',
+  '/app/transactions': 'Transactions',
   '/app/budgets': 'Budget',
   '/app/goals': 'Goal',
   '/app/debts': 'Debt',
-  '/app/insights': 'Insight',
-  '/app/notifications': 'Notification',
-  '/app/settings': 'Settings'
+  '/app/reports': 'Reports'
 };
 
 export function ShellPlaceholderPage() {

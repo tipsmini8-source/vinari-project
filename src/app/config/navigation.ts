@@ -1,11 +1,9 @@
 import {
   BarChart3,
-  Bell,
-  CircleDollarSign,
   FileText,
   Home,
   Landmark,
-  Settings,
+  ReceiptText,
   Target,
   WalletCards
 } from 'lucide-react';
@@ -18,7 +16,7 @@ export type NavigationItem = {
 
 export const primaryNavigation: NavigationItem[] = [
   {
-    label: 'Home',
+    label: 'Dashboard',
     href: '/app',
     icon: Home
   },
@@ -28,12 +26,17 @@ export const primaryNavigation: NavigationItem[] = [
     icon: WalletCards
   },
   {
-    label: 'Budget',
+    label: 'Transactions',
+    href: '/app/transactions',
+    icon: ReceiptText
+  },
+  {
+    label: 'Budgets',
     href: '/app/budgets',
     icon: BarChart3
   },
   {
-    label: 'Goal',
+    label: 'Goals',
     href: '/app/goals',
     icon: Target
   }
@@ -41,28 +44,15 @@ export const primaryNavigation: NavigationItem[] = [
 
 export const secondaryNavigation: NavigationItem[] = [
   {
-    label: 'Debt',
+    label: 'Debts',
     href: '/app/debts',
     icon: Landmark
   },
   {
-    label: 'Insight',
-    href: '/app/insights',
-    icon: CircleDollarSign
-  },
-  {
-    label: 'Report',
+    label: 'Reports',
     href: '/app/reports',
     icon: FileText
-  },
-  {
-    label: 'Notification',
-    href: '/app/notifications',
-    icon: Bell
-  },
-  {
-    label: 'Settings',
-    href: '/app/settings',
-    icon: Settings
   }
 ];
+
+export const appNavigation = [...primaryNavigation, ...secondaryNavigation];

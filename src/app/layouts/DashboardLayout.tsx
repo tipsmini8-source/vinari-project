@@ -10,9 +10,9 @@ export function DashboardLayout() {
       <AppSidebar />
       <div className="min-h-svh lg:pl-72">
         <AppHeader />
-        <main className="pb-24 pt-16 lg:pb-8">
+        <div className="pb-24 pt-16 lg:pb-8">
           <Outlet />
-        </main>
+        </div>
       </div>
       <AppBottomNavigation />
     </div>
