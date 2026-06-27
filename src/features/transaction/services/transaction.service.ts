@@ -1,4 +1,5 @@
 import { supabase } from '@/lib/supabase';
+import { convertToCSV, type CSVObjectRow } from '@shared/utils/csv';
 import type {
   Transaction,
   TransactionFilterInput,
@@ -224,5 +225,27 @@ export const TransactionService = {
       .eq('workspace_id', workspaceId);
 
     assertSupabaseSuccess(error, 'Gagal menghapus transaksi.');
+  },
+
+  async exportTransactionsCSV(workspaceId: string, filters: Pick<TransactionFilterInput, 'dateFrom' | 'dateTo'>): Promise<string> {
+    const transactions = await this.getTransactions(workspaceId, {
+      dateFrom: filters.dateFrom ?? '',
+      dateTo: filters.dateTo ?? '',
+      type: 'all',
+      walletId: '',
+      categoryId: ''
+    });
+    const rows: CSVObjectRow[] = transactions.map((transaction) => ({
+      tanggal_transaksi: transaction.transaction_date,
+      tipe_transaksi: transaction.type,
+      judul: transaction.title,
+      kategori: transaction.category_name ?? '',
+      wallet: transaction.wallet_name ?? '',
+      destination_wallet: transaction.destination_wallet_name ?? '',
+      nominal: transaction.amount,
+      catatan: transaction.note ?? ''
+    }));
+
+    return convertToCSV(rows);
   }
 };

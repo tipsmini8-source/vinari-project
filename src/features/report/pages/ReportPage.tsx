@@ -1,18 +1,32 @@
-import { ArrowDownCircle, ArrowLeft, ArrowRightLeft, ArrowUpCircle, BarChart3, Landmark, Target } from 'lucide-react';
+import {
+  ArrowDownCircle,
+  ArrowLeft,
+  ArrowRightLeft,
+  ArrowUpCircle,
+  BarChart3,
+  Download,
+  Landmark,
+  Loader2,
+  Lock,
+  Target
+} from 'lucide-react';
 import { useState } from 'react';
-import { Link, Navigate } from 'react-router';
+import { Link, Navigate, useNavigate } from 'react-router';
 
 import { useWorkspace } from '@/core/workspace';
+import { usePlan } from '@features/premium';
 import { ReportFilterBar } from '@features/report/components/ReportFilterBar';
 import { getCurrentMonthFilters } from '@features/report/components/report-filter-utils';
 import { ReportEmptyState, ReportErrorState, ReportSkeleton } from '@features/report/components/ReportStates';
 import { ReportSummaryCard } from '@features/report/components/ReportSummaryCard';
 import { CategoryBreakdownTable, WalletSummaryTable } from '@features/report/components/ReportTables';
-import { useReport } from '@features/report/hooks/useReport';
+import { useExportReport, useReport } from '@features/report/hooks/useReport';
 import type { ReportFilters } from '@features/report/types/report.types';
 import { Button } from '@shared/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@shared/ui/card';
 import { GlobalLoading } from '@shared/ui/global-loading';
+import { useToast } from '@shared/ui/use-toast';
+import { downloadCSV } from '@shared/utils/csv';
 
 const moneyFormatter = new Intl.NumberFormat('id-ID', {
   currency: 'IDR',
@@ -26,8 +40,12 @@ const dateFormatter = new Intl.DateTimeFormat('id-ID', {
 
 export function ReportPage() {
   const [filters, setFilters] = useState<ReportFilters>(() => getCurrentMonthFilters());
+  const navigate = useNavigate();
   const { loading, workspace } = useWorkspace();
+  const { toast } = useToast();
+  const planQuery = usePlan();
   const reportQuery = useReport(workspace?.id, filters);
+  const exportReport = useExportReport(workspace?.id);
   const report = reportQuery.data;
   const isEmpty = report
     ? report.monthly.totalIncome === 0 &&
@@ -46,21 +64,59 @@ export function ReportPage() {
     return <Navigate replace to="/onboarding" />;
   }
 
+  const handleExport = async () => {
+    const canExport = planQuery.isPremium && planQuery.hasFeature('export');
+
+    if (!canExport) {
+      void navigate('/app/upgrade');
+      return;
+    }
+
+    try {
+      const csv = await exportReport.mutateAsync(filters);
+      downloadCSV(`vinari-report-${new Date().toISOString().slice(0, 10)}.csv`, csv);
+      toast({ title: 'Export report selesai' });
+    } catch (error) {
+      toast({
+        title: 'Gagal export report',
+        description: error instanceof Error ? error.message : 'Silakan coba lagi.',
+        variant: 'destructive'
+      });
+    }
+  };
+
   return (
     <main className="min-h-svh bg-background px-4 py-8 text-foreground">
       <section className="mx-auto w-full max-w-6xl">
-        <div className="mb-6">
-          <Button asChild className="mb-3" size="sm" variant="ghost">
-            <Link to="/app">
-              <ArrowLeft className="size-4" />
-              Kembali
-            </Link>
+        <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <Button asChild className="mb-3" size="sm" variant="ghost">
+              <Link to="/app">
+                <ArrowLeft className="size-4" />
+                Kembali
+              </Link>
+            </Button>
+            <p className="text-sm font-medium text-primary">{workspace.name}</p>
+            <h1 className="mt-1 text-3xl font-semibold tracking-normal">Reports</h1>
+            <p className="mt-2 text-sm text-muted-foreground">
+              Laporan dasar transaksi, budget, goal, debt, dan wallet untuk periode pilihan.
+            </p>
+          </div>
+          <Button
+            disabled={exportReport.isPending || planQuery.isLoading}
+            onClick={handleExport}
+            type="button"
+            variant="outline"
+          >
+            {exportReport.isPending || planQuery.isLoading ? (
+              <Loader2 className="size-4 animate-spin" />
+            ) : planQuery.isPremium && planQuery.hasFeature('export') ? (
+              <Download className="size-4" />
+            ) : (
+              <Lock className="size-4" />
+            )}
+            Export Report CSV
           </Button>
-          <p className="text-sm font-medium text-primary">{workspace.name}</p>
-          <h1 className="mt-1 text-3xl font-semibold tracking-normal">Reports</h1>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Laporan dasar transaksi, budget, goal, debt, dan wallet untuk periode pilihan.
-          </p>
         </div>
 
         <div className="space-y-6">

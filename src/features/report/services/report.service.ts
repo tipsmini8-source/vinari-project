@@ -1,4 +1,5 @@
 import { supabase } from '@/lib/supabase';
+import { convertToCSV, type CSVRow } from '@shared/utils/csv';
 import type {
   ReportCategoryBreakdown,
   ReportFilters,
@@ -368,5 +369,55 @@ export const ReportService = {
           }
         : null
     };
+  },
+
+  async exportReportCSV(workspaceId: string, filters: ReportFilters): Promise<string> {
+    const report = await this.getReport(workspaceId, filters);
+    const rows: CSVRow[] = [
+      ['Vinari Report'],
+      ['Periode laporan', report.period.dateFrom, report.period.dateTo],
+      [],
+      ['Ringkasan bulan ini'],
+      ['Metric', 'Value'],
+      ['Total income', report.monthly.totalIncome],
+      ['Total expense', report.monthly.totalExpense],
+      ['Cashflow', report.monthly.cashflow],
+      ['Saving rate (%)', report.monthly.savingRate],
+      [],
+      ['Pengeluaran per kategori'],
+      ['Kategori', 'Total expense', 'Persentase (%)'],
+      ...report.expenseByCategory.map((item) => [item.category_name, item.total, item.percentage] satisfies CSVRow),
+      [],
+      ['Pemasukan per kategori'],
+      ['Kategori', 'Total income', 'Persentase (%)'],
+      ...report.incomeByCategory.map((item) => [item.category_name, item.total, item.percentage] satisfies CSVRow),
+      [],
+      ['Wallet summary'],
+      ['Wallet', 'Saldo saat ini'],
+      ...report.wallets.map((wallet) => [wallet.name, wallet.current_balance] satisfies CSVRow),
+      [],
+      ['Budget summary'],
+      ['Metric', 'Value'],
+      ['Budget aktif', report.budget.activeBudgetCount],
+      ['Total budget', report.budget.totalBudget],
+      ['Total terpakai', report.budget.totalUsed],
+      ['Jumlah over budget', report.budget.overBudgetCount],
+      [],
+      ['Goal summary'],
+      ['Metric', 'Value'],
+      ['Goal aktif', report.goal.activeGoalCount],
+      ['Total target', report.goal.totalTarget],
+      ['Total terkumpul', report.goal.totalCollected],
+      ['Progress rata-rata (%)', report.goal.averageProgress],
+      [],
+      ['Debt summary'],
+      ['Metric', 'Value'],
+      ['Total hutang aktif', report.debt.activeDebtCount],
+      ['Total sisa hutang', report.debt.totalRemainingDebt],
+      ['Hutang terdekat', report.debt.nearestDebt?.name ?? ''],
+      ['Tanggal jatuh tempo hutang terdekat', report.debt.nearestDebt?.due_date ?? '']
+    ];
+
+    return convertToCSV(rows);
   }
 };

@@ -130,3 +130,15 @@ export function useDeleteTransaction(workspaceId: string | undefined) {
     }
   });
 }
+
+export function useExportTransactions(workspaceId: string | undefined) {
+  return useMutation({
+    mutationFn: (filters: Pick<TransactionFilterInput, 'dateFrom' | 'dateTo'>) => {
+      if (!workspaceId) {
+        throw new Error('Workspace aktif tidak ditemukan.');
+      }
+
+      return TransactionService.exportTransactionsCSV(workspaceId, filters);
+    }
+  });
+}
