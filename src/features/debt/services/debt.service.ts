@@ -147,11 +147,12 @@ export const DebtService = {
     return (data ?? []).map(mapDebt);
   },
 
-  async getDebt(debtId: string): Promise<DebtWithProgress> {
+  async getDebt(debtId: string, workspaceId: string): Promise<DebtWithProgress> {
     const { data, error } = (await supabase
       .from('debts')
       .select(debtSelect)
       .eq('id', debtId)
+      .eq('workspace_id', workspaceId)
       .is('deleted_at', null)
       .single()) as unknown as {
       data: Record<string, unknown> | null;
@@ -167,11 +168,12 @@ export const DebtService = {
     return mapDebt(data);
   },
 
-  async getPayments(debtId: string): Promise<DebtPayment[]> {
+  async getPayments(debtId: string, workspaceId: string): Promise<DebtPayment[]> {
     const { data, error } = (await supabase
       .from('debt_payments')
       .select(paymentSelect)
       .eq('debt_id', debtId)
+      .eq('workspace_id', workspaceId)
       .is('deleted_at', null)
       .order('payment_date', { ascending: false })
       .order('created_at', { ascending: false })) as unknown as {
@@ -230,6 +232,7 @@ export const DebtService = {
       .from('debts')
       .update(toDebtUpdatePayload(workspaceId, input))
       .eq('id', debtId)
+      .eq('workspace_id', workspaceId)
       .select(debtSelect)
       .single()) as unknown as {
       data: Record<string, unknown> | null;
@@ -245,24 +248,21 @@ export const DebtService = {
     return mapDebt(data);
   },
 
-  async deleteDebt(debtId: string): Promise<void> {
+  async deleteDebt(debtId: string, workspaceId: string): Promise<void> {
     const { error } = await supabase
       .from('debts')
       .update({
         deleted_at: new Date().toISOString(),
         status: 'cancelled'
       })
-      .eq('id', debtId);
+      .eq('id', debtId)
+      .eq('workspace_id', workspaceId);
 
     assertSupabaseSuccess(error, 'Gagal menghapus hutang.');
   },
 
   async addPayment(debtId: string, workspaceId: string, input: DebtPaymentFormInput): Promise<DebtPayment> {
-    const debt = await this.getDebt(debtId);
-
-    if (debt.workspace_id !== workspaceId) {
-      throw new Error('Hutang tidak berada di workspace aktif.');
-    }
+    const debt = await this.getDebt(debtId, workspaceId);
 
     if (input.amount > debt.remaining_amount) {
       throw new Error('Pembayaran tidak boleh lebih besar dari sisa hutang.');

@@ -120,11 +120,12 @@ export const GoalService = {
     return (data ?? []).map(mapGoal);
   },
 
-  async getGoal(goalId: string): Promise<GoalWithProgress> {
+  async getGoal(goalId: string, workspaceId: string): Promise<GoalWithProgress> {
     const { data, error } = (await supabase
       .from('goals')
       .select(goalSelect)
       .eq('id', goalId)
+      .eq('workspace_id', workspaceId)
       .is('deleted_at', null)
       .single()) as unknown as {
       data: Record<string, unknown> | null;
@@ -140,11 +141,12 @@ export const GoalService = {
     return mapGoal(data);
   },
 
-  async getContributions(goalId: string): Promise<GoalContribution[]> {
+  async getContributions(goalId: string, workspaceId: string): Promise<GoalContribution[]> {
     const { data, error } = (await supabase
       .from('goal_contributions')
       .select('id, workspace_id, goal_id, wallet_id, amount, contribution_date, note, created_at, wallet:wallets(name)')
       .eq('goal_id', goalId)
+      .eq('workspace_id', workspaceId)
       .is('deleted_at', null)
       .order('contribution_date', { ascending: false })
       .order('created_at', { ascending: false })) as unknown as {
@@ -203,6 +205,7 @@ export const GoalService = {
       .from('goals')
       .update(toGoalPayload(workspaceId, input))
       .eq('id', goalId)
+      .eq('workspace_id', workspaceId)
       .select(goalSelect)
       .single()) as unknown as {
       data: Record<string, unknown> | null;
@@ -218,14 +221,15 @@ export const GoalService = {
     return mapGoal(data);
   },
 
-  async deleteGoal(goalId: string): Promise<void> {
+  async deleteGoal(goalId: string, workspaceId: string): Promise<void> {
     const { error } = await supabase
       .from('goals')
       .update({
         deleted_at: new Date().toISOString(),
         status: 'cancelled'
       })
-      .eq('id', goalId);
+      .eq('id', goalId)
+      .eq('workspace_id', workspaceId);
 
     assertSupabaseSuccess(error, 'Gagal menghapus goal.');
   },
@@ -235,11 +239,7 @@ export const GoalService = {
     workspaceId: string,
     input: GoalContributionFormInput
   ): Promise<GoalContribution> {
-    const goal = await this.getGoal(goalId);
-
-    if (goal.workspace_id !== workspaceId) {
-      throw new Error('Goal tidak berada di workspace aktif.');
-    }
+    await this.getGoal(goalId, workspaceId);
 
     const { data, error } = (await supabase
       .from('goal_contributions')

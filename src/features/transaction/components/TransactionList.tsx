@@ -49,10 +49,10 @@ export function TransactionList({ onDelete, transactions }: TransactionListProps
                   </span>
                 </div>
                 <p className="mt-1 text-sm text-muted-foreground">
-                  {dateFormatter.format(new Date(transaction.transaction_date))} ·{' '}
+                  {dateFormatter.format(new Date(transaction.transaction_date))} -{' '}
                   {transaction.type === 'transfer'
                     ? `${transaction.wallet_name ?? '-'} ke ${transaction.destination_wallet_name ?? '-'}`
-                    : `${transaction.wallet_name ?? '-'} · ${transaction.category_name ?? '-'}`}
+                    : `${transaction.wallet_name ?? '-'} - ${transaction.category_name ?? '-'}`}
                 </p>
                 {transaction.note ? (
                   <p className="mt-2 text-sm text-muted-foreground">{transaction.note}</p>

@@ -1,7 +1,7 @@
 import { NavLink } from 'react-router';
 
 import { primaryNavigation, secondaryNavigation } from '@app/config/navigation';
-import { dummyWorkspace } from '@app/config/workspace';
+import { useWorkspace } from '@/core/workspace';
 import { cn } from '@shared/lib/utils';
 
 function SidebarLink({ href, icon: Icon, label }: (typeof primaryNavigation)[number]) {
@@ -25,6 +25,8 @@ function SidebarLink({ href, icon: Icon, label }: (typeof primaryNavigation)[num
 }
 
 export function AppSidebar() {
+  const { workspace } = useWorkspace();
+
   return (
     <aside className="fixed inset-y-0 left-0 z-30 hidden w-72 border-r border-border bg-card lg:flex lg:flex-col">
       <div className="flex h-16 items-center gap-3 border-b border-border px-5">
@@ -40,8 +42,10 @@ export function AppSidebar() {
       <div className="border-b border-border p-4">
         <div className="rounded-md border border-border bg-background p-3">
           <p className="text-xs font-medium text-muted-foreground">Workspace</p>
-          <p className="mt-1 truncate text-sm font-semibold">{dummyWorkspace.name}</p>
-          <p className="mt-1 text-xs text-muted-foreground">{dummyWorkspace.plan}</p>
+          <p className="mt-1 truncate text-sm font-semibold">{workspace?.name ?? 'Vinari'}</p>
+          <p className="mt-1 text-xs text-muted-foreground">
+            {workspace?.role ? `${workspace.role} - ${workspace.currency_code}` : 'Workspace aktif'}
+          </p>
         </div>
       </div>
 

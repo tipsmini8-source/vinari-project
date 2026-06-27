@@ -5,8 +5,9 @@ import type { GoalContributionFormInput, GoalFormInput } from '@features/goal/ty
 
 export const goalKeys = {
   list: (workspaceId: string | undefined) => ['goals', workspaceId] as const,
-  detail: (goalId: string | undefined) => ['goal', goalId] as const,
-  contributions: (goalId: string | undefined) => ['goal-contributions', goalId] as const,
+  detail: (goalId: string | undefined, workspaceId: string | undefined) => ['goal', goalId, workspaceId] as const,
+  contributions: (goalId: string | undefined, workspaceId: string | undefined) =>
+    ['goal-contributions', goalId, workspaceId] as const,
   wallets: (workspaceId: string | undefined) => ['goal-wallets', workspaceId] as const
 };
 
@@ -24,30 +25,38 @@ export function useGoals(workspaceId: string | undefined) {
   });
 }
 
-export function useGoal(goalId: string | undefined) {
+export function useGoal(goalId: string | undefined, workspaceId: string | undefined) {
   return useQuery({
-    enabled: Boolean(goalId),
-    queryKey: goalKeys.detail(goalId),
+    enabled: Boolean(goalId) && Boolean(workspaceId),
+    queryKey: goalKeys.detail(goalId, workspaceId),
     queryFn: () => {
       if (!goalId) {
         throw new Error('Goal belum dipilih.');
       }
 
-      return GoalService.getGoal(goalId);
+      if (!workspaceId) {
+        throw new Error('Workspace aktif tidak ditemukan.');
+      }
+
+      return GoalService.getGoal(goalId, workspaceId);
     }
   });
 }
 
-export function useGoalContributions(goalId: string | undefined) {
+export function useGoalContributions(goalId: string | undefined, workspaceId: string | undefined) {
   return useQuery({
-    enabled: Boolean(goalId),
-    queryKey: goalKeys.contributions(goalId),
+    enabled: Boolean(goalId) && Boolean(workspaceId),
+    queryKey: goalKeys.contributions(goalId, workspaceId),
     queryFn: () => {
       if (!goalId) {
         return [];
       }
 
-      return GoalService.getContributions(goalId);
+      if (!workspaceId) {
+        return [];
+      }
+
+      return GoalService.getContributions(goalId, workspaceId);
     }
   });
 }
@@ -96,7 +105,7 @@ export function useUpdateGoal(workspaceId: string | undefined) {
     },
     onSuccess: async (goal) => {
       await queryClient.invalidateQueries({ queryKey: goalKeys.list(workspaceId) });
-      await queryClient.invalidateQueries({ queryKey: goalKeys.detail(goal.id) });
+      await queryClient.invalidateQueries({ queryKey: goalKeys.detail(goal.id, workspaceId) });
     }
   });
 }
@@ -105,10 +114,16 @@ export function useDeleteGoal(workspaceId: string | undefined) {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (goalId: string) => GoalService.deleteGoal(goalId),
+    mutationFn: (goalId: string) => {
+      if (!workspaceId) {
+        throw new Error('Workspace aktif tidak ditemukan.');
+      }
+
+      return GoalService.deleteGoal(goalId, workspaceId);
+    },
     onSuccess: async (_data, goalId) => {
       await queryClient.invalidateQueries({ queryKey: goalKeys.list(workspaceId) });
-      await queryClient.invalidateQueries({ queryKey: goalKeys.detail(goalId) });
+      await queryClient.invalidateQueries({ queryKey: goalKeys.detail(goalId, workspaceId) });
     }
   });
 }
@@ -126,8 +141,8 @@ export function useAddGoalContribution(workspaceId: string | undefined) {
     },
     onSuccess: async (contribution) => {
       await queryClient.invalidateQueries({ queryKey: goalKeys.list(workspaceId) });
-      await queryClient.invalidateQueries({ queryKey: goalKeys.detail(contribution.goal_id) });
-      await queryClient.invalidateQueries({ queryKey: goalKeys.contributions(contribution.goal_id) });
+      await queryClient.invalidateQueries({ queryKey: goalKeys.detail(contribution.goal_id, workspaceId) });
+      await queryClient.invalidateQueries({ queryKey: goalKeys.contributions(contribution.goal_id, workspaceId) });
     }
   });
 }

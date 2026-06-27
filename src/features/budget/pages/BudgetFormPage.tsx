@@ -17,7 +17,7 @@ export function BudgetFormPage() {
   const { loading, workspace } = useWorkspace();
   const { toast } = useToast();
   const categoriesQuery = useBudgetCategories(workspace?.id);
-  const budgetQuery = useBudget(id);
+  const budgetQuery = useBudget(id, workspace?.id);
   const createBudget = useCreateBudget(workspace?.id);
   const updateBudget = useUpdateBudget(workspace?.id);
 

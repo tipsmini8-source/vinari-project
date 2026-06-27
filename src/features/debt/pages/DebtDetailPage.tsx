@@ -38,8 +38,8 @@ export function DebtDetailPage() {
   const navigate = useNavigate();
   const { loading, workspace } = useWorkspace();
   const { toast } = useToast();
-  const debtQuery = useDebt(id);
-  const paymentsQuery = useDebtPayments(id);
+  const debtQuery = useDebt(id, workspace?.id);
+  const paymentsQuery = useDebtPayments(id, workspace?.id);
   const walletsQuery = useDebtWallets(workspace?.id);
   const addPayment = useAddDebtPayment(workspace?.id);
   const deleteDebt = useDeleteDebt(workspace?.id);

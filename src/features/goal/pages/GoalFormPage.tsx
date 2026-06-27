@@ -17,7 +17,7 @@ export function GoalFormPage() {
   const { loading, workspace } = useWorkspace();
   const { toast } = useToast();
   const walletsQuery = useGoalWallets(workspace?.id);
-  const goalQuery = useGoal(id);
+  const goalQuery = useGoal(id, workspace?.id);
   const createGoal = useCreateGoal(workspace?.id);
   const updateGoal = useUpdateGoal(workspace?.id);
 

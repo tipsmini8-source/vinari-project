@@ -40,7 +40,7 @@ export function WalletPage() {
 
   const wallets = useMemo(() => walletsQuery.data ?? [], [walletsQuery.data]);
   const effectiveSelectedWalletId = selectedWalletId ?? wallets[0]?.id;
-  const detailQuery = useWalletDetail(effectiveSelectedWalletId);
+  const detailQuery = useWalletDetail(effectiveSelectedWalletId, activeWorkspace?.id);
 
   if (!user) {
     return <Navigate replace to="/login" />;

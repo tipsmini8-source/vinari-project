@@ -35,8 +35,8 @@ export function GoalDetailPage() {
   const navigate = useNavigate();
   const { loading, workspace } = useWorkspace();
   const { toast } = useToast();
-  const goalQuery = useGoal(id);
-  const contributionsQuery = useGoalContributions(id);
+  const goalQuery = useGoal(id, workspace?.id);
+  const contributionsQuery = useGoalContributions(id, workspace?.id);
   const walletsQuery = useGoalWallets(workspace?.id);
   const addContribution = useAddGoalContribution(workspace?.id);
   const deleteGoal = useDeleteGoal(workspace?.id);

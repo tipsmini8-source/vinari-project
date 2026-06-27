@@ -120,13 +120,14 @@ export const BudgetService = {
     return attachProgress(budgets, transactions);
   },
 
-  async getBudget(budgetId: string): Promise<BudgetWithProgress> {
+  async getBudget(budgetId: string, workspaceId: string): Promise<BudgetWithProgress> {
     const { data, error } = (await supabase
       .from('budgets')
       .select(
         'id, workspace_id, category_id, name, amount, period, start_date, end_date, alert_percentage, is_active, created_at, category:categories(name, type)'
       )
       .eq('id', budgetId)
+      .eq('workspace_id', workspaceId)
       .is('deleted_at', null)
       .single()) as unknown as {
       data: Record<string, unknown> | null;
@@ -140,7 +141,7 @@ export const BudgetService = {
     }
 
     const budget = mapBudget(data);
-    const transactions = await this.getExpenseTransactionsForBudgets(budget.workspace_id, [budget]);
+    const transactions = await this.getExpenseTransactionsForBudgets(workspaceId, [budget]);
 
     return attachProgress([budget], transactions)[0];
   },
@@ -198,6 +199,7 @@ export const BudgetService = {
       .from('budgets')
       .update(toPayload(workspaceId, input))
       .eq('id', budgetId)
+      .eq('workspace_id', workspaceId)
       .select(
         'id, workspace_id, category_id, name, amount, period, start_date, end_date, alert_percentage, is_active, created_at, category:categories(name, type)'
       )
@@ -218,14 +220,15 @@ export const BudgetService = {
     return attachProgress([budget], transactions)[0];
   },
 
-  async deleteBudget(budgetId: string): Promise<void> {
+  async deleteBudget(budgetId: string, workspaceId: string): Promise<void> {
     const { error } = await supabase
       .from('budgets')
       .update({
         deleted_at: new Date().toISOString(),
         is_active: false
       })
-      .eq('id', budgetId);
+      .eq('id', budgetId)
+      .eq('workspace_id', workspaceId);
 
     assertSupabaseSuccess(error, 'Gagal menghapus budget.');
   },

@@ -103,13 +103,14 @@ export const TransactionService = {
     return (data ?? []).map(mapTransaction);
   },
 
-  async getTransaction(transactionId: string): Promise<Transaction> {
+  async getTransaction(transactionId: string, workspaceId: string): Promise<Transaction> {
     const { data, error } = (await supabase
       .from('transactions')
       .select(
         'id, workspace_id, type, financial_effect, title, amount, transaction_date, wallet_id, destination_wallet_id, category_id, note, created_at, wallet:wallets!transactions_wallet_id_workspace_id_fkey(name), destination_wallet:wallets!transactions_destination_wallet_id_workspace_id_fkey(name), category:categories!transactions_category_id_workspace_id_fkey(name)'
       )
       .eq('id', transactionId)
+      .eq('workspace_id', workspaceId)
       .is('deleted_at', null)
       .single()) as unknown as {
       data: Record<string, unknown> | null;
@@ -195,6 +196,7 @@ export const TransactionService = {
       .from('transactions')
       .update(toInsertPayload(workspaceId, input))
       .eq('id', transactionId)
+      .eq('workspace_id', workspaceId)
       .select(
         'id, workspace_id, type, financial_effect, title, amount, transaction_date, wallet_id, destination_wallet_id, category_id, note, created_at, wallet:wallets!transactions_wallet_id_workspace_id_fkey(name), destination_wallet:wallets!transactions_destination_wallet_id_workspace_id_fkey(name), category:categories!transactions_category_id_workspace_id_fkey(name)'
       )
@@ -212,13 +214,14 @@ export const TransactionService = {
     return mapTransaction(data);
   },
 
-  async deleteTransaction(transactionId: string): Promise<void> {
+  async deleteTransaction(transactionId: string, workspaceId: string): Promise<void> {
     const { error } = await supabase
       .from('transactions')
       .update({
         deleted_at: new Date().toISOString()
       })
-      .eq('id', transactionId);
+      .eq('id', transactionId)
+      .eq('workspace_id', workspaceId);
 
     assertSupabaseSuccess(error, 'Gagal menghapus transaksi.');
   }

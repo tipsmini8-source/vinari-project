@@ -202,7 +202,9 @@ export const ReportService = {
   async getTransactions(workspaceId: string, dateFrom?: string, dateTo?: string): Promise<TransactionRow[]> {
     let query = supabase
       .from('transactions')
-      .select('id, type, amount, transaction_date, wallet_id, destination_wallet_id, category_id, category:categories(name)')
+      .select(
+        'id, type, amount, transaction_date, wallet_id, destination_wallet_id, category_id, category:categories!transactions_category_id_workspace_id_fkey(name)'
+      )
       .eq('workspace_id', workspaceId)
       .is('deleted_at', null);
 

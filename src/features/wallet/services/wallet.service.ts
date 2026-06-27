@@ -45,11 +45,12 @@ export const WalletService = {
     return (data ?? []).map(mapWallet);
   },
 
-  async getWalletDetail(walletId: string): Promise<WalletDetail> {
+  async getWalletDetail(walletId: string, workspaceId: string): Promise<WalletDetail> {
     const { data, error } = (await supabase
       .from('wallets')
       .select('id, workspace_id, name, wallet_type, initial_balance, currency_code, icon, color, is_archived, created_at')
       .eq('id', walletId)
+      .eq('workspace_id', workspaceId)
       .is('deleted_at', null)
       .single()) as unknown as {
       data: Record<string, unknown> | null;
@@ -63,7 +64,7 @@ export const WalletService = {
     }
 
     const wallet = mapWallet(data);
-    const transactionCount = await this.getTransactionCount(walletId);
+    const transactionCount = await this.getTransactionCount(walletId, workspaceId);
 
     return {
       ...wallet,
@@ -101,7 +102,7 @@ export const WalletService = {
     return mapWallet(data);
   },
 
-  async updateWallet(walletId: string, input: WalletFormInput): Promise<Wallet> {
+  async updateWallet(walletId: string, workspaceId: string, input: WalletFormInput): Promise<Wallet> {
     const { data, error } = (await supabase
       .from('wallets')
       .update({
@@ -112,6 +113,7 @@ export const WalletService = {
         color: input.color
       })
       .eq('id', walletId)
+      .eq('workspace_id', workspaceId)
       .select('id, workspace_id, name, wallet_type, initial_balance, currency_code, icon, color, is_archived, created_at')
       .single()) as unknown as {
       data: Record<string, unknown> | null;
@@ -127,13 +129,17 @@ export const WalletService = {
     return mapWallet(data);
   },
 
-  async archiveWallet(walletId: string): Promise<void> {
-    const { error } = await supabase.from('wallets').update({ is_archived: true }).eq('id', walletId);
+  async archiveWallet(walletId: string, workspaceId: string): Promise<void> {
+    const { error } = await supabase
+      .from('wallets')
+      .update({ is_archived: true })
+      .eq('id', walletId)
+      .eq('workspace_id', workspaceId);
     assertSupabaseSuccess(error, 'Gagal mengarsipkan wallet.');
   },
 
-  async deleteWallet(walletId: string): Promise<void> {
-    const transactionCount = await this.getTransactionCount(walletId);
+  async deleteWallet(walletId: string, workspaceId: string): Promise<void> {
+    const transactionCount = await this.getTransactionCount(walletId, workspaceId);
 
     if (transactionCount > 0) {
       throw new Error('Wallet tidak bisa dihapus karena sudah memiliki transaksi. Arsipkan wallet sebagai alternatif.');
@@ -144,15 +150,17 @@ export const WalletService = {
       .update({
         deleted_at: new Date().toISOString()
       })
-      .eq('id', walletId);
+      .eq('id', walletId)
+      .eq('workspace_id', workspaceId);
 
     assertSupabaseSuccess(error, 'Gagal menghapus wallet.');
   },
 
-  async getTransactionCount(walletId: string): Promise<number> {
+  async getTransactionCount(walletId: string, workspaceId: string): Promise<number> {
     const { count, error } = await supabase
       .from('transactions')
       .select('id', { count: 'exact', head: true })
+      .eq('workspace_id', workspaceId)
       .or(`wallet_id.eq.${walletId},destination_wallet_id.eq.${walletId}`)
       .is('deleted_at', null);
 

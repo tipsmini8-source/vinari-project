@@ -23,7 +23,7 @@ export function TransactionDetailPage() {
   const navigate = useNavigate();
   const { loading, workspace } = useWorkspace();
   const { toast } = useToast();
-  const transactionQuery = useTransaction(id);
+  const transactionQuery = useTransaction(id, workspace?.id);
   const deleteTransaction = useDeleteTransaction(workspace?.id);
 
   if (loading || transactionQuery.isLoading) {

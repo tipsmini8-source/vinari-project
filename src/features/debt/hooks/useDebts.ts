@@ -5,8 +5,9 @@ import type { DebtFormInput, DebtPaymentFormInput } from '@features/debt/types/d
 
 export const debtKeys = {
   list: (workspaceId: string | undefined) => ['debts', workspaceId] as const,
-  detail: (debtId: string | undefined) => ['debt', debtId] as const,
-  payments: (debtId: string | undefined) => ['debt-payments', debtId] as const,
+  detail: (debtId: string | undefined, workspaceId: string | undefined) => ['debt', debtId, workspaceId] as const,
+  payments: (debtId: string | undefined, workspaceId: string | undefined) =>
+    ['debt-payments', debtId, workspaceId] as const,
   wallets: (workspaceId: string | undefined) => ['debt-wallets', workspaceId] as const
 };
 
@@ -24,30 +25,38 @@ export function useDebts(workspaceId: string | undefined) {
   });
 }
 
-export function useDebt(debtId: string | undefined) {
+export function useDebt(debtId: string | undefined, workspaceId: string | undefined) {
   return useQuery({
-    enabled: Boolean(debtId),
-    queryKey: debtKeys.detail(debtId),
+    enabled: Boolean(debtId) && Boolean(workspaceId),
+    queryKey: debtKeys.detail(debtId, workspaceId),
     queryFn: () => {
       if (!debtId) {
         throw new Error('Hutang belum dipilih.');
       }
 
-      return DebtService.getDebt(debtId);
+      if (!workspaceId) {
+        throw new Error('Workspace aktif tidak ditemukan.');
+      }
+
+      return DebtService.getDebt(debtId, workspaceId);
     }
   });
 }
 
-export function useDebtPayments(debtId: string | undefined) {
+export function useDebtPayments(debtId: string | undefined, workspaceId: string | undefined) {
   return useQuery({
-    enabled: Boolean(debtId),
-    queryKey: debtKeys.payments(debtId),
+    enabled: Boolean(debtId) && Boolean(workspaceId),
+    queryKey: debtKeys.payments(debtId, workspaceId),
     queryFn: () => {
       if (!debtId) {
         return [];
       }
 
-      return DebtService.getPayments(debtId);
+      if (!workspaceId) {
+        return [];
+      }
+
+      return DebtService.getPayments(debtId, workspaceId);
     }
   });
 }
@@ -96,7 +105,7 @@ export function useUpdateDebt(workspaceId: string | undefined) {
     },
     onSuccess: async (debt) => {
       await queryClient.invalidateQueries({ queryKey: debtKeys.list(workspaceId) });
-      await queryClient.invalidateQueries({ queryKey: debtKeys.detail(debt.id) });
+      await queryClient.invalidateQueries({ queryKey: debtKeys.detail(debt.id, workspaceId) });
     }
   });
 }
@@ -105,10 +114,16 @@ export function useDeleteDebt(workspaceId: string | undefined) {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (debtId: string) => DebtService.deleteDebt(debtId),
+    mutationFn: (debtId: string) => {
+      if (!workspaceId) {
+        throw new Error('Workspace aktif tidak ditemukan.');
+      }
+
+      return DebtService.deleteDebt(debtId, workspaceId);
+    },
     onSuccess: async (_data, debtId) => {
       await queryClient.invalidateQueries({ queryKey: debtKeys.list(workspaceId) });
-      await queryClient.invalidateQueries({ queryKey: debtKeys.detail(debtId) });
+      await queryClient.invalidateQueries({ queryKey: debtKeys.detail(debtId, workspaceId) });
     }
   });
 }
@@ -126,8 +141,8 @@ export function useAddDebtPayment(workspaceId: string | undefined) {
     },
     onSuccess: async (payment) => {
       await queryClient.invalidateQueries({ queryKey: debtKeys.list(workspaceId) });
-      await queryClient.invalidateQueries({ queryKey: debtKeys.detail(payment.debt_id) });
-      await queryClient.invalidateQueries({ queryKey: debtKeys.payments(payment.debt_id) });
+      await queryClient.invalidateQueries({ queryKey: debtKeys.detail(payment.debt_id, workspaceId) });
+      await queryClient.invalidateQueries({ queryKey: debtKeys.payments(payment.debt_id, workspaceId) });
     }
   });
 }

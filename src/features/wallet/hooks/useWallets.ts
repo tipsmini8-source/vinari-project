@@ -6,7 +6,8 @@ import type { Wallet, WalletFormInput } from '@features/wallet/types/wallet.type
 
 export const walletKeys = {
   wallets: (workspaceId: string | undefined) => ['wallets', workspaceId] as const,
-  detail: (walletId: string | undefined) => ['wallet-detail', walletId] as const
+  detail: (walletId: string | undefined, workspaceId: string | undefined) =>
+    ['wallet-detail', walletId, workspaceId] as const
 };
 
 export function useWallets(workspaceId: string | undefined) {
@@ -23,16 +24,20 @@ export function useWallets(workspaceId: string | undefined) {
   });
 }
 
-export function useWalletDetail(walletId: string | undefined) {
+export function useWalletDetail(walletId: string | undefined, workspaceId: string | undefined) {
   return useQuery({
-    enabled: Boolean(walletId),
-    queryKey: walletKeys.detail(walletId),
+    enabled: Boolean(walletId) && Boolean(workspaceId),
+    queryKey: walletKeys.detail(walletId, workspaceId),
     queryFn: () => {
       if (!walletId) {
         throw new Error('Wallet belum dipilih.');
       }
 
-      return WalletService.getWalletDetail(walletId);
+      if (!workspaceId) {
+        throw new Error('Workspace aktif tidak ditemukan.');
+      }
+
+      return WalletService.getWalletDetail(walletId, workspaceId);
     }
   });
 }
@@ -61,8 +66,13 @@ export function useUpdateWallet(workspaceId: string | undefined) {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ input, walletId }: { input: WalletFormInput; walletId: string }) =>
-      WalletService.updateWallet(walletId, input),
+    mutationFn: ({ input, walletId }: { input: WalletFormInput; walletId: string }) => {
+      if (!workspaceId) {
+        throw new Error('Workspace aktif tidak ditemukan.');
+      }
+
+      return WalletService.updateWallet(walletId, workspaceId, input);
+    },
     onMutate: async ({ input, walletId }) => {
       await queryClient.cancelQueries({ queryKey: walletKeys.wallets(workspaceId) });
       const previousWallets = queryClient.getQueryData<Wallet[]>(walletKeys.wallets(workspaceId));
@@ -91,7 +101,7 @@ export function useUpdateWallet(workspaceId: string | undefined) {
       queryClient.setQueryData<Wallet[]>(walletKeys.wallets(workspaceId), (current = []) =>
         current.map((item) => (item.id === wallet.id ? wallet : item))
       );
-      void queryClient.invalidateQueries({ queryKey: walletKeys.detail(wallet.id) });
+      void queryClient.invalidateQueries({ queryKey: walletKeys.detail(wallet.id, workspaceId) });
     }
   });
 }
@@ -100,7 +110,13 @@ export function useArchiveWallet(workspaceId: string | undefined) {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (walletId: string) => WalletService.archiveWallet(walletId),
+    mutationFn: (walletId: string) => {
+      if (!workspaceId) {
+        throw new Error('Workspace aktif tidak ditemukan.');
+      }
+
+      return WalletService.archiveWallet(walletId, workspaceId);
+    },
     onMutate: async (walletId) => {
       await queryClient.cancelQueries({ queryKey: walletKeys.wallets(workspaceId) });
       const previousWallets = queryClient.getQueryData<Wallet[]>(walletKeys.wallets(workspaceId));
@@ -124,7 +140,13 @@ export function useDeleteWallet(workspaceId: string | undefined) {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (walletId: string) => WalletService.deleteWallet(walletId),
+    mutationFn: (walletId: string) => {
+      if (!workspaceId) {
+        throw new Error('Workspace aktif tidak ditemukan.');
+      }
+
+      return WalletService.deleteWallet(walletId, workspaceId);
+    },
     onMutate: async (walletId) => {
       await queryClient.cancelQueries({ queryKey: walletKeys.wallets(workspaceId) });
       const previousWallets = queryClient.getQueryData<Wallet[]>(walletKeys.wallets(workspaceId));

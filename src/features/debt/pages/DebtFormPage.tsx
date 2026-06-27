@@ -16,7 +16,7 @@ export function DebtFormPage() {
   const navigate = useNavigate();
   const { loading, workspace } = useWorkspace();
   const { toast } = useToast();
-  const debtQuery = useDebt(id);
+  const debtQuery = useDebt(id, workspace?.id);
   const createDebt = useCreateDebt(workspace?.id);
   const updateDebt = useUpdateDebt(workspace?.id);
 

@@ -6,7 +6,8 @@ import type { TransactionFilterInput, TransactionFormInput } from '@features/tra
 export const transactionKeys = {
   list: (workspaceId: string | undefined, filters: TransactionFilterInput) =>
     ['transactions', workspaceId, filters] as const,
-  detail: (transactionId: string | undefined) => ['transaction', transactionId] as const,
+  detail: (transactionId: string | undefined, workspaceId: string | undefined) =>
+    ['transaction', transactionId, workspaceId] as const,
   wallets: (workspaceId: string | undefined) => ['transaction-wallets', workspaceId] as const,
   categories: (workspaceId: string | undefined) => ['transaction-categories', workspaceId] as const
 };
@@ -25,16 +26,20 @@ export function useTransactions(workspaceId: string | undefined, filters: Transa
   });
 }
 
-export function useTransaction(transactionId: string | undefined) {
+export function useTransaction(transactionId: string | undefined, workspaceId: string | undefined) {
   return useQuery({
-    enabled: Boolean(transactionId),
-    queryKey: transactionKeys.detail(transactionId),
+    enabled: Boolean(transactionId) && Boolean(workspaceId),
+    queryKey: transactionKeys.detail(transactionId, workspaceId),
     queryFn: () => {
       if (!transactionId) {
         throw new Error('Transaksi belum dipilih.');
       }
 
-      return TransactionService.getTransaction(transactionId);
+      if (!workspaceId) {
+        throw new Error('Workspace aktif tidak ditemukan.');
+      }
+
+      return TransactionService.getTransaction(transactionId, workspaceId);
     }
   });
 }
@@ -103,7 +108,7 @@ export function useUpdateTransaction(workspaceId: string | undefined) {
     },
     onSuccess: async (transaction) => {
       await queryClient.invalidateQueries({ queryKey: ['transactions', workspaceId] });
-      await queryClient.invalidateQueries({ queryKey: transactionKeys.detail(transaction.id) });
+      await queryClient.invalidateQueries({ queryKey: transactionKeys.detail(transaction.id, workspaceId) });
     }
   });
 }
@@ -112,10 +117,16 @@ export function useDeleteTransaction(workspaceId: string | undefined) {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (transactionId: string) => TransactionService.deleteTransaction(transactionId),
+    mutationFn: (transactionId: string) => {
+      if (!workspaceId) {
+        throw new Error('Workspace aktif tidak ditemukan.');
+      }
+
+      return TransactionService.deleteTransaction(transactionId, workspaceId);
+    },
     onSuccess: async (_data, transactionId) => {
       await queryClient.invalidateQueries({ queryKey: ['transactions', workspaceId] });
-      await queryClient.invalidateQueries({ queryKey: transactionKeys.detail(transactionId) });
+      await queryClient.invalidateQueries({ queryKey: transactionKeys.detail(transactionId, workspaceId) });
     }
   });
 }

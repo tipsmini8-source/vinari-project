@@ -22,7 +22,7 @@ export function TransactionFormPage() {
   const { loading, workspace } = useWorkspace();
   const { toast } = useToast();
   const references = useTransactionReferences(workspace?.id);
-  const transactionQuery = useTransaction(id);
+  const transactionQuery = useTransaction(id, workspace?.id);
   const createTransaction = useCreateTransaction(workspace?.id);
   const updateTransaction = useUpdateTransaction(workspace?.id);
 

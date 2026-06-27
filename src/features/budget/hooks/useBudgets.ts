@@ -5,7 +5,7 @@ import type { BudgetFormInput } from '@features/budget/types/budget.types';
 
 export const budgetKeys = {
   list: (workspaceId: string | undefined) => ['budgets', workspaceId] as const,
-  detail: (budgetId: string | undefined) => ['budget', budgetId] as const,
+  detail: (budgetId: string | undefined, workspaceId: string | undefined) => ['budget', budgetId, workspaceId] as const,
   categories: (workspaceId: string | undefined) => ['budget-categories', workspaceId] as const
 };
 
@@ -23,16 +23,20 @@ export function useBudgets(workspaceId: string | undefined) {
   });
 }
 
-export function useBudget(budgetId: string | undefined) {
+export function useBudget(budgetId: string | undefined, workspaceId: string | undefined) {
   return useQuery({
-    enabled: Boolean(budgetId),
-    queryKey: budgetKeys.detail(budgetId),
+    enabled: Boolean(budgetId) && Boolean(workspaceId),
+    queryKey: budgetKeys.detail(budgetId, workspaceId),
     queryFn: () => {
       if (!budgetId) {
         throw new Error('Budget belum dipilih.');
       }
 
-      return BudgetService.getBudget(budgetId);
+      if (!workspaceId) {
+        throw new Error('Workspace aktif tidak ditemukan.');
+      }
+
+      return BudgetService.getBudget(budgetId, workspaceId);
     }
   });
 }
@@ -81,7 +85,7 @@ export function useUpdateBudget(workspaceId: string | undefined) {
     },
     onSuccess: async (budget) => {
       await queryClient.invalidateQueries({ queryKey: budgetKeys.list(workspaceId) });
-      await queryClient.invalidateQueries({ queryKey: budgetKeys.detail(budget.id) });
+      await queryClient.invalidateQueries({ queryKey: budgetKeys.detail(budget.id, workspaceId) });
     }
   });
 }
@@ -90,10 +94,16 @@ export function useDeleteBudget(workspaceId: string | undefined) {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (budgetId: string) => BudgetService.deleteBudget(budgetId),
+    mutationFn: (budgetId: string) => {
+      if (!workspaceId) {
+        throw new Error('Workspace aktif tidak ditemukan.');
+      }
+
+      return BudgetService.deleteBudget(budgetId, workspaceId);
+    },
     onSuccess: async (_data, budgetId) => {
       await queryClient.invalidateQueries({ queryKey: budgetKeys.list(workspaceId) });
-      await queryClient.invalidateQueries({ queryKey: budgetKeys.detail(budgetId) });
+      await queryClient.invalidateQueries({ queryKey: budgetKeys.detail(budgetId, workspaceId) });
     }
   });
 }
