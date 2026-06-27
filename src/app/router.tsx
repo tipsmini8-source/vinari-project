@@ -7,7 +7,7 @@ import { NotFoundPage } from '@app/pages/NotFoundPage';
 import { ProtectedRoute } from '@app/routes/ProtectedRoute';
 import { PublicRoute } from '@app/routes/PublicRoute';
 import { RouteErrorBoundary } from '@app/routes/RouteErrorBoundary';
-import { AdminDashboardPage, AdminGuard, AdminPaymentsPage } from '@features/admin';
+import { AdminDashboardPage, AdminGuard, AdminPaymentMethodsPage, AdminPaymentsPage } from '@features/admin';
 import {
   ForgotPasswordPage,
   LoginPage,
@@ -263,6 +263,10 @@ export const router = createBrowserRouter([
           {
             path: 'payments',
             element: <AdminPaymentsPage />
+          },
+          {
+            path: 'payment-methods',
+            element: <AdminPaymentMethodsPage />
           }
         ]
       },

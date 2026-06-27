@@ -1,4 +1,4 @@
-import { ArrowLeft, CreditCard, LayoutDashboard } from 'lucide-react';
+import { ArrowLeft, CreditCard, LayoutDashboard, QrCode } from 'lucide-react';
 import { Link } from 'react-router';
 
 import { AdminErrorState, AdminSkeleton } from '@features/admin/components/AdminStates';
@@ -26,12 +26,20 @@ export function AdminDashboardPage() {
               Ringkasan approval pembayaran manual premium.
             </p>
           </div>
-          <Button asChild>
-            <Link to="/admin/payments">
-              <CreditCard className="size-4" />
-              Payment Requests
-            </Link>
-          </Button>
+          <div className="flex flex-wrap gap-2">
+            <Button asChild>
+              <Link to="/admin/payments">
+                <CreditCard className="size-4" />
+                Payment Requests
+              </Link>
+            </Button>
+            <Button asChild variant="outline">
+              <Link to="/admin/payment-methods">
+                <QrCode className="size-4" />
+                Payment Methods
+              </Link>
+            </Button>
+          </div>
         </div>
 
         {statsQuery.isLoading ? <AdminSkeleton /> : null}

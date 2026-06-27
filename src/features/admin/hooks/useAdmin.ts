@@ -1,11 +1,13 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { AdminService } from '@features/admin/services/admin.service';
-import type { AdminPaymentStatus } from '@features/admin/types/admin.types';
+import type { PaymentMethodFormInput } from '@features/admin/schemas/payment-method.schemas';
+import type { AdminPaymentMethod, AdminPaymentStatus } from '@features/admin/types/admin.types';
 
 export const adminKeys = {
   proofPreview: (proofUrl: string | null | undefined) => ['admin-payment-proof-preview', proofUrl] as const,
   status: ['admin-status'] as const,
+  paymentMethods: ['admin-payment-methods'] as const,
   paymentRequests: (status: AdminPaymentStatus) => ['admin-payment-requests', status] as const,
   stats: ['admin-payment-stats'] as const
 };
@@ -36,6 +38,13 @@ export function useAdminPaymentRequests(status: AdminPaymentStatus) {
   return useQuery({
     queryKey: adminKeys.paymentRequests(status),
     queryFn: () => AdminService.getPaymentRequests(status)
+  });
+}
+
+export function useAdminPaymentMethods() {
+  return useQuery({
+    queryKey: adminKeys.paymentMethods,
+    queryFn: () => AdminService.getPaymentMethods()
   });
 }
 
@@ -72,6 +81,51 @@ export function useAdminPaymentProofPreview(proofUrl: string | null | undefined)
       }
 
       return AdminService.getPaymentProofPreview(proofUrl);
+    }
+  });
+}
+
+export function useCreateAdminPaymentMethod() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (input: PaymentMethodFormInput) => AdminService.createPaymentMethod(input),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: adminKeys.paymentMethods });
+    }
+  });
+}
+
+export function useUpdateAdminPaymentMethod() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ input, paymentMethod }: { input: PaymentMethodFormInput; paymentMethod: AdminPaymentMethod }) =>
+      AdminService.updatePaymentMethod(paymentMethod, input),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: adminKeys.paymentMethods });
+    }
+  });
+}
+
+export function useToggleAdminPaymentMethod() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (paymentMethod: AdminPaymentMethod) => AdminService.togglePaymentMethod(paymentMethod),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: adminKeys.paymentMethods });
+    }
+  });
+}
+
+export function useDeleteAdminPaymentMethod() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (paymentMethodId: string) => AdminService.deletePaymentMethod(paymentMethodId),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: adminKeys.paymentMethods });
     }
   });
 }

@@ -2,10 +2,11 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { useWorkspace } from '@/core/workspace';
 import { PremiumService } from '@features/premium/services/premium.service';
-import type { PaymentRequest, Plan } from '@features/premium/types/premium.types';
+import type { PaymentMethod, PaymentRequest, Plan } from '@features/premium/types/premium.types';
 
 export const premiumKeys = {
   billing: (workspaceId: string | undefined) => ['premium-billing', workspaceId] as const,
+  paymentMethods: ['premium-payment-methods'] as const,
   proofPreview: (proofUrl: string | null | undefined) => ['payment-proof-preview', proofUrl] as const,
   plans: ['premium-plans'] as const
 };
@@ -39,6 +40,13 @@ export function useBillingData(workspaceId: string | undefined) {
   });
 }
 
+export function useActivePaymentMethods() {
+  return useQuery({
+    queryKey: premiumKeys.paymentMethods,
+    queryFn: () => PremiumService.getActivePaymentMethods()
+  });
+}
+
 export function usePlan() {
   const { workspace } = useWorkspace();
   const billingQuery = useBillingData(workspace?.id);
@@ -57,7 +65,7 @@ export function useCreatePaymentRequest(workspaceId: string | undefined, userId:
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (plan: Plan) => {
+    mutationFn: ({ paymentMethod, plan }: { paymentMethod: PaymentMethod; plan: Plan }) => {
       if (!workspaceId) {
         throw new Error('Workspace aktif tidak ditemukan.');
       }
@@ -66,7 +74,7 @@ export function useCreatePaymentRequest(workspaceId: string | undefined, userId:
         throw new Error('User aktif tidak ditemukan.');
       }
 
-      return PremiumService.createPaymentRequest(workspaceId, userId, plan);
+      return PremiumService.createPaymentRequest(workspaceId, userId, plan, paymentMethod);
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: premiumKeys.billing(workspaceId) });

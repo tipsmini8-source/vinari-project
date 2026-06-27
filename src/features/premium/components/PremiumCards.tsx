@@ -197,6 +197,7 @@ export function PaymentRequestList({ onUploadProof, onViewProof, requests }: Pay
               <p className="mt-1 text-sm text-muted-foreground">
                 {dateFormatter.format(new Date(request.created_at))}
               </p>
+              <p className="mt-1 text-sm text-muted-foreground">Metode: {request.method ?? '-'}</p>
               {request.rejected_reason ? (
                 <p className="mt-2 text-sm text-destructive">{request.rejected_reason}</p>
               ) : null}

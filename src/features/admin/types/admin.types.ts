@@ -29,3 +29,20 @@ export type AdminPaymentProofPreview = {
   path: string;
   signedUrl: string;
 };
+
+export type AdminPaymentMethodType = 'qris' | 'bank_transfer' | 'ewallet' | 'manual';
+
+export type AdminPaymentMethod = {
+  id: string;
+  method_type: AdminPaymentMethodType;
+  name: string;
+  account_number: string | null;
+  account_name: string | null;
+  bank_name: string | null;
+  qr_image_url: string | null;
+  qr_image_public_url: string | null;
+  instructions: string | null;
+  is_active: boolean;
+  sort_order: number;
+  created_at: string;
+};

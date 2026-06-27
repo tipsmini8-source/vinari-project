@@ -6,6 +6,8 @@ import {
 } from '@features/premium/schemas/payment-proof.schemas';
 import type {
   BillingData,
+  PaymentMethod,
+  PaymentMethodType,
   PaymentProofPreview,
   PaymentRequest,
   Plan,
@@ -106,6 +108,47 @@ function mapPaymentRequest(row: Record<string, unknown>): PaymentRequest {
   };
 }
 
+function asPaymentMethodType(value: unknown): PaymentMethodType {
+  if (value === 'bank_transfer' || value === 'ewallet' || value === 'manual') {
+    return value;
+  }
+
+  return 'qris';
+}
+
+function getPaymentMethodObjectPath(qrImageUrl: string) {
+  return qrImageUrl.startsWith('payment-methods/')
+    ? qrImageUrl.slice('payment-methods/'.length)
+    : qrImageUrl;
+}
+
+function getPaymentMethodPublicUrl(qrImageUrl: string | null) {
+  if (!qrImageUrl) {
+    return null;
+  }
+
+  const objectPath = getPaymentMethodObjectPath(qrImageUrl);
+  return supabase.storage.from('payment-methods').getPublicUrl(objectPath).data.publicUrl;
+}
+
+function mapPaymentMethod(row: Record<string, unknown>): PaymentMethod {
+  const qrImageUrl = asOptionalString(row.qr_image_url);
+
+  return {
+    id: asString(row.id),
+    method_type: asPaymentMethodType(row.method_type),
+    name: asString(row.name),
+    account_number: asOptionalString(row.account_number),
+    account_name: asOptionalString(row.account_name),
+    bank_name: asOptionalString(row.bank_name),
+    qr_image_url: qrImageUrl,
+    qr_image_public_url: getPaymentMethodPublicUrl(qrImageUrl),
+    instructions: asOptionalString(row.instructions),
+    is_active: Boolean(row.is_active),
+    sort_order: Number(row.sort_order ?? 0)
+  };
+}
+
 function getProofObjectPath(proofUrl: string) {
   return proofUrl.startsWith('premium-proofs/') ? proofUrl.slice('premium-proofs/'.length) : proofUrl;
 }
@@ -141,6 +184,9 @@ const subscriptionSelect = 'id, workspace_id, plan_code, status, started_at, exp
 
 const paymentRequestSelect =
   'id, workspace_id, user_id, plan_code, amount, method, proof_url, status, note, approved_at, rejected_reason, created_at';
+
+const paymentMethodSelect =
+  'id, method_type, name, account_number, account_name, bank_name, qr_image_url, instructions, is_active, sort_order';
 
 export const PremiumService = {
   async getPlans(): Promise<Plan[]> {
@@ -188,11 +234,28 @@ export const PremiumService = {
     return (data ?? []).map(mapPaymentRequest);
   },
 
+  async getActivePaymentMethods(): Promise<PaymentMethod[]> {
+    const { data, error } = (await supabase
+      .from('payment_methods')
+      .select(paymentMethodSelect)
+      .eq('is_active', true)
+      .order('sort_order', { ascending: true })
+      .order('created_at', { ascending: true })) as unknown as {
+      data: Array<Record<string, unknown>> | null;
+      error: SupabaseErrorLike | null;
+    };
+
+    assertSupabaseSuccess(error, 'Gagal mengambil metode pembayaran.');
+
+    return (data ?? []).map(mapPaymentMethod);
+  },
+
   async getBillingData(workspaceId: string): Promise<BillingData> {
-    const [plans, subscription, paymentRequests] = await Promise.all([
+    const [plans, subscription, paymentRequests, paymentMethods] = await Promise.all([
       this.getPlans(),
       this.getWorkspaceSubscription(workspaceId),
-      this.getPaymentRequests(workspaceId)
+      this.getPaymentRequests(workspaceId),
+      this.getActivePaymentMethods()
     ]);
     const activePlan = plans.find((plan) => plan.code === subscription.plan_code) ?? plans.find((plan) => plan.code === 'free');
 
@@ -202,13 +265,19 @@ export const PremiumService = {
 
     return {
       activePlan,
+      paymentMethods,
       paymentRequests,
       plans,
       subscription
     };
   },
 
-  async createPaymentRequest(workspaceId: string, userId: string, plan: Plan): Promise<PaymentRequest> {
+  async createPaymentRequest(
+    workspaceId: string,
+    userId: string,
+    plan: Plan,
+    paymentMethod: PaymentMethod
+  ): Promise<PaymentRequest> {
     const { data, error } = (await supabase
       .from('payment_requests')
       .insert({
@@ -216,11 +285,12 @@ export const PremiumService = {
         user_id: userId,
         plan_code: plan.code,
         amount: plan.price_monthly,
-        method: 'manual_transfer',
+        method: `${paymentMethod.method_type} - ${paymentMethod.name}`,
         status: 'pending',
         note: 'Upgrade request dibuat dari aplikasi Vinari.',
         metadata: {
           billing_cycle: 'monthly',
+          payment_method_id: paymentMethod.id,
           plan_name: plan.name
         }
       })

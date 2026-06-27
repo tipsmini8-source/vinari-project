@@ -1,8 +1,10 @@
 import { ArrowLeft } from 'lucide-react';
+import { useMemo, useState } from 'react';
 import { Link, Navigate } from 'react-router';
 
 import { useWorkspace } from '@/core/workspace';
 import { useAuth } from '@features/auth';
+import { PaymentMethodSelector } from '@features/premium/components/PaymentMethodSelector';
 import { PaymentProofPreviewPanel, PaymentProofUploadForm } from '@features/premium/components/PaymentProofUpload';
 import { ManualPaymentInstructions, PlanCard } from '@features/premium/components/PremiumCards';
 import { PremiumErrorState, PremiumSkeleton } from '@features/premium/components/PremiumStates';
@@ -19,6 +21,7 @@ import { useToast } from '@shared/ui/use-toast';
 
 export function UpgradePage() {
   const { user } = useAuth();
+  const [selectedPaymentMethodId, setSelectedPaymentMethodId] = useState<string | null>(null);
   const { loading, workspace } = useWorkspace();
   const { toast } = useToast();
   const billingQuery = useBillingData(workspace?.id);
@@ -27,6 +30,11 @@ export function UpgradePage() {
   const pendingRequest =
     billingQuery.data?.paymentRequests.find((request) => request.status === 'pending') ?? null;
   const proofPreviewQuery = usePaymentProofPreview(pendingRequest?.proof_url);
+  const paymentMethods = useMemo(() => billingQuery.data?.paymentMethods ?? [], [billingQuery.data?.paymentMethods]);
+  const selectedPaymentMethod = useMemo(
+    () => paymentMethods.find((method) => method.id === selectedPaymentMethodId) ?? paymentMethods[0] ?? null,
+    [paymentMethods, selectedPaymentMethodId]
+  );
 
   if (loading) {
     return <GlobalLoading />;
@@ -37,8 +45,20 @@ export function UpgradePage() {
   }
 
   const handleUpgrade = async (plan: Plan) => {
+    if (!selectedPaymentMethod) {
+      toast({
+        title: 'Pilih metode pembayaran',
+        description: 'Pilih QRIS atau metode pembayaran lain sebelum membuat request.',
+        variant: 'destructive'
+      });
+      return;
+    }
+
     try {
-      await createPaymentRequest.mutateAsync(plan);
+      await createPaymentRequest.mutateAsync({
+        paymentMethod: selectedPaymentMethod,
+        plan
+      });
       toast({
         title: 'Payment request dibuat',
         description: 'Silakan lanjutkan pembayaran manual lalu upload bukti pembayaran.'
@@ -106,6 +126,13 @@ export function UpgradePage() {
         {billingQuery.data ? (
           <div className="space-y-4">
             <ManualPaymentInstructions request={pendingRequest} />
+            {!pendingRequest ? (
+              <PaymentMethodSelector
+                methods={paymentMethods}
+                onSelect={(method) => setSelectedPaymentMethodId(method.id)}
+                selectedMethodId={selectedPaymentMethod?.id ?? null}
+              />
+            ) : null}
             {pendingRequest && !pendingRequest.proof_url ? (
               <PaymentProofUploadForm
                 isUploading={uploadPaymentProof.isPending}
