@@ -20,6 +20,7 @@ import { DashboardPage } from '@features/dashboard';
 import { DebtDetailPage, DebtFormPage, DebtListPage } from '@features/debt';
 import { GoalDetailPage, GoalFormPage, GoalListPage } from '@features/goal';
 import { OnboardingPage } from '@features/onboarding';
+import { BillingPage, UpgradePage } from '@features/premium';
 import {
   RecurringFormPage,
   RecurringListPage,
@@ -186,6 +187,14 @@ export const router = createBrowserRouter([
               {
                 path: 'reports',
                 element: <ReportPage />
+              },
+              {
+                path: 'upgrade',
+                element: <UpgradePage />
+              },
+              {
+                path: 'billing',
+                element: <BillingPage />
               },
               {
                 path: 'recurring',

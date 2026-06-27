@@ -1,9 +1,10 @@
-import { ArrowLeft, Plus } from 'lucide-react';
+import { ArrowLeft, Lock, Plus } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { Link, Navigate } from 'react-router';
 
 import { useWorkspace } from '@/core/workspace';
 import { useAuth } from '@features/auth';
+import { usePlan } from '@features/premium';
 import { WalletDetailPanel } from '@features/wallet/components/WalletDetailPanel';
 import { WalletForm } from '@features/wallet/components/WalletForm';
 import { WalletList } from '@features/wallet/components/WalletList';
@@ -37,8 +38,13 @@ export function WalletPage() {
   const updateWallet = useUpdateWallet(activeWorkspace?.id);
   const archiveWallet = useArchiveWallet(activeWorkspace?.id);
   const deleteWallet = useDeleteWallet(activeWorkspace?.id);
+  const planQuery = usePlan();
 
   const wallets = useMemo(() => walletsQuery.data ?? [], [walletsQuery.data]);
+  const activeWalletCount = wallets.filter((wallet) => !wallet.is_archived).length;
+  const walletLimit = planQuery.activePlan?.max_wallets ?? null;
+  const isWalletLimitReached =
+    planQuery.activePlan?.code === 'free' && walletLimit !== null && activeWalletCount >= walletLimit;
   const effectiveSelectedWalletId = selectedWalletId ?? wallets[0]?.id;
   const detailQuery = useWalletDetail(effectiveSelectedWalletId, activeWorkspace?.id);
 
@@ -55,6 +61,14 @@ export function WalletPage() {
   }
 
   const openCreatePanel = () => {
+    if (isWalletLimitReached) {
+      toast({
+        title: 'Limit wallet Free tercapai',
+        description: 'Upgrade ke Premium untuk menambah wallet lagi.'
+      });
+      return;
+    }
+
     setEditingWallet(null);
     setPanelMode('create');
   };
@@ -155,10 +169,19 @@ export function WalletPage() {
               Kelola sumber dana dan saldo awal workspace aktif.
             </p>
           </div>
-          <Button onClick={openCreatePanel} type="button">
-            <Plus className="size-4" />
-            Tambah Wallet
-          </Button>
+          {isWalletLimitReached ? (
+            <Button asChild>
+              <Link to="/app/upgrade">
+                <Lock className="size-4" />
+                Upgrade untuk Wallet
+              </Link>
+            </Button>
+          ) : (
+            <Button onClick={openCreatePanel} type="button">
+              <Plus className="size-4" />
+              Tambah Wallet
+            </Button>
+          )}
         </div>
 
         <div className="grid gap-6 lg:grid-cols-[1fr_22rem]">

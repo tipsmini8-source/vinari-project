@@ -1,6 +1,7 @@
 import {
   BarChart3,
   CreditCard,
+  Crown,
   FileText,
   Home,
   Landmark,
@@ -69,6 +70,16 @@ export const secondaryNavigation: NavigationItem[] = [
   {
     label: 'Subscriptions',
     href: '/app/subscriptions',
+    icon: CreditCard
+  },
+  {
+    label: 'Upgrade',
+    href: '/app/upgrade',
+    icon: Crown
+  },
+  {
+    label: 'Billing',
+    href: '/app/billing',
     icon: CreditCard
   }
 ];
