@@ -4,6 +4,7 @@ import {
   Home,
   Landmark,
   ReceiptText,
+  Tags,
   Target,
   WalletCards
 } from 'lucide-react';
@@ -34,6 +35,11 @@ export const primaryNavigation: NavigationItem[] = [
     label: 'Budgets',
     href: '/app/budgets',
     icon: BarChart3
+  },
+  {
+    label: 'Categories',
+    href: '/app/categories',
+    icon: Tags
   },
   {
     label: 'Goals',

@@ -15,6 +15,7 @@ import {
   VerifyEmailPage
 } from '@features/auth/pages';
 import { BudgetFormPage, BudgetListPage } from '@features/budget';
+import { CategoryFormPage, CategoryListPage } from '@features/category';
 import { DashboardPage } from '@features/dashboard';
 import { DebtDetailPage, DebtFormPage, DebtListPage } from '@features/debt';
 import { GoalDetailPage, GoalFormPage, GoalListPage } from '@features/goal';
@@ -131,6 +132,18 @@ export const router = createBrowserRouter([
               {
                 path: 'budgets/:id/edit',
                 element: <BudgetFormPage />
+              },
+              {
+                path: 'categories',
+                element: <CategoryListPage />
+              },
+              {
+                path: 'categories/new',
+                element: <CategoryFormPage />
+              },
+              {
+                path: 'categories/:id/edit',
+                element: <CategoryFormPage />
               },
               {
                 path: 'goals',
