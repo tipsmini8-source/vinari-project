@@ -26,6 +26,7 @@ import {
   isFinancialHealthDataEmpty,
   useFinancialHealthScore
 } from '@features/financial-health';
+import { InsightErrorState, InsightPreview, InsightSkeleton, useInsights } from '@features/insight';
 import { Button } from '@shared/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@shared/ui/card';
 import { GlobalLoading } from '@shared/ui/global-loading';
@@ -44,6 +45,7 @@ export function DashboardPage() {
   const { loading, workspace } = useWorkspace();
   const dashboardQuery = useDashboardSummary(workspace?.id);
   const financialHealthQuery = useFinancialHealthScore(workspace?.id);
+  const insightsQuery = useInsights(workspace?.id);
   const summary = dashboardQuery.data;
   const isEmpty = summary
     ? summary.activeWalletCount === 0 &&
@@ -123,6 +125,21 @@ export function DashboardPage() {
         ) : null}
 
         {summary && isEmpty ? <DashboardEmptyState /> : null}
+
+        {summary ? (
+          <div className="mb-6">
+            {insightsQuery.isLoading ? <InsightSkeleton /> : null}
+
+            {insightsQuery.isError ? (
+              <InsightErrorState
+                message={insightsQuery.error instanceof Error ? insightsQuery.error.message : 'Terjadi kesalahan.'}
+                onRetry={() => void insightsQuery.refetch()}
+              />
+            ) : null}
+
+            {insightsQuery.data && insightsQuery.data.length > 0 ? <InsightPreview insights={insightsQuery.data} /> : null}
+          </div>
+        ) : null}
 
         {summary && !isEmpty ? (
           <div className="space-y-6">

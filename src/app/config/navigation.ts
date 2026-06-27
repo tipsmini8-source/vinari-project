@@ -5,6 +5,7 @@ import {
   FileText,
   Home,
   Landmark,
+  Lightbulb,
   Repeat,
   ReceiptText,
   Settings,
@@ -62,6 +63,11 @@ export const secondaryNavigation: NavigationItem[] = [
     label: 'Reports',
     href: '/app/reports',
     icon: FileText
+  },
+  {
+    label: 'Insights',
+    href: '/app/insights',
+    icon: Lightbulb
   },
   {
     label: 'Recurring',
