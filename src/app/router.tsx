@@ -29,6 +29,13 @@ import {
   SubscriptionListPage
 } from '@features/recurring';
 import { ReportPage } from '@features/report';
+import {
+  PreferencesSettingsPage,
+  ProfileSettingsPage,
+  SecuritySettingsPage,
+  SettingsHomePage,
+  WorkspaceSettingsPage
+} from '@features/settings';
 import { TransactionDetailPage, TransactionFormPage, TransactionListPage } from '@features/transaction';
 import { WalletPage } from '@features/wallet';
 
@@ -196,6 +203,26 @@ export const router = createBrowserRouter([
               {
                 path: 'billing',
                 element: <BillingPage />
+              },
+              {
+                path: 'settings',
+                element: <SettingsHomePage />
+              },
+              {
+                path: 'settings/profile',
+                element: <ProfileSettingsPage />
+              },
+              {
+                path: 'settings/preferences',
+                element: <PreferencesSettingsPage />
+              },
+              {
+                path: 'settings/workspace',
+                element: <WorkspaceSettingsPage />
+              },
+              {
+                path: 'settings/security',
+                element: <SecuritySettingsPage />
               },
               {
                 path: 'recurring',

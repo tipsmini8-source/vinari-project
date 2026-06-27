@@ -7,6 +7,7 @@ import {
   Landmark,
   Repeat,
   ReceiptText,
+  Settings,
   Tags,
   Target,
   WalletCards
@@ -81,6 +82,11 @@ export const secondaryNavigation: NavigationItem[] = [
     label: 'Billing',
     href: '/app/billing',
     icon: CreditCard
+  },
+  {
+    label: 'Settings',
+    href: '/app/settings',
+    icon: Settings
   }
 ];
 
