@@ -32,7 +32,7 @@ export function WalletList({
       {wallets.map((wallet) => (
         <article
           className={cn(
-            'rounded-md border border-border bg-card p-4 text-card-foreground shadow-sm transition-colors',
+            'rounded-2xl border border-border bg-card p-4 text-card-foreground shadow-sm transition-colors',
             selectedWalletId === wallet.id && 'border-primary'
           )}
           key={wallet.id}
@@ -40,7 +40,7 @@ export function WalletList({
           <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
             <button className="flex flex-1 items-start gap-3 text-left" onClick={() => onSelect(wallet)} type="button">
               <span
-                className="flex size-10 shrink-0 items-center justify-center rounded-md text-white"
+                className="flex size-11 shrink-0 items-center justify-center rounded-2xl text-white"
                 style={{ backgroundColor: wallet.color ?? '#0f766e' }}
               >
                 <WalletCards className="size-5" />
@@ -50,7 +50,7 @@ export function WalletList({
                   <span className="font-semibold">{wallet.name}</span>
                   {wallet.is_archived ? (
                     <span className="rounded-sm bg-secondary px-2 py-0.5 text-xs text-muted-foreground">
-                      Archived
+                      Arsip
                     </span>
                   ) : null}
                 </span>
@@ -60,11 +60,11 @@ export function WalletList({
               </span>
             </button>
             <div className="flex gap-2 sm:justify-end">
-              <Button aria-label="Edit wallet" onClick={() => onEdit(wallet)} size="icon" type="button" variant="ghost">
+              <Button aria-label="Edit dompet" onClick={() => onEdit(wallet)} size="icon" type="button" variant="ghost">
                 <Edit className="size-4" />
               </Button>
               <Button
-                aria-label="Arsipkan wallet"
+                aria-label="Arsipkan dompet"
                 disabled={wallet.is_archived}
                 onClick={() => onArchive(wallet)}
                 size="icon"
@@ -74,7 +74,7 @@ export function WalletList({
                 <Archive className="size-4" />
               </Button>
               <Button
-                aria-label="Hapus wallet"
+                aria-label="Hapus dompet"
                 onClick={() => onDelete(wallet)}
                 size="icon"
                 type="button"

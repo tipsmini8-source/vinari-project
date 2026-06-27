@@ -8,15 +8,18 @@ import type {
   Transaction,
   TransactionFormInput,
   TransactionReferenceCategory,
-  TransactionReferenceWallet
+  TransactionReferenceWallet,
+  TransactionType
 } from '@features/transaction/types/transaction.types';
 import { Button } from '@shared/ui/button';
 import { Input } from '@shared/ui/input';
 import { Label } from '@shared/ui/label';
+import { MobileActionBar } from '@shared/components/mobile-ui';
 
 type TransactionFormProps = {
   categories: TransactionReferenceCategory[];
   defaultTransaction?: Transaction | null;
+  initialType?: TransactionType;
   isSubmitting: boolean;
   onCancel: () => void;
   onSubmit: (input: TransactionFormInput) => Promise<void>;
@@ -30,6 +33,7 @@ function today() {
 export function TransactionForm({
   categories,
   defaultTransaction,
+  initialType = 'expense',
   isSubmitting,
   onCancel,
   onSubmit,
@@ -44,7 +48,7 @@ export function TransactionForm({
   } = useForm<TransactionFormInput>({
     resolver: zodResolver(transactionSchema),
     defaultValues: {
-      type: 'expense',
+      type: initialType,
       title: '',
       amount: 0,
       transactionDate: today(),
@@ -65,7 +69,7 @@ export function TransactionForm({
         defaultTransaction?.type === 'expense' ||
         defaultTransaction?.type === 'transfer'
           ? defaultTransaction.type
-          : 'expense',
+          : initialType,
       title: defaultTransaction?.title ?? '',
       amount: defaultTransaction?.amount ?? 0,
       transactionDate: defaultTransaction?.transaction_date ?? today(),
@@ -74,42 +78,56 @@ export function TransactionForm({
       categoryId: defaultTransaction?.category_id ?? '',
       note: defaultTransaction?.note ?? ''
     });
-  }, [defaultTransaction, reset]);
+  }, [defaultTransaction, initialType, reset]);
+
+  const titleLabel =
+    selectedType === 'income'
+      ? 'Uang masuk dari mana?'
+      : selectedType === 'transfer'
+        ? 'Pindah saldo untuk apa?'
+        : 'Uang keluar untuk apa?';
+  const walletLabel =
+    selectedType === 'income'
+      ? 'Masuk ke dompet mana?'
+      : selectedType === 'transfer'
+        ? 'Dari dompet mana?'
+        : 'Dibayar dari dompet mana?';
+  const categoryLabel = selectedType === 'income' ? 'Masuk kategori apa?' : 'Masuk kategori apa?';
 
   return (
-    <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
+    <form className="space-y-5" onSubmit={handleSubmit(onSubmit)}>
       <div className="grid gap-4 sm:grid-cols-3">
         <div className="space-y-2">
-          <Label htmlFor="type">Tipe</Label>
+          <Label htmlFor="type">Jenis catatan</Label>
           <select
-            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className="flex h-12 w-full rounded-xl border border-input bg-background px-3 py-2 text-base text-foreground shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             id="type"
             {...register('type')}
           >
-            <option value="income">Income</option>
-            <option value="expense">Expense</option>
-            <option value="transfer">Transfer</option>
+            <option value="income">Uang Masuk</option>
+            <option value="expense">Uang Keluar</option>
+            <option value="transfer">Pindah Saldo</option>
           </select>
           {errors.type ? <p className="text-sm text-destructive">{errors.type.message}</p> : null}
         </div>
 
         <div className="space-y-2 sm:col-span-2">
-          <Label htmlFor="title">Judul</Label>
-          <Input id="title" placeholder="Contoh: Gaji Juni" {...register('title')} />
+          <Label htmlFor="title">{titleLabel}</Label>
+          <Input className="h-12 rounded-xl text-base" id="title" placeholder="Contoh: Gaji Juni" {...register('title')} />
           {errors.title ? <p className="text-sm text-destructive">{errors.title.message}</p> : null}
         </div>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-2">
-          <Label htmlFor="amount">Amount</Label>
-          <Input id="amount" min="0.01" step="0.01" type="number" {...register('amount', { valueAsNumber: true })} />
+          <Label htmlFor="amount">Berapa jumlahnya?</Label>
+          <Input className="h-12 rounded-xl text-base" id="amount" min="0.01" step="0.01" type="number" {...register('amount', { valueAsNumber: true })} />
           {errors.amount ? <p className="text-sm text-destructive">{errors.amount.message}</p> : null}
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="transactionDate">Tanggal</Label>
-          <Input id="transactionDate" type="date" {...register('transactionDate')} />
+          <Label htmlFor="transactionDate">Tanggalnya kapan?</Label>
+          <Input className="h-12 rounded-xl text-base" id="transactionDate" type="date" {...register('transactionDate')} />
           {errors.transactionDate ? (
             <p className="text-sm text-destructive">{errors.transactionDate.message}</p>
           ) : null}
@@ -118,13 +136,13 @@ export function TransactionForm({
 
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-2">
-          <Label htmlFor="walletId">{selectedType === 'transfer' ? 'Wallet sumber' : 'Wallet'}</Label>
+          <Label htmlFor="walletId">{walletLabel}</Label>
           <select
-            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className="flex h-12 w-full rounded-xl border border-input bg-background px-3 py-2 text-base text-foreground shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             id="walletId"
             {...register('walletId')}
           >
-            <option value="">Pilih wallet</option>
+            <option value="">Pilih dompet</option>
             {wallets.map((wallet) => (
               <option key={wallet.id} value={wallet.id}>
                 {wallet.name}
@@ -136,13 +154,13 @@ export function TransactionForm({
 
         {selectedType === 'transfer' ? (
           <div className="space-y-2">
-            <Label htmlFor="destinationWalletId">Wallet tujuan</Label>
+            <Label htmlFor="destinationWalletId">Ke dompet mana?</Label>
             <select
-              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              className="flex h-12 w-full rounded-xl border border-input bg-background px-3 py-2 text-base text-foreground shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               id="destinationWalletId"
               {...register('destinationWalletId')}
             >
-              <option value="">Pilih wallet tujuan</option>
+              <option value="">Pilih dompet tujuan</option>
               {wallets.map((wallet) => (
                 <option key={wallet.id} value={wallet.id}>
                   {wallet.name}
@@ -155,9 +173,9 @@ export function TransactionForm({
           </div>
         ) : (
           <div className="space-y-2">
-            <Label htmlFor="categoryId">Kategori</Label>
+            <Label htmlFor="categoryId">{categoryLabel}</Label>
             <select
-              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              className="flex h-12 w-full rounded-xl border border-input bg-background px-3 py-2 text-base text-foreground shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               id="categoryId"
               {...register('categoryId')}
             >
@@ -174,19 +192,21 @@ export function TransactionForm({
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="note">Catatan</Label>
-        <Input id="note" placeholder="Opsional" {...register('note')} />
+        <Label htmlFor="note">Catatan tambahan</Label>
+        <Input className="h-12 rounded-xl text-base" id="note" placeholder="Opsional" {...register('note')} />
       </div>
 
-      <div className="flex justify-end gap-2 pt-2">
-        <Button disabled={isSubmitting} onClick={onCancel} type="button" variant="outline">
-          Batal
-        </Button>
-        <Button disabled={isSubmitting} type="submit">
-          {isSubmitting ? <Loader2 className="size-4 animate-spin" /> : null}
-          Simpan
-        </Button>
-      </div>
+      <MobileActionBar>
+        <div className="flex gap-2 sm:justify-end">
+          <Button className="flex-1 rounded-xl sm:flex-none" disabled={isSubmitting} onClick={onCancel} type="button" variant="outline">
+            Batal
+          </Button>
+          <Button className="flex-1 rounded-xl sm:flex-none" disabled={isSubmitting} type="submit">
+            {isSubmitting ? <Loader2 className="size-4 animate-spin" /> : null}
+            Simpan Catatan
+          </Button>
+        </div>
+      </MobileActionBar>
     </form>
   );
 }

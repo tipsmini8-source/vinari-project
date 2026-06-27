@@ -1,5 +1,5 @@
 import { ArrowLeft } from 'lucide-react';
-import { Link, Navigate, useNavigate, useParams } from 'react-router';
+import { Link, Navigate, useNavigate, useParams, useSearchParams } from 'react-router';
 
 import { useWorkspace } from '@/core/workspace';
 import { TransactionForm } from '@features/transaction/components/TransactionForm';
@@ -17,6 +17,7 @@ import { useToast } from '@shared/ui/use-toast';
 
 export function TransactionFormPage() {
   const { id } = useParams();
+  const [searchParams] = useSearchParams();
   const isEdit = Boolean(id);
   const navigate = useNavigate();
   const { loading, workspace } = useWorkspace();
@@ -25,6 +26,9 @@ export function TransactionFormPage() {
   const transactionQuery = useTransaction(id, workspace?.id);
   const createTransaction = useCreateTransaction(workspace?.id);
   const updateTransaction = useUpdateTransaction(workspace?.id);
+  const initialType = searchParams.get('type');
+  const safeInitialType =
+    initialType === 'income' || initialType === 'expense' || initialType === 'transfer' ? initialType : 'expense';
 
   if (loading) {
     return <GlobalLoading />;
@@ -69,15 +73,16 @@ export function TransactionFormPage() {
         </Button>
         <Card>
           <CardHeader>
-            <CardTitle>{isEdit ? 'Edit Transaksi' : 'Tambah Transaksi'}</CardTitle>
+            <CardTitle>{isEdit ? 'Edit Catatan Uang' : 'Catat Uang'}</CardTitle>
             <CardDescription>
-              Isi transaksi sesuai aturan wallet, kategori, dan tipe transaksi.
+              Catat uang masuk, uang keluar, atau pindah saldo antar dompet.
             </CardDescription>
           </CardHeader>
           <CardContent>
             <TransactionForm
               categories={references.categories.data ?? []}
               defaultTransaction={transactionQuery.data ?? null}
+              initialType={safeInitialType}
               isSubmitting={createTransaction.isPending || updateTransaction.isPending}
               onCancel={() => void navigate('/app/transactions')}
               onSubmit={handleSubmit}

@@ -37,14 +37,30 @@ const dateFormatter = new Intl.DateTimeFormat('id-ID', {
 });
 
 const featureLabels: Record<string, string> = {
-  advanced_report: 'Advanced report',
-  ai_insight: 'AI insight',
-  export: 'Export data',
-  family_workspace: 'Family workspace'
+  advanced_report: 'Ringkasan lanjutan',
+  ai_insight: 'Insight pintar',
+  export: 'Unduh data',
+  family_workspace: 'Ruang keluarga'
 };
 
 function formatLimit(value: number | null, fallback: string) {
-  return value === null ? 'Unlimited' : `${value} ${fallback}`;
+  return value === null ? 'Tanpa batas' : `${value} ${fallback}`;
+}
+
+function statusLabel(status: string) {
+  if (status === 'pending') {
+    return 'Menunggu Dicek';
+  }
+
+  if (status === 'approved' || status === 'active') {
+    return 'Disetujui';
+  }
+
+  if (status === 'rejected') {
+    return 'Ditolak';
+  }
+
+  return status;
 }
 
 function formatPlanPrice(plan: Plan) {
@@ -89,10 +105,10 @@ export function PlanCard({ activePlanCode, isPending, isSubmitting, onUpgrade, p
         </p>
 
         <div className="mt-5 grid gap-2 text-sm">
-          <p>{formatLimit(plan.max_workspaces, 'workspace')}</p>
-          <p>{formatLimit(plan.max_members, 'member')}</p>
-          <p>{formatLimit(plan.max_wallets, 'wallet')}</p>
-          <p>{formatLimit(plan.max_transactions_per_month, 'transaksi/bulan')}</p>
+          <p>{formatLimit(plan.max_workspaces, 'ruang keuangan')}</p>
+          <p>{formatLimit(plan.max_members, 'anggota')}</p>
+          <p>{formatLimit(plan.max_wallets, 'dompet')}</p>
+          <p>{formatLimit(plan.max_transactions_per_month, 'catatan/bulan')}</p>
         </div>
 
         <div className="mt-5 space-y-2 text-sm">
@@ -121,7 +137,7 @@ export function PlanCard({ activePlanCode, isPending, isSubmitting, onUpgrade, p
           type="button"
           variant={isCurrent ? 'outline' : 'default'}
         >
-          {isCurrent ? 'Plan aktif' : isPending ? 'Request pending' : 'Upgrade'}
+          {isCurrent ? 'Paket aktif' : isPending ? 'Menunggu Dicek' : 'Upgrade'}
         </Button>
       </CardContent>
     </Card>
@@ -140,13 +156,13 @@ export function ManualPaymentInstructions({ request }: { request: PaymentRequest
         <div>
           <h2 className="font-semibold">Instruksi pembayaran manual</h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            Request upgrade sudah dibuat dengan status pending.
+            Request upgrade sudah dibuat. Admin akan mengecek setelah bukti pembayaran diupload.
           </p>
           <div className="mt-4 grid gap-2 text-sm">
-            <p>Plan: {request.plan_code}</p>
-            <p>Amount: {moneyFormatter.format(request.amount)}</p>
+            <p>Paket: {request.plan_code}</p>
+            <p>Nominal: {moneyFormatter.format(request.amount)}</p>
             <p>Metode: Transfer manual</p>
-            <p>Upload bukti pembayaran tersedia di halaman ini atau Billing.</p>
+            <p>Upload bukti pembayaran tersedia di halaman ini atau Pembayaran.</p>
           </div>
         </div>
       </div>
@@ -159,19 +175,19 @@ export function BillingSummary({ activePlan, subscription }: BillingSummaryProps
     <div className="grid gap-3 md:grid-cols-3">
       <Card>
         <CardHeader>
-          <CardDescription>Plan aktif</CardDescription>
+          <CardDescription>Paket aktif</CardDescription>
           <CardTitle>{activePlan.name}</CardTitle>
         </CardHeader>
       </Card>
       <Card>
         <CardHeader>
-          <CardDescription>Status subscription</CardDescription>
-          <CardTitle className="capitalize">{subscription.status}</CardTitle>
+          <CardDescription>Status pembayaran</CardDescription>
+          <CardTitle>{statusLabel(subscription.status)}</CardTitle>
         </CardHeader>
       </Card>
       <Card>
         <CardHeader>
-          <CardDescription>Expired at</CardDescription>
+          <CardDescription>Aktif sampai</CardDescription>
           <CardTitle className="text-xl">
             {subscription.expired_at ? dateFormatter.format(new Date(subscription.expired_at)) : 'Tidak ada'}
           </CardTitle>
@@ -190,8 +206,8 @@ export function PaymentRequestList({ onUploadProof, onViewProof, requests }: Pay
             <div>
               <div className="flex flex-wrap items-center gap-2">
                 <h2 className="font-semibold">{request.plan_code}</h2>
-                <span className={cn('rounded-sm px-2 py-0.5 text-xs font-medium capitalize', statusClass(request.status))}>
-                  {request.status}
+                <span className={cn('rounded-full px-2.5 py-1 text-xs font-medium', statusClass(request.status))}>
+                  {statusLabel(request.status)}
                 </span>
               </div>
               <p className="mt-1 text-sm text-muted-foreground">
@@ -235,8 +251,8 @@ export function PaymentRequestList({ onUploadProof, onViewProof, requests }: Pay
 export function UpgradeNotice() {
   return (
     <div className="rounded-md border border-border bg-card p-4 text-card-foreground shadow-sm">
-      <p className="text-sm text-muted-foreground">Butuh lebih banyak wallet?</p>
-      <p className="mt-1 font-semibold">Upgrade ke Premium untuk membuka limit wallet.</p>
+      <p className="text-sm text-muted-foreground">Butuh lebih banyak dompet?</p>
+      <p className="mt-1 font-semibold">Upgrade ke Premium untuk membuka limit dompet.</p>
       <Button asChild className="mt-4">
         <Link to="/app/upgrade">Lihat Paket</Link>
       </Button>

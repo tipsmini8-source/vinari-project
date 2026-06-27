@@ -16,7 +16,7 @@ type TransactionFiltersProps = {
 
 export function TransactionFilters({ categories, filters, onChange, wallets }: TransactionFiltersProps) {
   return (
-    <div className="grid gap-3 rounded-md border border-border bg-card p-4 shadow-sm sm:grid-cols-2 lg:grid-cols-5">
+    <div className="grid gap-3 rounded-2xl border border-border bg-card p-4 shadow-sm sm:grid-cols-2 lg:grid-cols-5">
       <div className="space-y-2">
         <Label htmlFor="dateFrom">Dari</Label>
         <Input
@@ -38,7 +38,7 @@ export function TransactionFilters({ categories, filters, onChange, wallets }: T
       <div className="space-y-2">
         <Label htmlFor="filterType">Tipe</Label>
         <select
-          className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+          className="flex h-12 w-full rounded-xl border border-input bg-background px-3 py-2 text-sm"
           id="filterType"
           onChange={(event) =>
             onChange({ ...filters, type: event.target.value as TransactionFilterInput['type'] })
@@ -46,20 +46,20 @@ export function TransactionFilters({ categories, filters, onChange, wallets }: T
           value={filters.type}
         >
           <option value="all">Semua</option>
-          <option value="income">Income</option>
-          <option value="expense">Expense</option>
-          <option value="transfer">Transfer</option>
+          <option value="income">Uang Masuk</option>
+          <option value="expense">Uang Keluar</option>
+          <option value="transfer">Pindah Saldo</option>
         </select>
       </div>
       <div className="space-y-2">
-        <Label htmlFor="filterWallet">Wallet</Label>
+        <Label htmlFor="filterWallet">Dompet</Label>
         <select
-          className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+          className="flex h-12 w-full rounded-xl border border-input bg-background px-3 py-2 text-sm"
           id="filterWallet"
           onChange={(event) => onChange({ ...filters, walletId: event.target.value })}
           value={filters.walletId ?? ''}
         >
-          <option value="">Semua wallet</option>
+          <option value="">Semua dompet</option>
           {wallets.map((wallet) => (
             <option key={wallet.id} value={wallet.id}>
               {wallet.name}
@@ -70,7 +70,7 @@ export function TransactionFilters({ categories, filters, onChange, wallets }: T
       <div className="space-y-2">
         <Label htmlFor="filterCategory">Kategori</Label>
         <select
-          className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+          className="flex h-12 w-full rounded-xl border border-input bg-background px-3 py-2 text-sm"
           id="filterCategory"
           onChange={(event) => onChange({ ...filters, categoryId: event.target.value })}
           value={filters.categoryId ?? ''}

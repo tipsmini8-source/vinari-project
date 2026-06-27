@@ -20,7 +20,7 @@ export function AppHeader() {
           <div className="min-w-0">
             <p className="truncate text-sm font-semibold">{workspace?.name ?? 'Vinari'}</p>
             <p className="hidden text-xs text-muted-foreground sm:block">
-              {workspace?.currency_code ?? 'IDR'} workspace
+              Ruang keuangan {workspace?.currency_code ?? 'IDR'}
             </p>
           </div>
         </div>

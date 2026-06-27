@@ -73,9 +73,9 @@ export function BillingPage() {
               </Link>
             </Button>
             <p className="text-sm font-medium text-primary">{workspace.name}</p>
-            <h1 className="mt-1 text-3xl font-semibold tracking-normal">Billing</h1>
+            <h1 className="mt-1 text-3xl font-semibold tracking-normal">Pembayaran</h1>
             <p className="mt-2 text-sm text-muted-foreground">
-              Lihat plan aktif, status subscription, dan payment request workspace.
+              Lihat paket aktif, status pembayaran, dan riwayat request upgrade.
             </p>
           </div>
           <Button asChild>
@@ -119,7 +119,7 @@ export function BillingPage() {
             ) : null}
 
             <div>
-              <h2 className="mb-3 text-xl font-semibold tracking-normal">Payment Request</h2>
+              <h2 className="mb-3 text-xl font-semibold tracking-normal">Riwayat Pembayaran</h2>
               {billingQuery.data.paymentRequests.length > 0 ? (
                 <PaymentRequestList
                   onUploadProof={(request) => {

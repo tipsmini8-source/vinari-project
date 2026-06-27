@@ -51,7 +51,7 @@ export function TransactionListPage() {
   }
 
   const handleDelete = async (transaction: Transaction) => {
-    const confirmed = window.confirm(`Hapus transaksi "${transaction.title}"?`);
+    const confirmed = window.confirm(`Hapus catatan "${transaction.title}"?`);
 
     if (!confirmed) {
       return;
@@ -59,10 +59,10 @@ export function TransactionListPage() {
 
     try {
       await deleteTransaction.mutateAsync(transaction.id);
-      toast({ title: 'Transaksi dihapus' });
+      toast({ title: 'Catatan dihapus' });
     } catch (error) {
       toast({
-        title: 'Gagal menghapus transaksi',
+        title: 'Gagal menghapus catatan',
         description: error instanceof Error ? error.message : 'Silakan coba lagi.',
         variant: 'destructive'
       });
@@ -84,10 +84,10 @@ export function TransactionListPage() {
       });
 
       downloadCSV(`vinari-transactions-${new Date().toISOString().slice(0, 10)}.csv`, csv);
-      toast({ title: 'Export transaksi selesai' });
+      toast({ title: 'Unduh data selesai' });
     } catch (error) {
       toast({
-        title: 'Gagal export transaksi',
+        title: 'Gagal unduh data',
         description: error instanceof Error ? error.message : 'Silakan coba lagi.',
         variant: 'destructive'
       });
@@ -106,9 +106,9 @@ export function TransactionListPage() {
               </Link>
             </Button>
             <p className="text-sm font-medium text-primary">{workspace.name}</p>
-            <h1 className="mt-1 text-3xl font-semibold tracking-normal">Transaksi</h1>
+            <h1 className="mt-1 text-3xl font-semibold tracking-normal">Catatan Uang</h1>
             <p className="mt-2 text-sm text-muted-foreground">
-              Catat dan telusuri pemasukan, pengeluaran, dan transfer antar wallet.
+              Catat uang masuk, uang keluar, dan pindah saldo antar dompet.
             </p>
           </div>
           <div className="flex flex-col gap-2 sm:flex-row">
@@ -125,12 +125,12 @@ export function TransactionListPage() {
               ) : (
                 <Lock className="size-4" />
               )}
-              Export CSV
+              Unduh Data
             </Button>
             <Button asChild>
               <Link to="/app/transactions/new">
                 <Plus className="size-4" />
-                Tambah Transaksi
+                Catat Uang
               </Link>
             </Button>
           </div>

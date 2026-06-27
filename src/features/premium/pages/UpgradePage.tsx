@@ -104,13 +104,13 @@ export function UpgradePage() {
               </Link>
             </Button>
             <p className="text-sm font-medium text-primary">{workspace.name}</p>
-            <h1 className="mt-1 text-3xl font-semibold tracking-normal">Upgrade</h1>
+            <h1 className="mt-1 text-3xl font-semibold tracking-normal">Upgrade Premium</h1>
             <p className="mt-2 text-sm text-muted-foreground">
-              Pilih paket Premium. Pembayaran saat ini masih diproses manual.
+              Pilih paket Premium. Pembayaran saat ini masih dicek manual oleh admin.
             </p>
           </div>
           <Button asChild variant="outline">
-            <Link to="/app/billing">Billing</Link>
+            <Link to="/app/billing">Pembayaran</Link>
           </Button>
         </div>
 

@@ -7,8 +7,8 @@ export const transactionSchema = z
     type: z.enum(['income', 'expense', 'transfer'], {
       message: 'Pilih tipe transaksi.'
     }),
-    title: z.string().min(2, 'Judul transaksi minimal 2 karakter.'),
-    amount: z.number().min(0.01, 'Amount wajib lebih besar dari 0.'),
+    title: z.string().min(2, 'Keterangan minimal 2 karakter.'),
+    amount: z.number().min(0.01, 'Jumlah uang wajib lebih besar dari 0.'),
     transactionDate: z.string().min(1, 'Tanggal transaksi wajib diisi.'),
     walletId: optionalUuid,
     destinationWalletId: optionalUuid,
@@ -20,7 +20,7 @@ export const transactionSchema = z
       if (!value.walletId) {
         context.addIssue({
           code: 'custom',
-          message: 'Wallet wajib dipilih.',
+          message: 'Dompet wajib dipilih.',
           path: ['walletId']
         });
       }
@@ -38,7 +38,7 @@ export const transactionSchema = z
       if (!value.walletId) {
         context.addIssue({
           code: 'custom',
-          message: 'Wallet sumber wajib dipilih.',
+          message: 'Dompet asal wajib dipilih.',
           path: ['walletId']
         });
       }
@@ -46,7 +46,7 @@ export const transactionSchema = z
       if (!value.destinationWalletId) {
         context.addIssue({
           code: 'custom',
-          message: 'Wallet tujuan wajib dipilih.',
+          message: 'Dompet tujuan wajib dipilih.',
           path: ['destinationWalletId']
         });
       }
@@ -54,7 +54,7 @@ export const transactionSchema = z
       if (value.walletId && value.destinationWalletId && value.walletId === value.destinationWalletId) {
         context.addIssue({
           code: 'custom',
-          message: 'Wallet tujuan tidak boleh sama dengan wallet sumber.',
+          message: 'Dompet tujuan tidak boleh sama dengan dompet asal.',
           path: ['destinationWalletId']
         });
       }

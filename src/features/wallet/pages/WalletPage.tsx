@@ -63,8 +63,8 @@ export function WalletPage() {
   const openCreatePanel = () => {
     if (isWalletLimitReached) {
       toast({
-        title: 'Limit wallet Free tercapai',
-        description: 'Upgrade ke Premium untuk menambah wallet lagi.'
+        title: 'Limit dompet Free tercapai',
+        description: 'Upgrade ke Premium untuk menambah dompet lagi.'
       });
       return;
     }
@@ -87,17 +87,17 @@ export function WalletPage() {
     try {
       if (panelMode === 'edit' && editingWallet) {
         await updateWallet.mutateAsync({ walletId: editingWallet.id, input });
-        toast({ title: 'Wallet diperbarui' });
+        toast({ title: 'Dompet diperbarui' });
       } else {
         const wallet = await createWallet.mutateAsync(input);
         setSelectedWalletId(wallet.id);
-        toast({ title: 'Wallet ditambahkan' });
+        toast({ title: 'Dompet ditambahkan' });
       }
 
       closePanel();
     } catch (error) {
       toast({
-        title: panelMode === 'edit' ? 'Gagal mengubah wallet' : 'Gagal menambah wallet',
+        title: panelMode === 'edit' ? 'Gagal mengubah dompet' : 'Gagal menambah dompet',
         description: error instanceof Error ? error.message : 'Silakan coba lagi.',
         variant: 'destructive'
       });
@@ -105,7 +105,7 @@ export function WalletPage() {
   };
 
   const handleArchive = async (wallet: Wallet) => {
-    const confirmed = window.confirm(`Arsipkan wallet "${wallet.name}"?`);
+    const confirmed = window.confirm(`Arsipkan dompet "${wallet.name}"?`);
 
     if (!confirmed) {
       return;
@@ -113,10 +113,10 @@ export function WalletPage() {
 
     try {
       await archiveWallet.mutateAsync(wallet.id);
-      toast({ title: 'Wallet diarsipkan', description: `${wallet.name} sudah masuk arsip.` });
+      toast({ title: 'Dompet diarsipkan', description: `${wallet.name} sudah masuk arsip.` });
     } catch (error) {
       toast({
-        title: 'Gagal mengarsipkan wallet',
+        title: 'Gagal mengarsipkan dompet',
         description: error instanceof Error ? error.message : 'Silakan coba lagi.',
         variant: 'destructive'
       });
@@ -125,7 +125,7 @@ export function WalletPage() {
 
   const handleDelete = async (wallet: Wallet) => {
     const confirmed = window.confirm(
-      `Hapus wallet "${wallet.name}"? Wallet hanya bisa dihapus jika belum memiliki transaksi.`
+      `Hapus dompet "${wallet.name}"? Dompet hanya bisa dihapus jika belum memiliki catatan uang.`
     );
 
     if (!confirmed) {
@@ -137,14 +137,14 @@ export function WalletPage() {
       if (effectiveSelectedWalletId === wallet.id) {
         setSelectedWalletId(undefined);
       }
-      toast({ title: 'Wallet dihapus', description: `${wallet.name} sudah dihapus.` });
+      toast({ title: 'Dompet dihapus', description: `${wallet.name} sudah dihapus.` });
     } catch (error) {
       toast({
-        title: 'Wallet tidak bisa dihapus',
+        title: 'Dompet tidak bisa dihapus',
         description:
           error instanceof Error
             ? error.message
-            : 'Wallet ini mungkin sudah memiliki transaksi. Arsipkan wallet sebagai alternatif.',
+            : 'Dompet ini mungkin sudah memiliki catatan uang. Arsipkan dompet sebagai alternatif.',
         variant: 'destructive'
       });
     }
@@ -164,22 +164,22 @@ export function WalletPage() {
               </Link>
             </Button>
             <p className="text-sm font-medium text-primary">{activeWorkspace.name}</p>
-            <h1 className="mt-1 text-3xl font-semibold tracking-normal">Wallet</h1>
+            <h1 className="mt-1 text-3xl font-semibold tracking-normal">Dompet</h1>
             <p className="mt-2 text-sm text-muted-foreground">
-              Kelola sumber dana dan saldo awal workspace aktif.
+              Kelola sumber uang dan saldo aktif di ruang keuangan ini.
             </p>
           </div>
           {isWalletLimitReached ? (
             <Button asChild>
               <Link to="/app/upgrade">
                 <Lock className="size-4" />
-                Upgrade untuk Wallet
+                Upgrade untuk Dompet
               </Link>
             </Button>
           ) : (
             <Button onClick={openCreatePanel} type="button">
               <Plus className="size-4" />
-              Tambah Wallet
+              Tambah Dompet
             </Button>
           )}
         </div>
@@ -189,9 +189,9 @@ export function WalletPage() {
             {panelMode ? (
               <Card>
                 <CardHeader>
-                  <CardTitle>{panelMode === 'edit' ? 'Edit Wallet' : 'Tambah Wallet'}</CardTitle>
+                  <CardTitle>{panelMode === 'edit' ? 'Edit Dompet' : 'Tambah Dompet'}</CardTitle>
                   <CardDescription>
-                    Isi data wallet dengan jelas agar laporan keuangan mudah dibaca.
+                    Isi data dompet dengan jelas agar catatan uang mudah dibaca.
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
