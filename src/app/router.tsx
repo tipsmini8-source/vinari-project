@@ -15,6 +15,7 @@ import {
 } from '@features/auth/pages';
 import { BudgetFormPage, BudgetListPage } from '@features/budget';
 import { DashboardPage } from '@features/dashboard';
+import { DebtDetailPage, DebtFormPage, DebtListPage } from '@features/debt';
 import { GoalDetailPage, GoalFormPage, GoalListPage } from '@features/goal';
 import { OnboardingPage } from '@features/onboarding';
 import { TransactionDetailPage, TransactionFormPage, TransactionListPage } from '@features/transaction';
@@ -124,6 +125,22 @@ export const router = createBrowserRouter([
           {
             path: 'app/goals/:id/edit',
             element: <GoalFormPage />
+          },
+          {
+            path: 'app/debts',
+            element: <DebtListPage />
+          },
+          {
+            path: 'app/debts/new',
+            element: <DebtFormPage />
+          },
+          {
+            path: 'app/debts/:id',
+            element: <DebtDetailPage />
+          },
+          {
+            path: 'app/debts/:id/edit',
+            element: <DebtFormPage />
           },
           {
             path: 'app/transactions',
