@@ -122,6 +122,7 @@ export function PreferencesForm({
       dateFormat: 'DD/MM/YYYY',
       firstDayOfWeek: 'monday',
       emailNotification: true,
+      appTemplate: defaultPreferences.app_template,
       pushNotification: true
     }
   });
@@ -134,12 +135,14 @@ export function PreferencesForm({
       dateFormat: defaultPreferences.date_format,
       firstDayOfWeek: defaultPreferences.first_day_of_week,
       emailNotification: defaultPreferences.email_notification,
+      appTemplate: defaultPreferences.app_template,
       pushNotification: defaultPreferences.push_notification
     });
   }, [defaultPreferences, reset]);
 
   return (
     <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
+      <input type="hidden" {...register('appTemplate')} />
       <div className="grid gap-4 sm:grid-cols-3">
         <div className="space-y-2">
           <Label htmlFor="theme">Theme</Label>

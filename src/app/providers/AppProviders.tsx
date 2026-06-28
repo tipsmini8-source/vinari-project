@@ -7,6 +7,7 @@ import { ThemeProvider } from '@app/providers/ThemeProvider';
 import { WorkspaceProvider } from '@/core/workspace';
 import { AuthProvider } from '@features/auth';
 import { queryClient } from '@shared/api/query-client';
+import { AppTemplateProvider } from '@shared/theme/use-app-template';
 import { ToastProvider } from '@shared/ui/toast';
 
 export function AppProviders({ children }: PropsWithChildren) {
@@ -16,7 +17,9 @@ export function AppProviders({ children }: PropsWithChildren) {
         <ThemeProvider>
           <ToastProvider>
             <AuthProvider>
-              <WorkspaceProvider>{children}</WorkspaceProvider>
+              <AppTemplateProvider>
+                <WorkspaceProvider>{children}</WorkspaceProvider>
+              </AppTemplateProvider>
             </AuthProvider>
           </ToastProvider>
         </ThemeProvider>

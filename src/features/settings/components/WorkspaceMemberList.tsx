@@ -28,11 +28,11 @@ function formatDate(value: string | null | undefined) {
 
 function statusClassName(status: WorkspaceMember['status']) {
   if (status === 'active') {
-    return 'border-emerald-500/20 bg-emerald-500/10 text-emerald-700';
+    return 'border-success/20 bg-success/10 text-success';
   }
 
   if (status === 'invited') {
-    return 'border-amber-500/20 bg-amber-500/10 text-amber-700';
+    return 'border-warning/30 bg-warning/15 text-warning';
   }
 
   return 'border-muted bg-muted text-muted-foreground';
@@ -94,7 +94,7 @@ export function WorkspaceMemberList({
                 <div className="flex flex-wrap items-center gap-2">
                   <h3 className="truncate font-semibold">{memberDisplayName(member)}</h3>
                   {member.user_id === currentUserId ? (
-                    <span className="rounded-full border border-primary/20 bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
+                    <span className="rounded-full border border-primary/20 bg-primary-soft px-2 py-0.5 text-xs font-medium text-primary">
                       Anda
                     </span>
                   ) : null}
@@ -105,7 +105,7 @@ export function WorkspaceMemberList({
                     : member.invite_email ?? 'Akun sudah bergabung'}
                 </p>
                 <div className="mt-3 flex flex-wrap gap-2">
-                  <span className="rounded-full border border-primary/20 bg-primary/10 px-2 py-0.5 text-xs font-medium capitalize text-primary">
+                  <span className="rounded-full border border-primary/20 bg-primary-soft px-2 py-0.5 text-xs font-medium capitalize text-primary">
                     {roleLabels[member.role]}
                   </span>
                   <span className={`rounded-full border px-2 py-0.5 text-xs font-medium capitalize ${statusClassName(member.status)}`}>

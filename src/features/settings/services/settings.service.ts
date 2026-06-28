@@ -12,6 +12,7 @@ import type {
   WorkspaceSettings,
   WorkspaceSettingsSubmitInput
 } from '@features/settings/types/settings.types';
+import { getAppTemplate, type AppTemplateId } from '@shared/theme/app-templates';
 
 type SupabaseErrorLike = {
   message?: string;
@@ -54,6 +55,10 @@ function asFirstDayOfWeek(value: unknown): UserPreferences['first_day_of_week'] 
   return value === 'sunday' ? 'sunday' : 'monday';
 }
 
+function asAppTemplate(value: unknown): AppTemplateId {
+  return getAppTemplate(value).id;
+}
+
 function mapProfile(row: Record<string, unknown>): UserProfile {
   return {
     id: asString(row.id),
@@ -76,6 +81,7 @@ function mapPreferences(row: Record<string, unknown> | null, userId: string): Us
       date_format: 'DD/MM/YYYY',
       first_day_of_week: 'monday',
       email_notification: true,
+      app_template: 'tech_premium',
       push_notification: true
     };
   }
@@ -89,6 +95,7 @@ function mapPreferences(row: Record<string, unknown> | null, userId: string): Us
     date_format: asString(row.date_format, 'DD/MM/YYYY'),
     first_day_of_week: asFirstDayOfWeek(row.first_day_of_week),
     email_notification: Boolean(row.email_notification),
+    app_template: asAppTemplate(row.app_template),
     push_notification: Boolean(row.push_notification)
   };
 }
@@ -275,7 +282,7 @@ export const SettingsService = {
   async getPreferences(userId: string): Promise<UserPreferences> {
     const { data, error } = (await supabase
       .from('user_preferences')
-      .select('id, user_id, theme, language, currency_code, date_format, first_day_of_week, email_notification, push_notification')
+      .select('id, user_id, theme, language, currency_code, date_format, first_day_of_week, email_notification, push_notification, app_template')
       .eq('user_id', userId)
       .maybeSingle()) as unknown as {
       data: Record<string, unknown> | null;
@@ -297,6 +304,7 @@ export const SettingsService = {
       first_day_of_week: input.firstDayOfWeek,
       email_notification: input.emailNotification,
       push_notification: input.pushNotification,
+      app_template: input.appTemplate,
       notification_enabled: input.emailNotification || input.pushNotification,
       metadata: {}
     };
@@ -304,13 +312,34 @@ export const SettingsService = {
     const { data, error } = (await supabase
       .from('user_preferences')
       .upsert(payload, { onConflict: 'user_id' })
-      .select('id, user_id, theme, language, currency_code, date_format, first_day_of_week, email_notification, push_notification')
+      .select('id, user_id, theme, language, currency_code, date_format, first_day_of_week, email_notification, push_notification, app_template')
       .single()) as unknown as {
       data: Record<string, unknown> | null;
       error: SupabaseErrorLike | null;
     };
 
     assertSupabaseSuccess(error, 'Gagal menyimpan preferensi.');
+
+    return mapPreferences(data, userId);
+  },
+
+  async updateAppTemplate(userId: string, templateId: AppTemplateId): Promise<UserPreferences> {
+    const payload = {
+      user_id: userId,
+      app_template: getAppTemplate(templateId).id,
+      metadata: {}
+    };
+
+    const { data, error } = (await supabase
+      .from('user_preferences')
+      .upsert(payload, { onConflict: 'user_id' })
+      .select('id, user_id, theme, language, currency_code, date_format, first_day_of_week, email_notification, push_notification, app_template')
+      .single()) as unknown as {
+      data: Record<string, unknown> | null;
+      error: SupabaseErrorLike | null;
+    };
+
+    assertSupabaseSuccess(error, 'Gagal menyimpan template tampilan.');
 
     return mapPreferences(data, userId);
   },

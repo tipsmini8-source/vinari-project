@@ -73,7 +73,7 @@ function formatPlanPrice(plan: Plan) {
 
 function statusClass(status: string) {
   if (status === 'approved' || status === 'active') {
-    return 'bg-primary/10 text-primary';
+    return 'bg-primary-soft text-primary';
   }
 
   if (status === 'pending') {
@@ -117,7 +117,7 @@ export function PlanCard({ activePlanCode, isPending, isSubmitting, onUpgrade, p
               <span
                 className={cn(
                   'flex size-5 items-center justify-center rounded-full',
-                  enabled ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground'
+                  enabled ? 'bg-primary-soft text-primary' : 'bg-muted text-muted-foreground'
                 )}
               >
                 <Check className="size-3" />
@@ -218,7 +218,7 @@ export function PaymentRequestList({ onUploadProof, onViewProof, requests }: Pay
                 <p className="mt-2 text-sm text-destructive">{request.rejected_reason}</p>
               ) : null}
               {request.proof_url ? (
-                <p className="mt-2 inline-flex items-center gap-2 rounded-sm bg-primary/10 px-2 py-1 text-xs font-medium text-primary">
+                <p className="mt-2 inline-flex items-center gap-2 rounded-sm bg-primary-soft px-2 py-1 text-xs font-medium text-primary">
                   <FileCheck className="size-3" />
                   Bukti sudah diupload
                 </p>

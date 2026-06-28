@@ -13,8 +13,8 @@ import { GlobalLoading } from '@shared/ui/global-loading';
 import { useToast } from '@shared/ui/use-toast';
 
 const tabs: Array<{ label: string; value: CategoryType }> = [
-  { label: 'Income', value: 'income' },
-  { label: 'Expense', value: 'expense' }
+  { label: 'Uang Masuk', value: 'income' },
+  { label: 'Uang Keluar', value: 'expense' }
 ];
 
 function canManageCategories(role: string | undefined) {
@@ -70,7 +70,7 @@ export function CategoryListPage() {
             <p className="text-sm font-medium text-primary">{workspace.name}</p>
             <h1 className="mt-1 text-3xl font-semibold tracking-normal">Kategori</h1>
             <p className="mt-2 text-sm text-muted-foreground">
-              Kelola kategori income dan expense untuk transaksi, budget, dan laporan.
+              Kelola kategori uang masuk dan uang keluar agar catatan lebih rapi.
             </p>
           </div>
           {canManage ? (

@@ -4,6 +4,7 @@ import type {
   ProfileFormInput,
   WorkspaceSettingsFormInput
 } from '@features/settings/schemas/settings.schemas';
+import type { AppTemplateId } from '@shared/theme/app-templates';
 
 export type UserProfile = {
   id: string;
@@ -23,6 +24,7 @@ export type UserPreferences = {
   date_format: string;
   first_day_of_week: 'monday' | 'sunday';
   email_notification: boolean;
+  app_template: AppTemplateId;
   push_notification: boolean;
 };
 

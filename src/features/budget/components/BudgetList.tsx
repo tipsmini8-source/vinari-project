@@ -27,7 +27,7 @@ const statusLabels: Record<BudgetStatus, string> = {
 };
 
 const statusClasses: Record<BudgetStatus, string> = {
-  safe: 'bg-primary/10 text-primary',
+  safe: 'bg-primary-soft text-primary',
   warning: 'bg-secondary text-foreground',
   over: 'bg-destructive/10 text-destructive'
 };

@@ -21,6 +21,9 @@ export const preferencesSchema = z.object({
     message: 'Hari pertama minggu tidak valid.'
   }),
   emailNotification: z.boolean(),
+  appTemplate: z.enum(['tech_premium', 'fintech_fresh'], {
+    message: 'Template tampilan tidak valid.'
+  }),
   pushNotification: z.boolean()
 });
 

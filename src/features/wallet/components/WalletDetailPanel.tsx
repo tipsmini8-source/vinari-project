@@ -44,7 +44,7 @@ export function WalletDetailPanel({ detail, isLoading }: WalletDetailPanelProps)
       <div className="flex items-start gap-3">
         <span
           className="flex size-10 items-center justify-center rounded-md text-white"
-          style={{ backgroundColor: detail.color ?? '#0f766e' }}
+          style={{ backgroundColor: detail.color ?? '#0077B6' }}
         >
           <WalletCards className="size-5" />
         </span>

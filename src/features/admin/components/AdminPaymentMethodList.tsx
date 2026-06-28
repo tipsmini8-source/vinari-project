@@ -40,7 +40,7 @@ export function AdminPaymentMethodList({
                 <span
                   className={cn(
                     'rounded-sm px-2 py-0.5 text-xs font-medium',
-                    method.is_active ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground'
+                    method.is_active ? 'bg-primary-soft text-primary' : 'bg-muted text-muted-foreground'
                   )}
                 >
                   {method.is_active ? 'Aktif' : 'Nonaktif'}

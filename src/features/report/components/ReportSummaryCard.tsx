@@ -9,7 +9,7 @@ type ReportSummaryCardProps = {
 
 export function ReportSummaryCard({ icon: Icon, label, tone = 'default', value }: ReportSummaryCardProps) {
   const toneClass =
-    tone === 'positive' ? 'text-primary' : tone === 'negative' ? 'text-destructive' : 'text-foreground';
+    tone === 'positive' ? 'text-success' : tone === 'negative' ? 'text-destructive' : 'text-foreground';
 
   return (
     <article className="rounded-md border border-border bg-card p-4 text-card-foreground shadow-sm">

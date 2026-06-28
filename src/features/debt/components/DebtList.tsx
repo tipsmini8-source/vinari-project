@@ -22,8 +22,8 @@ const dateFormatter = new Intl.DateTimeFormat('id-ID', {
 });
 
 const statusClasses: Record<DebtStatus, string> = {
-  active: 'bg-primary/10 text-primary',
-  paid: 'bg-primary/10 text-primary',
+  active: 'bg-primary-soft text-primary',
+  paid: 'bg-success/10 text-success',
   cancelled: 'bg-destructive/10 text-destructive'
 };
 

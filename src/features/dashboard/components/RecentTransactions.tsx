@@ -20,7 +20,7 @@ const dateFormatter = new Intl.DateTimeFormat('id-ID', {
 
 function getAmountClass(type: DashboardTransaction['type']) {
   if (type === 'income') {
-    return 'text-primary';
+    return 'text-success';
   }
 
   if (type === 'expense') {

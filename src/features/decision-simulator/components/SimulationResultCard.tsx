@@ -4,9 +4,9 @@ import type { SimulationStatus } from '@features/decision-simulator/types/decisi
 import { cn } from '@shared/lib/utils';
 
 const statusClassName: Record<SimulationStatus, string> = {
-  Aman: 'border-emerald-500/20 bg-emerald-500/10 text-emerald-700',
+  Aman: 'border-success/20 bg-success/10 text-success',
   Berisiko: 'border-destructive/20 bg-destructive/10 text-destructive',
-  'Perlu Perhatian': 'border-amber-500/20 bg-amber-500/10 text-amber-700'
+  'Perlu Perhatian': 'border-warning/30 bg-warning/15 text-warning'
 };
 
 export function SimulationResultCard({

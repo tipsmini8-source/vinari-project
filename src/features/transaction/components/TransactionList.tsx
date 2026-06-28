@@ -21,7 +21,7 @@ const dateFormatter = new Intl.DateTimeFormat('id-ID', {
 
 function getAmountClass(type: Transaction['type']) {
   if (type === 'income') {
-    return 'text-primary';
+    return 'text-success';
   }
 
   if (type === 'expense') {

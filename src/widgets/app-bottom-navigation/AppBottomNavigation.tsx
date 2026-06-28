@@ -4,6 +4,7 @@ import { Link, useLocation } from 'react-router';
 
 import { appNavigation, isNavigationActive } from '@app/config/navigation';
 import { cn } from '@shared/lib/utils';
+import { useAppTemplate } from '@shared/theme/use-app-template';
 import { Button } from '@shared/ui/button';
 
 const actionItems = [
@@ -27,6 +28,7 @@ const actionItems = [
 export function AppBottomNavigation() {
   const [open, setOpen] = useState(false);
   const { pathname } = useLocation();
+  const { activeColors } = useAppTemplate();
   const firstItems = appNavigation.slice(0, 2);
   const lastItems = appNavigation.slice(2);
 
@@ -56,7 +58,10 @@ export function AppBottomNavigation() {
                   onClick={() => setOpen(false)}
                   to={href}
                 >
-                  <span className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                  <span
+                    className="flex size-10 items-center justify-center rounded-xl"
+                    style={{ backgroundColor: activeColors.iconSoftBackground, color: activeColors.primaryColor }}
+                  >
                     <Icon className="size-5" />
                   </span>
                   {label}
@@ -70,22 +75,29 @@ export function AppBottomNavigation() {
       <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-border bg-background/95 px-2 pb-[max(env(safe-area-inset-bottom),0.5rem)] pt-2 backdrop-blur lg:hidden">
         <div className="grid grid-cols-5 items-end gap-1 pb-1">
           {firstItems.map((item) => (
-            <BottomLink item={item} key={item.href} pathname={pathname} />
+            <BottomLink activeColors={activeColors} item={item} key={item.href} pathname={pathname} />
           ))}
 
           <button
-            className="mx-auto flex -translate-y-3 flex-col items-center gap-1 text-xs font-semibold text-primary"
+            className="mx-auto flex -translate-y-3 flex-col items-center gap-1 text-xs font-semibold"
             onClick={() => setOpen(true)}
+            style={{ color: activeColors.navActiveColor }}
             type="button"
           >
-            <span className="flex size-14 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-lg shadow-primary/25">
-              <Plus className="size-7" />
+            <span
+              className="flex size-14 items-center justify-center rounded-[1.35rem] text-white shadow-lg"
+              style={{
+                background: activeColors.centerButtonGradient,
+                boxShadow: '0 16px 34px rgba(29, 78, 216, 0.32)'
+              }}
+            >
+              <Plus className="size-8" />
             </span>
             <span>Catat</span>
           </button>
 
           {lastItems.map((item) => (
-            <BottomLink item={item} key={item.href} pathname={pathname} />
+            <BottomLink activeColors={activeColors} item={item} key={item.href} pathname={pathname} />
           ))}
         </div>
       </nav>
@@ -93,17 +105,25 @@ export function AppBottomNavigation() {
   );
 }
 
-function BottomLink({ item, pathname }: { item: (typeof appNavigation)[number]; pathname: string }) {
+function BottomLink({
+  activeColors,
+  item,
+  pathname
+}: {
+  activeColors: ReturnType<typeof useAppTemplate>['activeColors'];
+  item: (typeof appNavigation)[number];
+  pathname: string;
+}) {
   const Icon = item.icon;
+  const active = isNavigationActive(pathname, item);
 
   return (
     <Link
       className={cn(
         'flex h-14 min-w-0 flex-col items-center justify-center gap-1 rounded-xl px-1 text-[11px] font-medium transition-colors',
-        isNavigationActive(pathname, item)
-          ? 'bg-primary/10 text-primary'
-          : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
+        active ? '' : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
       )}
+      style={active ? { backgroundColor: activeColors.softBackground, color: activeColors.navActiveColor } : undefined}
       to={item.href}
     >
       <Icon aria-hidden="true" className="size-5" />

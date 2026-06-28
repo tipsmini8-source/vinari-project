@@ -22,7 +22,7 @@ const walletTypes = [
 ];
 
 const walletIcons = ['wallet', 'landmark', 'smartphone', 'piggy-bank', 'trending-up', 'coins'];
-const walletColors = ['#0f766e', '#2563eb', '#16a34a', '#f97316', '#7c3aed', '#64748b'];
+const walletColors = ['#0077B6', '#023E8A', '#00B4D8', '#16A34A', '#F59E0B', '#64748B'];
 
 type WalletFormProps = {
   defaultWallet?: Wallet | null;
@@ -46,7 +46,7 @@ export function WalletForm({ defaultWallet, isSubmitting, onCancel, onSubmit }: 
       walletType: 'bank',
       initialBalance: 0,
       icon: 'wallet',
-      color: '#0f766e'
+      color: '#0077B6'
     }
   });
 
@@ -59,7 +59,7 @@ export function WalletForm({ defaultWallet, isSubmitting, onCancel, onSubmit }: 
       walletType: defaultWallet?.wallet_type ?? 'bank',
       initialBalance: defaultWallet?.initial_balance ?? 0,
       icon: defaultWallet?.icon ?? 'wallet',
-      color: defaultWallet?.color ?? '#0f766e'
+      color: defaultWallet?.color ?? '#0077B6'
     });
   }, [defaultWallet, reset]);
 

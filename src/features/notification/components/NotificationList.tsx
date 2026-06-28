@@ -14,9 +14,9 @@ const dateFormatter = new Intl.DateTimeFormat('id-ID', {
 
 const typeClassName: Record<NotificationType, string> = {
   error: 'border-destructive/20 bg-destructive/10 text-destructive',
-  info: 'border-primary/20 bg-primary/10 text-primary',
-  success: 'border-emerald-500/20 bg-emerald-500/10 text-emerald-700',
-  warning: 'border-amber-500/20 bg-amber-500/10 text-amber-700'
+  info: 'border-primary/20 bg-primary-soft text-primary',
+  success: 'border-success/20 bg-success/10 text-success',
+  warning: 'border-warning/30 bg-warning/15 text-warning'
 };
 
 function formatDate(value: string) {
@@ -51,7 +51,7 @@ export function NotificationList({
         <article
           className={cn(
             'rounded-md border bg-card p-4 text-card-foreground shadow-sm transition-colors',
-            notification.is_read ? 'border-border' : 'border-primary/40 bg-primary/5'
+            notification.is_read ? 'border-border' : 'border-primary/40 bg-primary-soft/60'
           )}
           key={notification.id}
         >

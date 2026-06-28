@@ -4,13 +4,14 @@ import type { LucideProps } from 'lucide-react';
 import { Link } from 'react-router';
 
 import { cn } from '@shared/lib/utils';
+import { useAppTemplate } from '@shared/theme/use-app-template';
 import { Button } from '@shared/ui/button';
 
 type IconComponent = ComponentType<LucideProps>;
 
 export function AppPage({ children, className }: PropsWithChildren<{ className?: string }>) {
   return (
-    <main className={cn('min-h-svh overflow-x-hidden bg-muted/30 px-4 py-6 text-foreground sm:px-6 lg:px-8', className)}>
+    <main className={cn('min-h-svh overflow-x-hidden bg-background px-4 py-6 text-foreground sm:px-6 lg:px-8', className)}>
       <section className="mx-auto w-full max-w-6xl">{children}</section>
     </main>
   );
@@ -61,8 +62,8 @@ export function MoneyCard({
     <div
       className={cn(
         'rounded-2xl border border-border bg-card p-4 text-card-foreground shadow-sm',
-        tone === 'positive' && 'bg-emerald-500/10',
-        tone === 'negative' && 'bg-rose-500/10'
+        tone === 'positive' && 'bg-success/10',
+        tone === 'negative' && 'bg-destructive/10'
       )}
     >
       <p className="text-sm text-muted-foreground">{label}</p>
@@ -84,7 +85,7 @@ export function StatCard({
     <div className="rounded-2xl border border-border bg-card p-4 text-card-foreground shadow-sm">
       <div className="flex items-start gap-3">
         {Icon ? (
-          <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+          <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary-soft text-primary">
             <Icon className="size-5" />
           </span>
         ) : null}
@@ -100,6 +101,7 @@ export function StatCard({
 export function QuickActionButton({
   icon: Icon,
   label,
+  style,
   tone = 'default',
   to,
   ...props
@@ -109,10 +111,18 @@ export function QuickActionButton({
   tone?: 'default' | 'income' | 'expense';
   to?: string;
 }) {
+  const { activeColors } = useAppTemplate();
+  const gradientByTone = {
+    default: activeColors.centerButtonGradient,
+    expense: 'linear-gradient(135deg, #E11D48 0%, #F43F5E 100%)',
+    income: 'linear-gradient(135deg, #16A34A 0%, #22C55E 100%)'
+  };
   const content = (
     <>
-      <Icon className="size-5" />
-      <span className="text-xs font-semibold leading-tight sm:text-sm">{label}</span>
+      <span className="flex size-9 items-center justify-center rounded-full bg-white/20 shadow-inner shadow-white/10 sm:size-10">
+        <Icon className="size-5 sm:size-6" />
+      </span>
+      <span className="text-xs font-semibold leading-tight text-white sm:text-sm">{label}</span>
     </>
   );
 
@@ -120,10 +130,13 @@ export function QuickActionButton({
     <Button
       asChild={Boolean(to)}
       className={cn(
-        'h-auto min-h-20 flex-1 flex-col gap-2 rounded-2xl px-3 py-4 text-center shadow-sm',
-        tone === 'income' && 'bg-emerald-600 text-white hover:bg-emerald-700',
-        tone === 'expense' && 'bg-rose-600 text-white hover:bg-rose-700'
+        'h-auto min-h-[5.75rem] flex-1 flex-col gap-2 rounded-[1.35rem] px-3 py-4 text-center text-white shadow-lg transition-all hover:-translate-y-0.5 hover:opacity-95 active:translate-y-0 dark:text-white'
       )}
+      style={{
+        background: gradientByTone[tone],
+        boxShadow: '0 14px 30px rgba(15, 23, 42, 0.14)',
+        ...style
+      }}
       {...props}
     >
       {to ? <Link to={to}>{content}</Link> : content}
@@ -137,8 +150,8 @@ export function StatusBadge({ children, tone = 'default' }: PropsWithChildren<{ 
       className={cn(
         'inline-flex w-fit items-center rounded-full px-2.5 py-1 text-xs font-medium',
         tone === 'default' && 'bg-secondary text-secondary-foreground',
-        tone === 'good' && 'bg-emerald-500/10 text-emerald-700',
-        tone === 'warn' && 'bg-amber-500/10 text-amber-700',
+        tone === 'good' && 'bg-success/10 text-success',
+        tone === 'warn' && 'bg-warning/15 text-warning',
         tone === 'bad' && 'bg-destructive/10 text-destructive'
       )}
     >
@@ -197,9 +210,9 @@ export function ErrorState({ message, onRetry, title = 'Data gagal dimuat' }: { 
 
 export function PremiumLockCard({ description = 'Upgrade Premium untuk membuka fitur ini.' }: { description?: string }) {
   return (
-    <div className="rounded-2xl border border-amber-500/20 bg-amber-500/10 p-5">
-      <h2 className="font-semibold text-amber-800">Fitur Premium</h2>
-      <p className="mt-1 text-sm leading-6 text-amber-800/80">{description}</p>
+    <div className="rounded-2xl border border-warning/30 bg-warning/10 p-5">
+      <h2 className="font-semibold text-warning">Fitur Premium</h2>
+      <p className="mt-1 text-sm leading-6 text-muted-foreground">{description}</p>
       <Button asChild className="mt-4 rounded-xl" size="sm">
         <Link to="/app/upgrade">Upgrade Premium</Link>
       </Button>

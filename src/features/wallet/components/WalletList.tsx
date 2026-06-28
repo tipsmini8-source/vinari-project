@@ -41,7 +41,7 @@ export function WalletList({
             <button className="flex flex-1 items-start gap-3 text-left" onClick={() => onSelect(wallet)} type="button">
               <span
                 className="flex size-11 shrink-0 items-center justify-center rounded-2xl text-white"
-                style={{ backgroundColor: wallet.color ?? '#0f766e' }}
+                style={{ backgroundColor: wallet.color ?? '#0077B6' }}
               >
                 <WalletCards className="size-5" />
               </span>

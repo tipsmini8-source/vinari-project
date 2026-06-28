@@ -31,7 +31,7 @@ const cycleLabels: Record<ScheduleCycle, string> = {
 };
 
 const typeClasses = {
-  income: 'bg-primary/10 text-primary',
+  income: 'bg-success/10 text-success',
   expense: 'bg-destructive/10 text-destructive'
 };
 
@@ -40,7 +40,7 @@ function StatusBadge({ isActive }: { isActive: boolean }) {
     <span
       className={cn(
         'rounded-sm px-2 py-0.5 text-xs font-medium',
-        isActive ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground'
+        isActive ? 'bg-primary-soft text-primary' : 'bg-muted text-muted-foreground'
       )}
     >
       {isActive ? 'Aktif' : 'Nonaktif'}

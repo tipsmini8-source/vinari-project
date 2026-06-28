@@ -1,5 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Loader2 } from 'lucide-react';
+import { createElement } from 'react';
 import { useEffect } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 
@@ -8,6 +9,7 @@ import type { Category, CategorySubmitInput } from '@features/category/types/cat
 import { Button } from '@shared/ui/button';
 import { Input } from '@shared/ui/input';
 import { Label } from '@shared/ui/label';
+import { categoryIconOptions, getCategoryIcon } from '@shared/utils/icon-map';
 
 type CategoryFormProps = {
   defaultCategory?: Category | null;
@@ -20,7 +22,7 @@ const selectClassName =
   'flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-70';
 
 function asColorInputValue(value: string) {
-  return /^#[0-9a-fA-F]{6}$/.test(value) ? value : '#2563eb';
+  return /^#[0-9a-fA-F]{6}$/.test(value) ? value : '#0077b6';
 }
 
 export function CategoryForm({ defaultCategory, isSubmitting, onCancel, onSubmit }: CategoryFormProps) {
@@ -38,8 +40,8 @@ export function CategoryForm({ defaultCategory, isSubmitting, onCancel, onSubmit
     defaultValues: {
       name: '',
       type: 'expense',
-      icon: '',
-      color: '#2563eb',
+      icon: 'circle-dollar-sign',
+      color: '#0077b6',
       sortOrder: 0
     }
   });
@@ -48,13 +50,15 @@ export function CategoryForm({ defaultCategory, isSubmitting, onCancel, onSubmit
     reset({
       name: defaultCategory?.name ?? '',
       type: defaultCategory?.type ?? 'expense',
-      icon: defaultCategory?.icon ?? '',
-      color: defaultCategory?.color ?? '#2563eb',
+      icon: defaultCategory?.icon ?? 'circle-dollar-sign',
+      color: defaultCategory?.color ?? '#0077b6',
       sortOrder: defaultCategory?.sort_order ?? 0
     });
   }, [defaultCategory, reset]);
 
-  const selectedColor = useWatch({ control, name: 'color' }) || '#2563eb';
+  const selectedColor = useWatch({ control, name: 'color' }) || '#0077b6';
+  const selectedIcon = useWatch({ control, name: 'icon' }) || 'circle-dollar-sign';
+  const iconOptions = categoryIconOptions.includes(selectedIcon) ? categoryIconOptions : [selectedIcon, ...categoryIconOptions];
 
   return (
     <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
@@ -71,19 +75,19 @@ export function CategoryForm({ defaultCategory, isSubmitting, onCancel, onSubmit
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="type">Type</Label>
+          <Label htmlFor="type">Jenis kategori</Label>
           {isEdit ? (
             <>
               <input type="hidden" {...register('type')} />
               <select className={selectClassName} disabled id="type" value={defaultCategory?.type ?? 'expense'}>
-                <option value="income">Income</option>
-                <option value="expense">Expense</option>
+                <option value="income">Uang Masuk</option>
+                <option value="expense">Uang Keluar</option>
               </select>
             </>
           ) : (
             <select className={selectClassName} id="type" {...register('type')}>
-              <option value="income">Income</option>
-              <option value="expense">Expense</option>
+              <option value="income">Uang Masuk</option>
+              <option value="expense">Uang Keluar</option>
             </select>
           )}
           {errors.type ? <p className="text-sm text-destructive">{errors.type.message}</p> : null}
@@ -93,7 +97,27 @@ export function CategoryForm({ defaultCategory, isSubmitting, onCancel, onSubmit
       <div className="grid gap-4 sm:grid-cols-3">
         <div className="space-y-2">
           <Label htmlFor="icon">Icon</Label>
-          <Input id="icon" placeholder="Contoh: Utensils" {...register('icon')} />
+          <div className="flex gap-2">
+            <div
+              className="flex size-10 shrink-0 items-center justify-center rounded-xl"
+              style={{
+                backgroundColor: /^#[0-9a-fA-F]{6}$/.test(selectedColor) ? `${selectedColor}18` : '#e0f2fe',
+                color: /^#[0-9a-fA-F]{6}$/.test(selectedColor) ? selectedColor : '#0077b6'
+              }}
+            >
+              {createElement(getCategoryIcon(selectedIcon), { className: 'size-5' })}
+            </div>
+            <select className={selectClassName} id="icon" {...register('icon')}>
+              {iconOptions.map((iconName) => (
+                <option key={iconName} value={iconName}>
+                  {iconName}
+                </option>
+              ))}
+            </select>
+          </div>
+          <p className="text-xs leading-5 text-muted-foreground">
+            Contoh icon: home, receipt, shopping-bag, car.
+          </p>
           {errors.icon ? <p className="text-sm text-destructive">{errors.icon.message}</p> : null}
         </div>
 
@@ -107,7 +131,7 @@ export function CategoryForm({ defaultCategory, isSubmitting, onCancel, onSubmit
               type="color"
               value={asColorInputValue(selectedColor)}
             />
-            <Input id="color" placeholder="#2563eb" {...register('color')} />
+            <Input id="color" placeholder="#0077b6" {...register('color')} />
           </div>
           {errors.color ? <p className="text-sm text-destructive">{errors.color.message}</p> : null}
         </div>

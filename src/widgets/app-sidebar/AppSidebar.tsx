@@ -28,7 +28,7 @@ function SidebarGroup({ group }: { group: NavigationGroup }) {
   const Icon = group.icon;
 
   return (
-    <div className={cn('rounded-xl border border-border bg-background p-2', active && 'border-primary/40 bg-primary/5')}>
+    <div className={cn('rounded-xl border border-border bg-background p-2', active && 'border-primary/40 bg-primary-soft/60')}>
       <Link
         className={cn(
           'flex items-start gap-3 rounded-lg p-2 transition-colors hover:bg-accent hover:text-accent-foreground',

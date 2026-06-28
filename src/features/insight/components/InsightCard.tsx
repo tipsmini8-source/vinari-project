@@ -7,15 +7,15 @@ import { Button } from '@shared/ui/button';
 
 const typeClassName: Record<InsightType, string> = {
   danger: 'border-destructive/20 bg-destructive/10 text-destructive',
-  info: 'border-primary/20 bg-primary/10 text-primary',
-  positive: 'border-emerald-500/20 bg-emerald-500/10 text-emerald-700',
-  warning: 'border-amber-500/20 bg-amber-500/10 text-amber-700'
+  info: 'border-primary/20 bg-primary-soft text-primary',
+  positive: 'border-success/20 bg-success/10 text-success',
+  warning: 'border-warning/30 bg-warning/15 text-warning'
 };
 
 const priorityClassName: Record<InsightPriority, string> = {
   high: 'border-destructive/20 bg-destructive/10 text-destructive',
   low: 'border-border bg-secondary text-secondary-foreground',
-  medium: 'border-amber-500/20 bg-amber-500/10 text-amber-700'
+  medium: 'border-warning/30 bg-warning/15 text-warning'
 };
 
 const iconByType = {

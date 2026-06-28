@@ -25,7 +25,7 @@ const dateFormatter = new Intl.DateTimeFormat('id-ID', {
 
 function statusClass(status: string) {
   if (status === 'approved') {
-    return 'bg-primary/10 text-primary';
+    return 'bg-primary-soft text-primary';
   }
 
   if (status === 'pending') {

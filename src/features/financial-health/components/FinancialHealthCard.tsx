@@ -7,9 +7,9 @@ import { Button } from '@shared/ui/button';
 
 const statusClassName: Record<FinancialHealthStatus, string> = {
   Berisiko: 'border-destructive/20 bg-destructive/10 text-destructive',
-  'Cukup Sehat': 'border-primary/20 bg-primary/10 text-primary',
-  'Perlu Perhatian': 'border-amber-500/20 bg-amber-500/10 text-amber-700',
-  Sehat: 'border-emerald-500/20 bg-emerald-500/10 text-emerald-700'
+  'Cukup Sehat': 'border-primary/20 bg-primary-soft text-primary',
+  'Perlu Perhatian': 'border-warning/30 bg-warning/15 text-warning',
+  Sehat: 'border-success/20 bg-success/10 text-success'
 };
 
 export function FinancialHealthSkeleton() {

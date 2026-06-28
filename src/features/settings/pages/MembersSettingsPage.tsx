@@ -186,7 +186,7 @@ export function MembersSettingsPage() {
               {planQuery.activePlan?.name ?? 'Free'}
             </span>
             {familyLocked ? (
-              <span className="rounded-full border border-amber-500/20 bg-amber-500/10 px-2 py-0.5 text-xs font-medium text-amber-700">
+              <span className="rounded-full border border-warning/30 bg-warning/15 px-2 py-0.5 text-xs font-medium text-warning">
                 Family terkunci
               </span>
             ) : null}
@@ -219,12 +219,12 @@ export function MembersSettingsPage() {
               ) : null}
 
               {manageable && memberLimitReached ? (
-                <div className="rounded-md border border-amber-500/20 bg-amber-500/10 p-4">
+                <div className="rounded-md border border-warning/30 bg-warning/15 p-4">
                   <div className="flex items-start gap-3">
-                    <Lock className="mt-0.5 size-5 text-amber-700" />
+                    <Lock className="mt-0.5 size-5 text-warning" />
                     <div>
-                      <h2 className="font-semibold text-amber-800">Limit member tercapai</h2>
-                      <p className="mt-1 text-sm text-amber-800/80">
+                      <h2 className="font-semibold text-warning">Limit member tercapai</h2>
+                      <p className="mt-1 text-sm text-muted-foreground">
                         Plan saat ini membatasi workspace ke {maxMembers} member. Upgrade ke Premium Family untuk
                         menambah hingga 5 member.
                       </p>
