@@ -1,4 +1,14 @@
-import { ArrowDownCircle, ArrowRightLeft, ArrowUpCircle, Plus, X } from 'lucide-react';
+import {
+  ArrowDownCircle,
+  ArrowRightLeft,
+  ArrowUpCircle,
+  CreditCard,
+  Landmark,
+  Plus,
+  Repeat,
+  Target,
+  X
+} from 'lucide-react';
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router';
 
@@ -9,19 +19,46 @@ import { Button } from '@shared/ui/button';
 
 const actionItems = [
   {
-    href: '/app/transactions/new?type=income',
+    description: 'Gaji, bonus, atau pemasukan lain.',
+    href: '/app/record?mode=income',
     icon: ArrowDownCircle,
     label: 'Catat Uang Masuk'
   },
   {
-    href: '/app/transactions/new?type=expense',
+    description: 'Belanja, makan, transport, dan kebutuhan harian.',
+    href: '/app/record?mode=expense',
     icon: ArrowUpCircle,
     label: 'Catat Uang Keluar'
   },
   {
-    href: '/app/transactions/new?type=transfer',
+    description: 'Pindahkan saldo antar dompet.',
+    href: '/app/record?mode=transfer',
     icon: ArrowRightLeft,
     label: 'Pindah Saldo'
+  },
+  {
+    description: 'Kurangi sisa hutang dan catat uang keluar.',
+    href: '/app/record?mode=debt',
+    icon: Landmark,
+    label: 'Bayar Hutang / Cicilan'
+  },
+  {
+    description: 'Bayar tagihan rutin dan majukan jatuh tempo.',
+    href: '/app/record?mode=subscription',
+    icon: CreditCard,
+    label: 'Bayar Langganan'
+  },
+  {
+    description: 'Tambah progres target tabungan.',
+    href: '/app/record?mode=goal',
+    icon: Target,
+    label: 'Tambah Tabungan Target'
+  },
+  {
+    description: 'Jalankan template transaksi berulang.',
+    href: '/app/record?mode=recurring',
+    icon: Repeat,
+    label: 'Catat Transaksi Rutin'
   }
 ];
 
@@ -37,7 +74,7 @@ export function AppBottomNavigation() {
       {open ? (
         <div className="fixed inset-0 z-40 bg-black/35 lg:hidden" onClick={() => setOpen(false)}>
           <div
-            className="absolute inset-x-0 bottom-0 rounded-t-[1.75rem] bg-background p-4 pb-[max(env(safe-area-inset-bottom),1rem)] shadow-2xl"
+            className="absolute inset-x-0 bottom-0 max-h-[86svh] overflow-y-auto rounded-t-[1.75rem] bg-background p-4 pb-[max(env(safe-area-inset-bottom),1rem)] shadow-2xl"
             onClick={(event) => event.stopPropagation()}
           >
             <div className="mx-auto mb-3 h-1.5 w-12 rounded-full bg-muted" />
@@ -51,9 +88,9 @@ export function AppBottomNavigation() {
               </Button>
             </div>
             <div className="grid gap-3">
-              {actionItems.map(({ href, icon: Icon, label }) => (
+              {actionItems.map(({ description, href, icon: Icon, label }) => (
                 <Link
-                  className="flex min-h-14 items-center gap-3 rounded-2xl bg-muted/60 p-4 font-semibold transition-colors hover:bg-accent"
+                  className="flex min-h-16 items-center gap-3 rounded-2xl bg-muted/60 p-4 transition-colors hover:bg-accent"
                   key={href}
                   onClick={() => setOpen(false)}
                   to={href}
@@ -64,7 +101,10 @@ export function AppBottomNavigation() {
                   >
                     <Icon className="size-5" />
                   </span>
-                  {label}
+                  <span className="min-w-0">
+                    <span className="block font-semibold leading-tight">{label}</span>
+                    <span className="mt-1 block text-xs font-normal leading-snug text-muted-foreground">{description}</span>
+                  </span>
                 </Link>
               ))}
             </div>

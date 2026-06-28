@@ -33,6 +33,7 @@ import {
   SubscriptionFormPage,
   SubscriptionListPage
 } from '@features/recurring';
+import { RecordActionPage } from '@features/record';
 import { ReportPage } from '@features/report';
 import {
   MembersSettingsPage,
@@ -158,6 +159,10 @@ export const router = createBrowserRouter([
               {
                 path: 'transactions/new',
                 element: <TransactionFormPage />
+              },
+              {
+                path: 'record',
+                element: <RecordActionPage />
               },
               {
                 path: 'transactions/:id',

@@ -196,6 +196,13 @@ export function TransactionForm({
         <Input className="h-12 rounded-xl text-base" id="note" placeholder="Opsional" {...register('note')} />
       </div>
 
+      {selectedType === 'expense' ? (
+        <div className="rounded-2xl bg-primary/10 p-3 text-sm text-muted-foreground">
+          Untuk bayar hutang, cicilan, atau langganan, gunakan menu khusus di tombol Catat agar sisa hutang dan jadwal
+          tagihan ikut tersinkron.
+        </div>
+      ) : null}
+
       <MobileActionBar>
         <div className="flex gap-2 sm:justify-end">
           <Button className="flex-1 rounded-xl sm:flex-none" disabled={isSubmitting} onClick={onCancel} type="button" variant="outline">
