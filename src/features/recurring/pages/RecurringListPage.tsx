@@ -7,10 +7,12 @@ import { RecurringEmptyState, RecurringErrorState, RecurringSkeleton } from '@fe
 import {
   useDeactivateRecurringTransaction,
   useDeleteRecurringTransaction,
-  useRecurringTransactions
+  useRecurringTransactions,
+  useUpdateRecurringTransaction
 } from '@features/recurring/hooks/useRecurring';
 import { formatRecurringDate } from '@features/recurring/services/recurring-formatters';
-import type { RecurringTransaction } from '@features/recurring/types/recurring.types';
+import type { RecurringTransaction, ScheduleCycle } from '@features/recurring/types/recurring.types';
+import { useCreateTransaction } from '@features/transaction/hooks/useTransactions';
 import { Button } from '@shared/ui/button';
 import { GlobalLoading } from '@shared/ui/global-loading';
 import { useToast } from '@shared/ui/use-toast';
@@ -19,12 +21,30 @@ function canManageRecurring(role: string | undefined) {
   return role === 'owner' || role === 'partner' || role === 'member';
 }
 
+function advanceDate(date: string, cycle: ScheduleCycle) {
+  const nextDate = new Date(date);
+
+  if (cycle === 'daily') {
+    nextDate.setDate(nextDate.getDate() + 1);
+  } else if (cycle === 'weekly') {
+    nextDate.setDate(nextDate.getDate() + 7);
+  } else if (cycle === 'yearly') {
+    nextDate.setFullYear(nextDate.getFullYear() + 1);
+  } else {
+    nextDate.setMonth(nextDate.getMonth() + 1);
+  }
+
+  return nextDate.toISOString().slice(0, 10);
+}
+
 export function RecurringListPage() {
   const { loading, workspace } = useWorkspace();
   const { toast } = useToast();
   const recurringQuery = useRecurringTransactions(workspace?.id);
   const deactivateRecurring = useDeactivateRecurringTransaction(workspace?.id);
   const deleteRecurring = useDeleteRecurringTransaction(workspace?.id);
+  const updateRecurring = useUpdateRecurringTransaction(workspace?.id);
+  const createTransaction = useCreateTransaction(workspace?.id);
   const canManage = canManageRecurring(workspace?.role);
 
   if (loading) {
@@ -70,6 +90,53 @@ export function RecurringListPage() {
     } catch (error) {
       toast({
         title: 'Gagal menghapus transaksi berulang',
+        description: error instanceof Error ? error.message : 'Silakan coba lagi.',
+        variant: 'destructive'
+      });
+    }
+  };
+
+  const handleRunNow = async (item: RecurringTransaction) => {
+    if (!item.wallet_id || !item.category_id) {
+      toast({
+        title: 'Data rutin belum lengkap',
+        description: 'Pastikan transaksi rutin punya dompet dan kategori sebelum dicatat.',
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    try {
+      await createTransaction.mutateAsync({
+        amount: item.amount,
+        categoryId: item.category_id,
+        destinationWalletId: '',
+        note: item.note ?? `Dari transaksi rutin: ${item.title}`,
+        title: item.title,
+        transactionDate: new Date().toISOString().slice(0, 10),
+        type: item.type,
+        walletId: item.wallet_id
+      });
+      await updateRecurring.mutateAsync({
+        recurringId: item.id,
+        input: {
+          amount: item.amount,
+          categoryId: item.category_id,
+          endDate: item.end_date ?? '',
+          frequency: item.frequency,
+          isActive: item.is_active,
+          nextRunDate: advanceDate(item.next_run_date, item.frequency),
+          note: item.note ?? '',
+          startDate: item.start_date,
+          title: item.title,
+          type: item.type,
+          walletId: item.wallet_id
+        }
+      });
+      toast({ title: 'Transaksi rutin dicatat' });
+    } catch (error) {
+      toast({
+        title: 'Gagal mencatat transaksi rutin',
         description: error instanceof Error ? error.message : 'Silakan coba lagi.',
         variant: 'destructive'
       });
@@ -137,6 +204,7 @@ export function RecurringListPage() {
             items={recurringQuery.data ?? []}
             onDeactivate={handleDeactivate}
             onDelete={handleDelete}
+            onRun={canManage ? handleRunNow : undefined}
           />
         ) : null}
       </section>

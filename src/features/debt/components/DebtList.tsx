@@ -8,6 +8,7 @@ import { Button } from '@shared/ui/button';
 type DebtListProps = {
   debts: DebtWithProgress[];
   onDelete: (debt: DebtWithProgress) => void;
+  onPay?: (debt: DebtWithProgress) => void;
 };
 
 const moneyFormatter = new Intl.NumberFormat('id-ID', {
@@ -89,21 +90,28 @@ function getDueDateLabel(debt: DebtWithProgress) {
   return `Jatuh tempo ${dueInDays} hari lagi`;
 }
 
-export function DebtList({ debts, onDelete }: DebtListProps) {
+export function DebtList({ debts, onDelete, onPay }: DebtListProps) {
   return (
     <div className="grid gap-3 lg:grid-cols-2">
       {debts.map((debt) => {
         const status = getDebtCardStatus(debt);
+        const canPay = debt.status === 'active' && debt.remaining_amount > 0;
 
         return (
           <CompactProgressCard
             action={
-              <Button asChild className="w-full rounded-2xl" size="sm" variant="outline">
-                <Link to={`/app/debts/${debt.id}`}>
-                  <Eye className="size-4" />
-                  Lihat Detail
-                </Link>
-              </Button>
+              canPay && onPay ? (
+                <Button className="w-full rounded-2xl" onClick={() => onPay(debt)} size="sm" type="button">
+                  Bayar
+                </Button>
+              ) : (
+                <Button asChild className="w-full rounded-2xl" size="sm" variant="outline">
+                  <Link to={`/app/debts/${debt.id}`}>
+                    <Eye className="size-4" />
+                    Lihat Detail
+                  </Link>
+                </Button>
+              )
             }
             badgeClassName={status.badgeClassName}
             badgeLabel={status.label}

@@ -7,6 +7,7 @@ import { Button } from '@shared/ui/button';
 
 type GoalListProps = {
   goals: GoalWithProgress[];
+  onAddContribution?: (goal: GoalWithProgress) => void;
   onDelete: (goal: GoalWithProgress) => void;
 };
 
@@ -52,23 +53,30 @@ function getGoalCardStatus(goal: GoalWithProgress) {
   };
 }
 
-export function GoalList({ goals, onDelete }: GoalListProps) {
+export function GoalList({ goals, onAddContribution, onDelete }: GoalListProps) {
   return (
     <div className="grid gap-3 lg:grid-cols-2">
       {goals.map((goal) => {
         const status = getGoalCardStatus(goal);
         const remainingLabel =
           goal.remaining_amount <= 0 ? 'Target tercapai' : `Kurang ${moneyFormatter.format(goal.remaining_amount)}`;
+        const canAddContribution = goal.status === 'active' && goal.percentage < 100;
 
         return (
           <CompactProgressCard
             action={
-              <Button asChild className="w-full rounded-2xl" size="sm" variant="outline">
-                <Link to={`/app/goals/${goal.id}`}>
-                  <Eye className="size-4" />
-                  Lihat Detail
-                </Link>
-              </Button>
+              canAddContribution && onAddContribution ? (
+                <Button className="w-full rounded-2xl" onClick={() => onAddContribution(goal)} size="sm" type="button">
+                  Tambah Tabungan
+                </Button>
+              ) : (
+                <Button asChild className="w-full rounded-2xl" size="sm" variant="outline">
+                  <Link to={`/app/goals/${goal.id}`}>
+                    <Eye className="size-4" />
+                    Lihat Detail
+                  </Link>
+                </Button>
+              )
             }
             badgeClassName={status.badgeClassName}
             badgeLabel={status.label}

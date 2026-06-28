@@ -10,8 +10,11 @@ import { Input } from '@shared/ui/input';
 import { Label } from '@shared/ui/label';
 
 type GoalContributionFormProps = {
+  defaultAmount?: number;
+  defaultWalletId?: string;
   isSubmitting: boolean;
   onSubmit: (input: GoalContributionFormInput) => Promise<void>;
+  submitLabel?: string;
   wallets: GoalReferenceWallet[];
 };
 
@@ -19,7 +22,14 @@ function today() {
   return new Date().toISOString().slice(0, 10);
 }
 
-export function GoalContributionForm({ isSubmitting, onSubmit, wallets }: GoalContributionFormProps) {
+export function GoalContributionForm({
+  defaultAmount = 0,
+  defaultWalletId = '',
+  isSubmitting,
+  onSubmit,
+  submitLabel = 'Tambah Kontribusi',
+  wallets
+}: GoalContributionFormProps) {
   const {
     formState: { errors, isSubmitSuccessful },
     handleSubmit,
@@ -28,23 +38,32 @@ export function GoalContributionForm({ isSubmitting, onSubmit, wallets }: GoalCo
   } = useForm<GoalContributionFormInput>({
     resolver: zodResolver(goalContributionSchema),
     defaultValues: {
-      amount: 0,
+      amount: defaultAmount,
       contributionDate: today(),
-      walletId: '',
+      walletId: defaultWalletId,
       note: ''
     }
   });
 
   useEffect(() => {
+    reset({
+      amount: defaultAmount,
+      contributionDate: today(),
+      walletId: defaultWalletId,
+      note: ''
+    });
+  }, [defaultAmount, defaultWalletId, reset]);
+
+  useEffect(() => {
     if (isSubmitSuccessful) {
       reset({
-        amount: 0,
+        amount: defaultAmount,
         contributionDate: today(),
-        walletId: '',
+        walletId: defaultWalletId,
         note: ''
       });
     }
-  }, [isSubmitSuccessful, reset]);
+  }, [defaultAmount, defaultWalletId, isSubmitSuccessful, reset]);
 
   return (
     <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
@@ -89,7 +108,7 @@ export function GoalContributionForm({ isSubmitting, onSubmit, wallets }: GoalCo
 
       <Button disabled={isSubmitting} type="submit">
         {isSubmitting ? <Loader2 className="size-4 animate-spin" /> : <Plus className="size-4" />}
-        Tambah Kontribusi
+        {submitLabel}
       </Button>
     </form>
   );

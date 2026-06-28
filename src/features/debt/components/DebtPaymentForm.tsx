@@ -10,9 +10,12 @@ import { Input } from '@shared/ui/input';
 import { Label } from '@shared/ui/label';
 
 type DebtPaymentFormProps = {
+  defaultAmount?: number;
+  defaultWalletId?: string;
   isSubmitting: boolean;
   onSubmit: (input: DebtPaymentFormInput) => Promise<void>;
   remainingAmount: number;
+  submitLabel?: string;
   wallets: DebtReferenceWallet[];
 };
 
@@ -20,7 +23,15 @@ function today() {
   return new Date().toISOString().slice(0, 10);
 }
 
-export function DebtPaymentForm({ isSubmitting, onSubmit, remainingAmount, wallets }: DebtPaymentFormProps) {
+export function DebtPaymentForm({
+  defaultAmount = 0,
+  defaultWalletId = '',
+  isSubmitting,
+  onSubmit,
+  remainingAmount,
+  submitLabel = 'Tambah Pembayaran',
+  wallets
+}: DebtPaymentFormProps) {
   const {
     formState: { errors, isSubmitSuccessful },
     handleSubmit,
@@ -29,23 +40,32 @@ export function DebtPaymentForm({ isSubmitting, onSubmit, remainingAmount, walle
   } = useForm<DebtPaymentFormInput>({
     resolver: zodResolver(debtPaymentSchema),
     defaultValues: {
-      amount: 0,
+      amount: defaultAmount,
       paymentDate: today(),
-      walletId: '',
+      walletId: defaultWalletId,
       note: ''
     }
   });
 
   useEffect(() => {
+    reset({
+      amount: defaultAmount,
+      paymentDate: today(),
+      walletId: defaultWalletId,
+      note: ''
+    });
+  }, [defaultAmount, defaultWalletId, reset]);
+
+  useEffect(() => {
     if (isSubmitSuccessful) {
       reset({
-        amount: 0,
+        amount: defaultAmount,
         paymentDate: today(),
-        walletId: '',
+        walletId: defaultWalletId,
         note: ''
       });
     }
-  }, [isSubmitSuccessful, reset]);
+  }, [defaultAmount, defaultWalletId, isSubmitSuccessful, reset]);
 
   return (
     <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
@@ -97,7 +117,7 @@ export function DebtPaymentForm({ isSubmitting, onSubmit, remainingAmount, walle
 
       <Button disabled={isSubmitting || remainingAmount <= 0} type="submit">
         {isSubmitting ? <Loader2 className="size-4 animate-spin" /> : <Plus className="size-4" />}
-        Tambah Pembayaran
+        {submitLabel}
       </Button>
     </form>
   );

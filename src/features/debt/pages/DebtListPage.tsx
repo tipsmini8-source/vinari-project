@@ -4,9 +4,12 @@ import { Link, Navigate } from 'react-router';
 
 import { useWorkspace } from '@/core/workspace';
 import { DebtList } from '@features/debt/components/DebtList';
+import { DebtPaymentForm } from '@features/debt/components/DebtPaymentForm';
 import { DebtEmptyState, DebtErrorState, DebtSkeleton } from '@features/debt/components/DebtStates';
-import { useDebts, useDeleteDebt } from '@features/debt/hooks/useDebts';
-import type { DebtWithProgress } from '@features/debt/types/debt.types';
+import { useAddDebtPayment, useDebts, useDeleteDebt, useDebtWallets } from '@features/debt/hooks/useDebts';
+import type { DebtPaymentFormInput, DebtWithProgress } from '@features/debt/types/debt.types';
+import { useCreateTransaction, useTransactionReferences } from '@features/transaction/hooks/useTransactions';
+import { ActionDialog } from '@shared/components/ActionDialog';
 import { ModuleInfoTip } from '@shared/components/ModuleInfoTip';
 import { ModuleSummaryCard } from '@shared/components/ModuleSummaryCard';
 import { SectionHeaderAction } from '@shared/components/SectionHeaderAction';
@@ -28,12 +31,22 @@ const moneyFormatter = new Intl.NumberFormat('id-ID', {
   maximumFractionDigits: 0
 });
 
+function canManagePlanning(role: string | undefined) {
+  return role === 'owner' || role === 'partner' || role === 'member';
+}
+
 export function DebtListPage() {
   const [statusFilter, setStatusFilter] = useState<StatusFilterValue>('active');
+  const [paymentDebt, setPaymentDebt] = useState<DebtWithProgress | null>(null);
   const { loading, workspace } = useWorkspace();
   const { toast } = useToast();
   const debtsQuery = useDebts(workspace?.id);
   const deleteDebt = useDeleteDebt(workspace?.id);
+  const addPayment = useAddDebtPayment(workspace?.id);
+  const createTransaction = useCreateTransaction(workspace?.id);
+  const paymentWallets = useDebtWallets(workspace?.id);
+  const transactionReferences = useTransactionReferences(workspace?.id);
+  const canManage = canManagePlanning(workspace?.role);
   const debts = useMemo(() => debtsQuery.data ?? [], [debtsQuery.data]);
   const filteredDebts = useMemo(
     () => filterByStatus(debts, statusFilter, getDebtDisplayStatus),
@@ -65,6 +78,56 @@ export function DebtListPage() {
     } catch (error) {
       toast({
         title: 'Gagal menghapus hutang',
+        description: error instanceof Error ? error.message : 'Silakan coba lagi.',
+        variant: 'destructive'
+      });
+    }
+  };
+
+  const expenseCategories = transactionReferences.categories.data?.filter((category) => category.type === 'expense') ?? [];
+  const debtCategory =
+    expenseCategories.find((category) => /hutang|cicilan|pinjaman/i.test(category.name)) ?? expenseCategories[0];
+
+  const handlePayment = async (input: DebtPaymentFormInput) => {
+    if (!paymentDebt) {
+      return;
+    }
+
+    if (!input.walletId) {
+      toast({
+        title: 'Dompet wajib dipilih',
+        description: 'Pilih dompet agar pembayaran hutang tercatat sebagai uang keluar.',
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    if (!debtCategory) {
+      toast({
+        title: 'Kategori belum tersedia',
+        description: 'Tambahkan kategori uang keluar untuk hutang atau cicilan terlebih dulu.',
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    try {
+      await addPayment.mutateAsync({ debtId: paymentDebt.id, input });
+      await createTransaction.mutateAsync({
+        amount: input.amount,
+        categoryId: debtCategory.id,
+        destinationWalletId: '',
+        note: input.note || `Pembayaran hutang: ${paymentDebt.name}`,
+        title: `Bayar ${paymentDebt.name}`,
+        transactionDate: input.paymentDate,
+        type: 'expense',
+        walletId: input.walletId
+      });
+      setPaymentDebt(null);
+      toast({ title: 'Pembayaran hutang dicatat' });
+    } catch (error) {
+      toast({
+        title: 'Gagal mencatat pembayaran',
         description: error instanceof Error ? error.message : 'Silakan coba lagi.',
         variant: 'destructive'
       });
@@ -125,7 +188,7 @@ export function DebtListPage() {
         ) : null}
 
         {!debtsQuery.isLoading && !debtsQuery.isError && filteredDebts.length > 0 ? (
-          <DebtList debts={filteredDebts} onDelete={handleDelete} />
+          <DebtList debts={filteredDebts} onDelete={handleDelete} onPay={canManage ? setPaymentDebt : undefined} />
         ) : null}
 
         {!debtsQuery.isLoading && !debtsQuery.isError ? (
@@ -133,6 +196,25 @@ export function DebtListPage() {
             Catat pembayaran secara rutin agar sisa hutang dan progres pelunasan tetap mudah dipantau.
           </ModuleInfoTip>
         ) : null}
+
+        <ActionDialog
+          description="Catat pembayaran cicilan dan otomatis buat catatan uang keluar dari dompet yang dipilih."
+          onClose={() => setPaymentDebt(null)}
+          open={Boolean(paymentDebt)}
+          title={paymentDebt ? `Bayar ${paymentDebt.name}` : 'Bayar Hutang'}
+        >
+          {paymentDebt ? (
+            <DebtPaymentForm
+              defaultAmount={Math.min(paymentDebt.installment_amount ?? paymentDebt.remaining_amount, paymentDebt.remaining_amount)}
+              defaultWalletId={paymentWallets.data?.[0]?.id ?? ''}
+              isSubmitting={addPayment.isPending || createTransaction.isPending}
+              onSubmit={handlePayment}
+              remainingAmount={paymentDebt.remaining_amount}
+              submitLabel="Bayar"
+              wallets={paymentWallets.data ?? []}
+            />
+          ) : null}
+        </ActionDialog>
       </section>
     </main>
   );

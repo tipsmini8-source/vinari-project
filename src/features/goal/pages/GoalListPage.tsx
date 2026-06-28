@@ -3,10 +3,12 @@ import { useMemo, useState } from 'react';
 import { Link, Navigate } from 'react-router';
 
 import { useWorkspace } from '@/core/workspace';
+import { GoalContributionForm } from '@features/goal/components/GoalContributionForm';
 import { GoalList } from '@features/goal/components/GoalList';
 import { GoalEmptyState, GoalErrorState, GoalSkeleton } from '@features/goal/components/GoalStates';
-import { useDeleteGoal, useGoals } from '@features/goal/hooks/useGoals';
-import type { GoalWithProgress } from '@features/goal/types/goal.types';
+import { useAddGoalContribution, useDeleteGoal, useGoalWallets, useGoals } from '@features/goal/hooks/useGoals';
+import type { GoalContributionFormInput, GoalWithProgress } from '@features/goal/types/goal.types';
+import { ActionDialog } from '@shared/components/ActionDialog';
 import { ModuleInfoTip } from '@shared/components/ModuleInfoTip';
 import { ModuleSummaryCard } from '@shared/components/ModuleSummaryCard';
 import { SectionHeaderAction } from '@shared/components/SectionHeaderAction';
@@ -28,12 +30,20 @@ const moneyFormatter = new Intl.NumberFormat('id-ID', {
   maximumFractionDigits: 0
 });
 
+function canManagePlanning(role: string | undefined) {
+  return role === 'owner' || role === 'partner' || role === 'member';
+}
+
 export function GoalListPage() {
   const [statusFilter, setStatusFilter] = useState<StatusFilterValue>('active');
+  const [contributionGoal, setContributionGoal] = useState<GoalWithProgress | null>(null);
   const { loading, workspace } = useWorkspace();
   const { toast } = useToast();
   const goalsQuery = useGoals(workspace?.id);
   const deleteGoal = useDeleteGoal(workspace?.id);
+  const addContribution = useAddGoalContribution(workspace?.id);
+  const walletsQuery = useGoalWallets(workspace?.id);
+  const canManage = canManagePlanning(workspace?.role);
   const goals = useMemo(() => goalsQuery.data ?? [], [goalsQuery.data]);
   const filteredGoals = useMemo(
     () => filterByStatus(goals, statusFilter, getGoalDisplayStatus),
@@ -65,6 +75,24 @@ export function GoalListPage() {
     } catch (error) {
       toast({
         title: 'Gagal menghapus target tabungan',
+        description: error instanceof Error ? error.message : 'Silakan coba lagi.',
+        variant: 'destructive'
+      });
+    }
+  };
+
+  const handleContribution = async (input: GoalContributionFormInput) => {
+    if (!contributionGoal) {
+      return;
+    }
+
+    try {
+      await addContribution.mutateAsync({ goalId: contributionGoal.id, input });
+      setContributionGoal(null);
+      toast({ title: 'Tabungan target ditambahkan' });
+    } catch (error) {
+      toast({
+        title: 'Gagal menambah tabungan',
         description: error instanceof Error ? error.message : 'Silakan coba lagi.',
         variant: 'destructive'
       });
@@ -125,7 +153,11 @@ export function GoalListPage() {
         ) : null}
 
         {!goalsQuery.isLoading && !goalsQuery.isError && filteredGoals.length > 0 ? (
-          <GoalList goals={filteredGoals} onDelete={handleDelete} />
+          <GoalList
+            goals={filteredGoals}
+            onAddContribution={canManage ? setContributionGoal : undefined}
+            onDelete={handleDelete}
+          />
         ) : null}
 
         {!goalsQuery.isLoading && !goalsQuery.isError ? (
@@ -133,6 +165,24 @@ export function GoalListPage() {
             Target tabungan membantu memantau tujuan uang tanpa mengubah saldo asli sampai Anda mencatat kontribusi.
           </ModuleInfoTip>
         ) : null}
+
+        <ActionDialog
+          description="Tambahkan progres tabungan target. Ini tidak mengurangi saldo dompet secara otomatis."
+          onClose={() => setContributionGoal(null)}
+          open={Boolean(contributionGoal)}
+          title={contributionGoal ? `Tambah Tabungan ${contributionGoal.name}` : 'Tambah Tabungan'}
+        >
+          {contributionGoal ? (
+            <GoalContributionForm
+              defaultAmount={Math.max(contributionGoal.remaining_amount, 0)}
+              defaultWalletId={contributionGoal.wallet_id ?? walletsQuery.data?.[0]?.id ?? ''}
+              isSubmitting={addContribution.isPending}
+              onSubmit={handleContribution}
+              submitLabel="Tambah Tabungan"
+              wallets={walletsQuery.data ?? []}
+            />
+          ) : null}
+        </ActionDialog>
       </section>
     </main>
   );
