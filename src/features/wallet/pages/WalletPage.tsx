@@ -1,4 +1,4 @@
-import { ArrowLeft, Lock, Plus } from 'lucide-react';
+import { ArrowLeft, Gem, Plus, ShieldCheck } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { Link, Navigate } from 'react-router';
 
@@ -153,8 +153,8 @@ export function WalletPage() {
   const isFormSubmitting = createWallet.isPending || updateWallet.isPending;
 
   return (
-    <main className="min-h-svh bg-background px-4 py-8 text-foreground">
-      <section className="mx-auto w-full max-w-6xl">
+    <main className="min-h-svh bg-background px-4 pb-28 pt-6 text-foreground sm:py-8">
+      <section className="mx-auto w-full max-w-5xl">
         <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <Button asChild className="mb-3" size="sm" variant="ghost">
@@ -169,25 +169,38 @@ export function WalletPage() {
               Kelola sumber uang dan saldo aktif di ruang keuangan ini.
             </p>
           </div>
-          {isWalletLimitReached ? (
-            <Button asChild>
-              <Link to="/app/upgrade">
-                <Lock className="size-4" />
-                Upgrade untuk Dompet
-              </Link>
-            </Button>
-          ) : (
-            <Button onClick={openCreatePanel} type="button">
-              <Plus className="size-4" />
-              Tambah Dompet
-            </Button>
-          )}
+          <Button className="w-full rounded-full shadow-sm sm:w-auto" onClick={openCreatePanel} type="button">
+            <Plus className="size-4" />
+            Tambah Dompet
+          </Button>
         </div>
 
-        <div className="grid gap-6 lg:grid-cols-[1fr_22rem]">
+        {isWalletLimitReached && !planQuery.isPremium ? (
+          <div className="mb-5 rounded-3xl border border-sky-200/80 bg-gradient-to-br from-sky-50 via-cyan-50 to-white p-4 text-slate-900 shadow-[0_18px_45px_rgba(14,165,233,0.12)] dark:border-sky-900/70 dark:from-sky-950/60 dark:via-cyan-950/30 dark:to-card dark:text-foreground">
+            <div className="flex items-center gap-3">
+              <span className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-white text-primary shadow-sm dark:bg-white/10">
+                <Gem className="size-5" />
+              </span>
+              <div className="min-w-0 flex-1">
+                <h2 className="font-semibold">Tingkatkan ke Vinari Premium</h2>
+                <p className="mt-1 text-sm leading-5 text-muted-foreground">
+                  Nikmati fitur lanjutan dan kontrol penuh atas keuangan Anda.
+                </p>
+              </div>
+              <Button asChild className="hidden rounded-full sm:inline-flex" size="sm">
+                <Link to="/app/upgrade">Upgrade Sekarang</Link>
+              </Button>
+            </div>
+            <Button asChild className="mt-3 w-full rounded-full sm:hidden" size="sm">
+              <Link to="/app/upgrade">Upgrade Sekarang</Link>
+            </Button>
+          </div>
+        ) : null}
+
+        <div className="grid gap-5 lg:grid-cols-[1fr_21rem]">
           <div className="space-y-4">
             {panelMode ? (
-              <Card>
+              <Card className="rounded-3xl">
                 <CardHeader>
                   <CardTitle>{panelMode === 'edit' ? 'Edit Dompet' : 'Tambah Dompet'}</CardTitle>
                   <CardDescription>
@@ -228,11 +241,31 @@ export function WalletPage() {
                 wallets={wallets}
               />
             ) : null}
+
+            <WalletSecurityNote />
           </div>
 
           <WalletDetailPanel detail={detailQuery.data} isLoading={detailQuery.isLoading} />
         </div>
       </section>
     </main>
+  );
+}
+
+function WalletSecurityNote() {
+  return (
+    <section className="rounded-2xl border border-border/80 bg-primary-soft/60 p-4 text-card-foreground shadow-sm dark:bg-primary-soft/30">
+      <div className="flex gap-3">
+        <span className="flex size-10 shrink-0 items-center justify-center rounded-2xl bg-background text-primary shadow-sm">
+          <ShieldCheck className="size-5" />
+        </span>
+        <div>
+          <h2 className="font-semibold">Semua data keuangan Anda aman</h2>
+          <p className="mt-1 text-sm leading-6 text-muted-foreground">
+            Kami menjaga data agar hanya bisa diakses oleh akun dan ruang keuangan yang sesuai.
+          </p>
+        </div>
+      </div>
+    </section>
   );
 }

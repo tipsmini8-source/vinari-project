@@ -399,16 +399,26 @@ function getRecap(summary: DashboardSummary, period: RecapPeriod) {
 
 function FinancialRecap({ period, summary }: { period: RecapPeriod; summary: DashboardSummary }) {
   const recap = getRecap(summary, period);
+  const isPositiveDifference = recap.cashflow >= 0;
+  const differenceValue = isPositiveDifference
+    ? moneyFormatter.format(recap.cashflow)
+    : `Kurang ${moneyFormatter.format(Math.abs(recap.cashflow))}`;
 
   return (
-    <div className="grid grid-cols-3 gap-3">
-      <MonthMiniStat label="Masuk" tone="positive" value={moneyFormatter.format(recap.income)} />
-      <MonthMiniStat label="Keluar" tone="negative" value={moneyFormatter.format(recap.expense)} />
-      <MonthMiniStat
-        label="Sisa"
-        tone={recap.cashflow >= 0 ? 'positive' : 'negative'}
-        value={moneyFormatter.format(recap.cashflow)}
-      />
+    <div>
+      <div className="grid grid-cols-3 gap-3">
+        <MonthMiniStat label="Masuk" tone="positive" value={moneyFormatter.format(recap.income)} />
+        <MonthMiniStat label="Keluar" tone="negative" value={moneyFormatter.format(recap.expense)} />
+        <MonthMiniStat
+          helper={isPositiveDifference ? 'Masih lebih' : undefined}
+          label="Selisih"
+          tone={isPositiveDifference ? 'positive' : 'negative'}
+          value={differenceValue}
+        />
+      </div>
+      <p className="mt-3 text-xs leading-5 text-muted-foreground">
+        Selisih dihitung dari uang masuk dikurangi uang keluar pada periode ini.
+      </p>
     </div>
   );
 }
@@ -477,10 +487,12 @@ function MoneyConditionCard({ score }: { score: FinancialHealthScore }) {
 }
 
 function MonthMiniStat({
+  helper,
   label,
   tone,
   value
 }: {
+  helper?: string;
   label: string;
   tone: 'positive' | 'negative';
   value: string;
@@ -491,6 +503,7 @@ function MonthMiniStat({
       <p className={`mt-1 truncate text-sm font-semibold sm:text-base ${tone === 'positive' ? 'text-success' : 'text-destructive'}`}>
         {value}
       </p>
+      {helper ? <p className="mt-0.5 text-[11px] leading-4 text-muted-foreground">{helper}</p> : null}
     </div>
   );
 }

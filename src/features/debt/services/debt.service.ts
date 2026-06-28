@@ -134,8 +134,8 @@ export const DebtService = {
       .from('debts')
       .select(debtSelect)
       .eq('workspace_id', workspaceId)
-      .eq('status', 'active')
       .is('deleted_at', null)
+      .order('status', { ascending: true })
       .order('due_date', { ascending: true, nullsFirst: false })
       .order('created_at', { ascending: false })) as unknown as {
       data: Array<Record<string, unknown>> | null;

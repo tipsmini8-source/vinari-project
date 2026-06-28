@@ -104,8 +104,8 @@ export const BudgetService = {
         'id, workspace_id, category_id, name, amount, period, start_date, end_date, alert_percentage, is_active, created_at, category:categories(name, type)'
       )
       .eq('workspace_id', workspaceId)
-      .eq('is_active', true)
       .is('deleted_at', null)
+      .order('is_active', { ascending: false })
       .order('start_date', { ascending: false })
       .order('created_at', { ascending: false })) as unknown as {
       data: Array<Record<string, unknown>> | null;

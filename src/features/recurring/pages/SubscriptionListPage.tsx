@@ -1,4 +1,5 @@
 import { ArrowLeft, Plus } from 'lucide-react';
+import { useMemo, useState } from 'react';
 import { Link, Navigate } from 'react-router';
 
 import { useWorkspace } from '@/core/workspace';
@@ -15,9 +16,17 @@ import {
 } from '@features/recurring/hooks/useRecurring';
 import { formatRecurringDate, formatRecurringMoney } from '@features/recurring/services/recurring-formatters';
 import type { ScheduleCycle, Subscription } from '@features/recurring/types/recurring.types';
+import { SectionStatusTabs } from '@shared/components/SectionStatusTabs';
+import { StatusFilterEmptyState } from '@shared/components/StatusFilterEmptyState';
 import { Button } from '@shared/ui/button';
 import { GlobalLoading } from '@shared/ui/global-loading';
 import { useToast } from '@shared/ui/use-toast';
+import {
+  filterByStatus,
+  getSubscriptionDisplayStatus,
+  statusFilterOptions,
+  type StatusFilterValue
+} from '@shared/utils/statusFilters';
 
 function canManageRecurring(role: string | undefined) {
   return role === 'owner' || role === 'partner' || role === 'member';
@@ -40,12 +49,24 @@ function monthlyEquivalent(amount: number, cycle: ScheduleCycle) {
 }
 
 export function SubscriptionListPage() {
+  const [statusFilter, setStatusFilter] = useState<StatusFilterValue>('active');
   const { loading, workspace } = useWorkspace();
   const { toast } = useToast();
   const subscriptionsQuery = useSubscriptions(workspace?.id);
   const deactivateSubscription = useDeactivateSubscription(workspace?.id);
   const deleteSubscription = useDeleteSubscription(workspace?.id);
   const canManage = canManageRecurring(workspace?.role);
+  const subscriptions = useMemo(() => subscriptionsQuery.data ?? [], [subscriptionsQuery.data]);
+  const filteredSubscriptions = useMemo(
+    () => filterByStatus(subscriptions, statusFilter, getSubscriptionDisplayStatus),
+    [subscriptions, statusFilter]
+  );
+  const activeSubscriptions = subscriptions.filter((item) => item.is_active);
+  const nearestDue = activeSubscriptions[0] ?? null;
+  const monthlyTotal = activeSubscriptions.reduce(
+    (total, item) => total + monthlyEquivalent(item.amount, item.billing_cycle),
+    0
+  );
 
   if (loading) {
     return <GlobalLoading />;
@@ -54,13 +75,6 @@ export function SubscriptionListPage() {
   if (!workspace) {
     return <Navigate replace to="/onboarding" />;
   }
-
-  const activeSubscriptions = (subscriptionsQuery.data ?? []).filter((item) => item.is_active);
-  const nearestDue = activeSubscriptions[0] ?? null;
-  const monthlyTotal = activeSubscriptions.reduce(
-    (total, item) => total + monthlyEquivalent(item.amount, item.billing_cycle),
-    0
-  );
 
   const handleDeactivate = async (item: Subscription) => {
     const confirmed = window.confirm(`Nonaktifkan langganan "${item.name}"?`);
@@ -117,8 +131,12 @@ export function SubscriptionListPage() {
               Pantau langganan rutin dan biaya bulanan tanpa reminder otomatis.
             </p>
           </div>
+        </div>
+
+        <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <SectionStatusTabs options={statusFilterOptions} value={statusFilter} onChange={setStatusFilter} />
           {canManage ? (
-            <Button asChild>
+            <Button asChild className="w-full rounded-full sm:w-auto">
               <Link to="/app/subscriptions/new">
                 <Plus className="size-4" />
                 Tambah Langganan
@@ -149,7 +167,7 @@ export function SubscriptionListPage() {
           />
         ) : null}
 
-        {!subscriptionsQuery.isLoading && !subscriptionsQuery.isError && (subscriptionsQuery.data ?? []).length === 0 ? (
+        {!subscriptionsQuery.isLoading && !subscriptionsQuery.isError && subscriptions.length === 0 ? (
           <SubscriptionEmptyState
             canCreate={canManage}
             createHref="/app/subscriptions/new"
@@ -159,10 +177,23 @@ export function SubscriptionListPage() {
           />
         ) : null}
 
-        {!subscriptionsQuery.isLoading && !subscriptionsQuery.isError && (subscriptionsQuery.data ?? []).length > 0 ? (
+        {!subscriptionsQuery.isLoading &&
+        !subscriptionsQuery.isError &&
+        subscriptions.length > 0 &&
+        filteredSubscriptions.length === 0 ? (
+          <StatusFilterEmptyState
+            canCreate={canManage}
+            createHref="/app/subscriptions/new"
+            ctaLabel="Tambah Langganan"
+            description="Coba pilih status lain atau catat langganan baru."
+            filter={statusFilter}
+          />
+        ) : null}
+
+        {!subscriptionsQuery.isLoading && !subscriptionsQuery.isError && filteredSubscriptions.length > 0 ? (
           <SubscriptionList
             canManage={canManage}
-            items={subscriptionsQuery.data ?? []}
+            items={filteredSubscriptions}
             onDeactivate={handleDeactivate}
             onDelete={handleDelete}
           />

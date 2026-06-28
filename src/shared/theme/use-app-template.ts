@@ -25,7 +25,7 @@ const AppTemplateContext = createContext<AppTemplateContextValue>({
   activeColors: defaultAppTemplate.colors.light,
   activeTemplate: defaultAppTemplate,
   isUpdating: false,
-  updateTemplate: async () => undefined
+  updateTemplate: () => Promise.resolve()
 });
 
 function useResolvedDarkMode() {

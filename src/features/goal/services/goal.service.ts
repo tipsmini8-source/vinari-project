@@ -107,8 +107,8 @@ export const GoalService = {
       .from('goals')
       .select(goalSelect)
       .eq('workspace_id', workspaceId)
-      .eq('status', 'active')
       .is('deleted_at', null)
+      .order('status', { ascending: true })
       .order('target_date', { ascending: true, nullsFirst: false })
       .order('created_at', { ascending: false })) as unknown as {
       data: Array<Record<string, unknown>> | null;

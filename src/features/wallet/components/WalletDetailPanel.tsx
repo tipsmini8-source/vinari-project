@@ -32,7 +32,7 @@ const walletTypeLabels: Record<string, string> = {
 export function WalletDetailPanel({ detail, isLoading }: WalletDetailPanelProps) {
   if (isLoading) {
     return (
-      <aside className="rounded-md border border-border bg-card p-6 shadow-sm">
+      <aside className="rounded-3xl border border-border bg-card p-5 shadow-sm">
         <div className="h-5 w-32 animate-pulse rounded bg-secondary" />
         <div className="mt-4 h-8 w-48 animate-pulse rounded bg-secondary" />
         <div className="mt-6 grid gap-3">
@@ -45,17 +45,17 @@ export function WalletDetailPanel({ detail, isLoading }: WalletDetailPanelProps)
 
   if (!detail) {
     return (
-      <aside className="rounded-md border border-border bg-card p-6 text-card-foreground shadow-sm">
+      <aside className="rounded-3xl border border-border bg-card p-5 text-card-foreground shadow-sm">
         <p className="text-sm text-muted-foreground">Pilih dompet untuk melihat detail.</p>
       </aside>
     );
   }
 
   return (
-    <aside className="rounded-md border border-border bg-card p-6 text-card-foreground shadow-sm">
+    <aside className="h-fit rounded-3xl border border-border bg-card p-5 text-card-foreground shadow-sm lg:sticky lg:top-6">
       <div className="flex items-start gap-3">
         <span
-          className="flex size-10 items-center justify-center rounded-md text-white"
+          className="flex size-12 items-center justify-center rounded-2xl text-white shadow-sm"
           style={{ backgroundColor: detail.color ?? '#0077B6' }}
         >
           <WalletCards className="size-5" />
@@ -67,21 +67,21 @@ export function WalletDetailPanel({ detail, isLoading }: WalletDetailPanelProps)
       </div>
 
       <dl className="mt-6 grid gap-3">
-        <div className="rounded-md border border-border p-4">
+        <div className="rounded-2xl border border-border p-4">
           <dt className="text-sm text-muted-foreground">Saldo saat ini</dt>
           <dd className="mt-1 text-2xl font-semibold">{moneyFormatter.format(detail.current_balance)}</dd>
         </div>
-        <div className="rounded-md border border-border p-4">
+        <div className="rounded-2xl border border-border p-4">
           <dt className="text-sm text-muted-foreground">Saldo awal</dt>
           <dd className="mt-1 font-semibold">{moneyFormatter.format(detail.initial_balance)}</dd>
         </div>
         <div className="grid grid-cols-2 gap-3">
-          <div className="rounded-md border border-border p-4">
+          <div className="rounded-2xl border border-border p-4">
             <ReceiptText className="mb-2 size-4 text-muted-foreground" />
             <dt className="text-sm text-muted-foreground">Catatan uang</dt>
             <dd className="mt-1 font-semibold">{detail.transaction_count}</dd>
           </div>
-          <div className="rounded-md border border-border p-4">
+          <div className="rounded-2xl border border-border p-4">
             <CalendarDays className="mb-2 size-4 text-muted-foreground" />
             <dt className="text-sm text-muted-foreground">Dibuat</dt>
             <dd className="mt-1 font-semibold">{dateFormatter.format(new Date(detail.created_at))}</dd>
