@@ -1,4 +1,4 @@
-import { ArrowLeft, Lightbulb } from 'lucide-react';
+import { ArrowLeft, Lightbulb, Sparkles } from 'lucide-react';
 import { Link, Navigate } from 'react-router';
 
 import { useWorkspace } from '@/core/workspace';
@@ -22,7 +22,7 @@ export function InsightsPage() {
   }
 
   return (
-    <main className="min-h-svh bg-background px-4 py-8 text-foreground">
+    <main className="min-h-svh bg-background px-4 pb-28 pt-6 text-foreground sm:py-8">
       <section className="mx-auto w-full max-w-5xl">
         <div className="mb-6">
           <Button asChild className="mb-3" size="sm" variant="ghost">
@@ -31,14 +31,26 @@ export function InsightsPage() {
               Kembali
             </Link>
           </Button>
-          <div className="flex items-center gap-2 text-primary">
-            <Lightbulb className="size-5" />
-            <p className="text-sm font-medium">{workspace.name}</p>
+
+          <div className="overflow-hidden rounded-[2rem] border border-primary/10 bg-gradient-to-br from-primary/10 via-card to-accent/10 p-5 shadow-sm sm:p-6">
+            <div className="flex items-start justify-between gap-4">
+              <div className="min-w-0">
+                <div className="flex items-center gap-2 text-primary">
+                  <span className="flex size-9 items-center justify-center rounded-2xl bg-primary/10">
+                    <Lightbulb className="size-5" />
+                  </span>
+                  <p className="text-sm font-medium">{workspace.name}</p>
+                </div>
+                <h1 className="mt-4 text-3xl font-semibold tracking-normal sm:text-4xl">Saran untuk Kamu</h1>
+                <p className="mt-2 max-w-xl text-sm leading-6 text-muted-foreground">
+                  Masukan sederhana agar keuanganmu lebih rapi dan tenang.
+                </p>
+              </div>
+              <span className="hidden size-16 shrink-0 items-center justify-center rounded-[1.75rem] bg-primary text-primary-foreground shadow-lg shadow-primary/20 sm:flex">
+                <Sparkles className="size-8" />
+              </span>
+            </div>
           </div>
-          <h1 className="mt-1 text-3xl font-semibold tracking-normal">Saran Otomatis</h1>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Saran sederhana dari catatan uang, batas pengeluaran, target tabungan, cicilan, dan dompet aktif.
-          </p>
         </div>
 
         {insightsQuery.isLoading ? <InsightSkeleton count={5} /> : null}
