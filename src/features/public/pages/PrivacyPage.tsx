@@ -21,6 +21,10 @@ const sections = [
   {
     title: 'Bukan lembaga keuangan',
     text: 'Vinari bukan bank, e-wallet, atau lembaga keuangan. Vinari tidak menyimpan uang asli user.'
+  },
+  {
+    title: 'Tanggung jawab keputusan',
+    text: 'Vinari hanya alat bantu pencatatan. Keputusan finansial tetap menjadi tanggung jawab user.'
   }
 ];
 

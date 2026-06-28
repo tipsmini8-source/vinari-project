@@ -91,6 +91,18 @@ function mapSubscription(row: Record<string, unknown> | null, workspaceId: strin
   };
 }
 
+function isSubscriptionUsable(subscription: WorkspaceSubscription) {
+  if (subscription.status !== 'active') {
+    return false;
+  }
+
+  if (!subscription.expired_at) {
+    return true;
+  }
+
+  return new Date(subscription.expired_at).getTime() > Date.now();
+}
+
 function mapPaymentRequest(row: Record<string, unknown>): PaymentRequest {
   return {
     id: asString(row.id),
@@ -257,7 +269,10 @@ export const PremiumService = {
       this.getPaymentRequests(workspaceId),
       this.getActivePaymentMethods()
     ]);
-    const activePlan = plans.find((plan) => plan.code === subscription.plan_code) ?? plans.find((plan) => plan.code === 'free');
+    const freePlan = plans.find((plan) => plan.code === 'free');
+    const activePlan = isSubscriptionUsable(subscription)
+      ? plans.find((plan) => plan.code === subscription.plan_code) ?? freePlan
+      : freePlan;
 
     if (!activePlan) {
       throw new Error('Plan Free belum tersedia.');

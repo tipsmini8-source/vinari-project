@@ -39,6 +39,14 @@ function asNumberOrNull(value: unknown) {
   return typeof value === 'number' ? value : null;
 }
 
+function isFutureTimestamp(value: unknown) {
+  if (typeof value !== 'string' || value.length === 0) {
+    return true;
+  }
+
+  return new Date(value).getTime() > Date.now();
+}
+
 function asTheme(value: unknown): UserPreferences['theme'] {
   if (value === 'light' || value === 'dark') {
     return value;
@@ -204,7 +212,7 @@ async function assertMemberLimitAvailable(workspaceId: string) {
 
   const { data: subscription, error: subscriptionError } = (await supabase
     .from('workspace_subscriptions')
-    .select('plan_code')
+    .select('plan_code, expired_at')
     .eq('workspace_id', workspaceId)
     .eq('status', 'active')
     .maybeSingle()) as unknown as {
@@ -214,7 +222,9 @@ async function assertMemberLimitAvailable(workspaceId: string) {
 
   assertSupabaseSuccess(subscriptionError, 'Gagal mengambil subscription workspace.');
 
-  const planCode = asString(subscription?.plan_code, 'free');
+  const planCode = subscription && isFutureTimestamp(subscription.expired_at)
+    ? asString(subscription.plan_code, 'free')
+    : 'free';
   const { data: plan, error: planError } = (await supabase
     .from('plans')
     .select('max_members')

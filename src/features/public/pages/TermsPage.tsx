@@ -9,7 +9,7 @@ const sections = [
   },
   {
     title: 'Alat bantu pencatatan',
-    text: 'Vinari hanya alat bantu pencatatan keuangan. Vinari bukan penasihat keuangan profesional.'
+    text: 'Vinari hanya alat bantu pencatatan keuangan. Vinari bukan bank, bukan e-wallet, tidak menyimpan uang asli user, dan bukan penasihat keuangan profesional.'
   },
   {
     title: 'Pembayaran premium manual',
