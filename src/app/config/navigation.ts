@@ -41,7 +41,7 @@ export const mainNavigation: NavigationGroup[] = [
     href: '/app',
     icon: Home,
     description: 'Saldo, aksi cepat, dan kondisi uang.',
-    matches: ['/app']
+    matches: ['/app', '/app/menu']
   },
   {
     label: 'Catatan',
@@ -103,7 +103,7 @@ export const mainNavigation: NavigationGroup[] = [
 ];
 
 export const appNavigation = mainNavigation.filter((item) =>
-  ['Beranda', 'Catatan', 'Dompet', 'Rencana', 'Akun'].includes(item.label)
+  ['Beranda', 'Catatan', 'Ringkasan', 'Akun'].includes(item.label)
 );
 
 export const primaryNavigation = mainNavigation.slice(0, 3);

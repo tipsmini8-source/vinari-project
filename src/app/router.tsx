@@ -22,6 +22,7 @@ import { DebtDetailPage, DebtFormPage, DebtListPage } from '@features/debt';
 import { DecisionSimulatorPage } from '@features/decision-simulator';
 import { GoalDetailPage, GoalFormPage, GoalListPage } from '@features/goal';
 import { InsightsPage } from '@features/insight';
+import { AppMenuPage } from '@features/menu/pages/AppMenuPage';
 import { NotificationsPage } from '@features/notification';
 import { OnboardingPage } from '@features/onboarding';
 import { BillingPage, UpgradePage } from '@features/premium';
@@ -119,6 +120,10 @@ export const router = createBrowserRouter([
               {
                 index: true,
                 element: <DashboardPage />
+              },
+              {
+                path: 'menu',
+                element: <AppMenuPage />
               },
               {
                 path: 'wallets',
