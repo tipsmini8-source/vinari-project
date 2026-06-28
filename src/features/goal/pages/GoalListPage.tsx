@@ -1,4 +1,4 @@
-import { ArrowLeft, Plus } from 'lucide-react';
+import { Coins, Plus, Target, WalletCards } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { Link, Navigate } from 'react-router';
 
@@ -7,6 +7,9 @@ import { GoalList } from '@features/goal/components/GoalList';
 import { GoalEmptyState, GoalErrorState, GoalSkeleton } from '@features/goal/components/GoalStates';
 import { useDeleteGoal, useGoals } from '@features/goal/hooks/useGoals';
 import type { GoalWithProgress } from '@features/goal/types/goal.types';
+import { ModuleInfoTip } from '@shared/components/ModuleInfoTip';
+import { ModuleSummaryCard } from '@shared/components/ModuleSummaryCard';
+import { SectionHeaderAction } from '@shared/components/SectionHeaderAction';
 import { SectionStatusTabs } from '@shared/components/SectionStatusTabs';
 import { StatusFilterEmptyState } from '@shared/components/StatusFilterEmptyState';
 import { Button } from '@shared/ui/button';
@@ -19,6 +22,12 @@ import {
   type StatusFilterValue
 } from '@shared/utils/statusFilters';
 
+const moneyFormatter = new Intl.NumberFormat('id-ID', {
+  currency: 'IDR',
+  style: 'currency',
+  maximumFractionDigits: 0
+});
+
 export function GoalListPage() {
   const [statusFilter, setStatusFilter] = useState<StatusFilterValue>('active');
   const { loading, workspace } = useWorkspace();
@@ -30,6 +39,10 @@ export function GoalListPage() {
     () => filterByStatus(goals, statusFilter, getGoalDisplayStatus),
     [goals, statusFilter]
   );
+  const activeGoals = useMemo(() => filterByStatus(goals, 'active', getGoalDisplayStatus), [goals]);
+  const targetTotal = activeGoals.reduce((total, goal) => total + goal.target_amount, 0);
+  const collectedTotal = activeGoals.reduce((total, goal) => total + goal.current_amount, 0);
+  const remainingTotal = Math.max(targetTotal - collectedTotal, 0);
 
   if (loading) {
     return <GlobalLoading />;
@@ -59,32 +72,34 @@ export function GoalListPage() {
   };
 
   return (
-    <main className="min-h-svh bg-background px-4 py-8 text-foreground">
+    <main className="min-h-svh bg-background px-4 pb-28 pt-6 text-foreground sm:py-8">
       <section className="mx-auto w-full max-w-6xl">
-        <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <Button asChild className="mb-3" size="sm" variant="ghost">
-              <Link to="/app">
-                <ArrowLeft className="size-4" />
-                Kembali
+        <SectionHeaderAction
+          action={
+            <Button asChild className="w-full rounded-full sm:w-auto">
+              <Link to="/app/goals/new">
+                <Plus className="size-4" />
+                Tambah Target
               </Link>
             </Button>
-            <p className="text-sm font-medium text-primary">{workspace.name}</p>
-            <h1 className="mt-1 text-3xl font-semibold tracking-normal">Target Tabungan</h1>
-            <p className="mt-2 text-sm text-muted-foreground">
-              Kelola target keuangan dan pantau kontribusi tabungan.
-            </p>
-          </div>
+          }
+          description="Kelola target keuangan dan pantau kontribusi tabungan."
+          eyebrow={workspace.name}
+          title="Target Tabungan"
+        />
+
+        <div className="mb-4">
+          <SectionStatusTabs options={statusFilterOptions} value={statusFilter} onChange={setStatusFilter} />
         </div>
 
-        <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <SectionStatusTabs options={statusFilterOptions} value={statusFilter} onChange={setStatusFilter} />
-          <Button asChild className="w-full rounded-full sm:w-auto">
-            <Link to="/app/goals/new">
-              <Plus className="size-4" />
-              Tambah Target
-            </Link>
-          </Button>
+        <div className="mb-5">
+          <ModuleSummaryCard
+            stats={[
+              { icon: Target, label: 'Target Aktif', value: moneyFormatter.format(targetTotal) },
+              { icon: WalletCards, label: 'Terkumpul', tone: 'good', value: moneyFormatter.format(collectedTotal) },
+              { icon: Coins, label: 'Masih Kurang', tone: 'default', value: moneyFormatter.format(remainingTotal) }
+            ]}
+          />
         </div>
 
         {goalsQuery.isLoading ? <GoalSkeleton /> : null}
@@ -111,6 +126,12 @@ export function GoalListPage() {
 
         {!goalsQuery.isLoading && !goalsQuery.isError && filteredGoals.length > 0 ? (
           <GoalList goals={filteredGoals} onDelete={handleDelete} />
+        ) : null}
+
+        {!goalsQuery.isLoading && !goalsQuery.isError ? (
+          <ModuleInfoTip>
+            Target tabungan membantu memantau tujuan uang tanpa mengubah saldo asli sampai Anda mencatat kontribusi.
+          </ModuleInfoTip>
         ) : null}
       </section>
     </main>

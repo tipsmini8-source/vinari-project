@@ -1,4 +1,4 @@
-import { Edit, PauseCircle, Trash2 } from 'lucide-react';
+import { CreditCard, Edit, PauseCircle, Trash2 } from 'lucide-react';
 import { Link } from 'react-router';
 
 import {
@@ -6,6 +6,7 @@ import {
   formatRecurringMoney
 } from '@features/recurring/services/recurring-formatters';
 import type { RecurringTransaction, ScheduleCycle, Subscription } from '@features/recurring/types/recurring.types';
+import { CompactProgressCard } from '@shared/components/CompactProgressCard';
 import { cn } from '@shared/lib/utils';
 import { Button } from '@shared/ui/button';
 
@@ -51,6 +52,56 @@ function StatusBadge({ isActive }: { isActive: boolean }) {
       {isActive ? 'Aktif' : 'Nonaktif'}
     </span>
   );
+}
+
+function daysUntil(date: string) {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const targetDate = new Date(date);
+  targetDate.setHours(0, 0, 0, 0);
+
+  return Math.ceil((targetDate.getTime() - today.getTime()) / 86_400_000);
+}
+
+function getSubscriptionCardStatus(item: Subscription) {
+  const dueInDays = daysUntil(item.next_due_date);
+
+  if (!item.is_active) {
+    return {
+      badgeClassName: 'bg-muted text-muted-foreground',
+      label: 'Selesai'
+    };
+  }
+
+  if (dueInDays <= 3) {
+    return {
+      badgeClassName: 'bg-warning/15 text-warning',
+      label: 'Jatuh Tempo'
+    };
+  }
+
+  return {
+    badgeClassName: 'bg-primary-soft text-primary',
+    label: 'Aktif'
+  };
+}
+
+function getSubscriptionDueText(item: Subscription) {
+  if (!item.is_active) {
+    return 'Sudah berakhir';
+  }
+
+  const dueInDays = daysUntil(item.next_due_date);
+
+  if (dueInDays < 0) {
+    return `Lewat ${Math.abs(dueInDays)} hari`;
+  }
+
+  if (dueInDays === 0) {
+    return 'Bayar hari ini';
+  }
+
+  return `Bayar lagi ${dueInDays} hari lagi`;
 }
 
 export function RecurringTransactionList({
@@ -133,73 +184,45 @@ export function RecurringTransactionList({
 
 export function SubscriptionList({ canManage, items, onDeactivate, onDelete }: SubscriptionListProps) {
   return (
-    <div className="grid gap-3">
-      {items.map((item) => (
-        <article className="rounded-md border border-border bg-card p-4 text-card-foreground shadow-sm" key={item.id}>
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-            <div>
-              <div className="flex flex-wrap items-center gap-2">
-                <h2 className="font-semibold">{item.name}</h2>
-                <StatusBadge isActive={item.is_active} />
-                <span className="rounded-sm bg-secondary px-2 py-0.5 text-xs font-medium text-foreground">
-                  {cycleLabels[item.billing_cycle]}
-                </span>
-              </div>
-              <p className="mt-1 text-sm text-muted-foreground">
-                {item.category_name ?? 'Tanpa kategori'} - {item.wallet_name ?? 'Tanpa dompet'}
-              </p>
-            </div>
+    <div className="grid gap-3 lg:grid-cols-2">
+      {items.map((item) => {
+        const status = getSubscriptionCardStatus(item);
 
-            <div className="flex items-center justify-between gap-3 sm:flex-col sm:items-end">
-              <p className="font-semibold">{formatRecurringMoney(item.amount)}</p>
-              {canManage ? (
-                <div className="flex gap-1">
-                  <Button asChild aria-label="Edit langganan" size="icon" variant="ghost">
-                    <Link to={`/app/subscriptions/${item.id}/edit`}>
-                      <Edit className="size-4" />
-                    </Link>
-                  </Button>
-                  {item.is_active ? (
-                    <Button
-                      aria-label="Nonaktifkan langganan"
-                      onClick={() => onDeactivate(item)}
-                      size="icon"
-                      type="button"
-                      variant="ghost"
-                    >
-                      <PauseCircle className="size-4" />
-                    </Button>
-                  ) : null}
-                  <Button
-                    aria-label="Hapus langganan"
-                    onClick={() => onDelete(item)}
-                    size="icon"
-                    type="button"
-                    variant="ghost"
-                  >
-                    <Trash2 className="size-4" />
-                  </Button>
-                </div>
-              ) : null}
-            </div>
-          </div>
-
-          <div className="mt-4 grid gap-3 text-sm sm:grid-cols-3">
-            <div>
-              <p className="text-muted-foreground">Siklus tagihan</p>
-              <p className="font-medium">{cycleLabels[item.billing_cycle]}</p>
-            </div>
-            <div>
-              <p className="text-muted-foreground">Jatuh tempo berikutnya</p>
-              <p className="font-medium">{formatRecurringDate(item.next_due_date)}</p>
-            </div>
-            <div>
-              <p className="text-muted-foreground">Nominal</p>
-              <p className="font-medium">{formatRecurringMoney(item.amount)}</p>
-            </div>
-          </div>
-        </article>
-      ))}
+        return (
+          <CompactProgressCard
+            badgeClassName={status.badgeClassName}
+            badgeLabel={status.label}
+            footer={[
+              {
+                label: 'Tagihan berikutnya',
+                tone: status.label === 'Jatuh Tempo' ? 'warn' : 'default',
+                value: getSubscriptionDueText(item)
+              },
+              {
+                label: 'Tanggal bayar',
+                value: item.is_active ? formatRecurringDate(item.next_due_date) : 'Selesai'
+              }
+            ]}
+            icon={CreditCard}
+            iconClassName="bg-primary-soft text-primary"
+            key={item.id}
+            menuActions={
+              canManage
+                ? [
+                    { href: `/app/subscriptions/${item.id}/edit`, icon: Edit, label: 'Edit' },
+                    ...(item.is_active
+                      ? [{ icon: PauseCircle, label: 'Nonaktifkan', onSelect: () => onDeactivate(item) }]
+                      : []),
+                    { destructive: true, icon: Trash2, label: 'Hapus', onSelect: () => onDelete(item) }
+                  ]
+                : []
+            }
+            primaryText={`${formatRecurringMoney(item.amount)} • ${cycleLabels[item.billing_cycle]}`}
+            subtitle={`${item.category_name ?? 'Tanpa kategori'} • ${cycleLabels[item.billing_cycle]}`}
+            title={item.name}
+          />
+        );
+      })}
     </div>
   );
 }

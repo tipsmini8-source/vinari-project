@@ -1,9 +1,8 @@
-import { Edit, Eye, Trash2 } from 'lucide-react';
+import { Edit, Eye, Landmark, Trash2 } from 'lucide-react';
 import { Link } from 'react-router';
 
-import { DebtProgress } from '@features/debt/components/DebtProgress';
-import type { DebtStatus, DebtWithProgress } from '@features/debt/types/debt.types';
-import { cn } from '@shared/lib/utils';
+import type { DebtWithProgress } from '@features/debt/types/debt.types';
+import { CompactProgressCard } from '@shared/components/CompactProgressCard';
 import { Button } from '@shared/ui/button';
 
 type DebtListProps = {
@@ -21,80 +20,125 @@ const dateFormatter = new Intl.DateTimeFormat('id-ID', {
   dateStyle: 'medium'
 });
 
-const statusClasses: Record<DebtStatus, string> = {
-  active: 'bg-primary-soft text-primary',
-  paid: 'bg-success/10 text-success',
-  cancelled: 'bg-destructive/10 text-destructive'
-};
+function daysUntil(date: string | null) {
+  if (!date) {
+    return null;
+  }
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const dueDate = new Date(date);
+  dueDate.setHours(0, 0, 0, 0);
+
+  return Math.ceil((dueDate.getTime() - today.getTime()) / 86_400_000);
+}
+
+function getDebtCardStatus(debt: DebtWithProgress) {
+  const dueInDays = daysUntil(debt.due_date);
+
+  if (debt.status === 'cancelled') {
+    return {
+      badgeClassName: 'bg-muted text-muted-foreground',
+      label: 'Selesai',
+      progressClassName: 'bg-muted-foreground'
+    };
+  }
+
+  if (debt.status === 'paid' || debt.remaining_amount <= 0) {
+    return {
+      badgeClassName: 'bg-success/10 text-success',
+      label: 'Lunas',
+      progressClassName: 'bg-success'
+    };
+  }
+
+  if (dueInDays !== null && dueInDays <= 7) {
+    return {
+      badgeClassName: 'bg-warning/15 text-warning',
+      label: 'Jatuh Tempo',
+      progressClassName: 'bg-warning'
+    };
+  }
+
+  return {
+    badgeClassName: 'bg-primary-soft text-primary',
+    label: 'Lancar',
+    progressClassName: 'bg-primary'
+  };
+}
+
+function getDueDateLabel(debt: DebtWithProgress) {
+  if (debt.remaining_amount <= 0 || debt.status === 'paid') {
+    return 'Lunas';
+  }
+
+  const dueInDays = daysUntil(debt.due_date);
+
+  if (dueInDays === null) {
+    return 'Tanpa jatuh tempo';
+  }
+
+  if (dueInDays < 0) {
+    return `Lewat ${Math.abs(dueInDays)} hari`;
+  }
+
+  if (dueInDays === 0) {
+    return 'Jatuh tempo hari ini';
+  }
+
+  return `Jatuh tempo ${dueInDays} hari lagi`;
+}
 
 export function DebtList({ debts, onDelete }: DebtListProps) {
   return (
-    <div className="grid gap-3">
-      {debts.map((debt) => (
-        <article className="rounded-md border border-border bg-card p-4 text-card-foreground shadow-sm" key={debt.id}>
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-            <div>
-              <div className="flex flex-wrap items-center gap-2">
-                <h2 className="font-semibold">{debt.name}</h2>
-                <span className={cn('rounded-sm px-2 py-0.5 text-xs font-medium capitalize', statusClasses[debt.status])}>
-                  {debt.status}
-                </span>
-              </div>
-              <p className="mt-1 text-sm text-muted-foreground">
-                {debt.lender_name ?? 'Tanpa lender'}
-                {debt.due_date ? ` - jatuh tempo ${dateFormatter.format(new Date(debt.due_date))}` : ''}
-              </p>
-            </div>
+    <div className="grid gap-3 lg:grid-cols-2">
+      {debts.map((debt) => {
+        const status = getDebtCardStatus(debt);
 
-            <div className="flex items-center justify-between gap-3 sm:flex-col sm:items-end">
-              <p className="font-semibold">{moneyFormatter.format(debt.remaining_amount)}</p>
-              <div className="flex gap-1">
-                <Button asChild aria-label="Detail hutang" size="icon" variant="ghost">
-                  <Link to={`/app/debts/${debt.id}`}>
-                    <Eye className="size-4" />
-                  </Link>
-                </Button>
-                <Button asChild aria-label="Edit hutang" size="icon" variant="ghost">
-                  <Link to={`/app/debts/${debt.id}/edit`}>
-                    <Edit className="size-4" />
-                  </Link>
-                </Button>
-                <Button
-                  aria-label="Hapus hutang"
-                  onClick={() => onDelete(debt)}
-                  size="icon"
-                  type="button"
-                  variant="ghost"
-                >
-                  <Trash2 className="size-4" />
-                </Button>
-              </div>
-            </div>
-          </div>
-
-          <div className="mt-4 space-y-3">
-            <DebtProgress percentage={debt.percentage} status={debt.status} />
-            <div className="grid gap-3 text-sm sm:grid-cols-4">
-              <div>
-                <p className="text-muted-foreground">Principal</p>
-                <p className="font-medium">{moneyFormatter.format(debt.principal_amount)}</p>
-              </div>
-              <div>
-                <p className="text-muted-foreground">Terbayar</p>
-                <p className="font-medium">{moneyFormatter.format(debt.paid_amount)}</p>
-              </div>
-              <div>
-                <p className="text-muted-foreground">Sisa</p>
-                <p className="font-medium">{moneyFormatter.format(debt.remaining_amount)}</p>
-              </div>
-              <div>
-                <p className="text-muted-foreground">Progress</p>
-                <p className="font-medium">{debt.percentage}%</p>
-              </div>
-            </div>
-          </div>
-        </article>
-      ))}
+        return (
+          <CompactProgressCard
+            action={
+              <Button asChild className="w-full rounded-2xl" size="sm" variant="outline">
+                <Link to={`/app/debts/${debt.id}`}>
+                  <Eye className="size-4" />
+                  Lihat Detail
+                </Link>
+              </Button>
+            }
+            badgeClassName={status.badgeClassName}
+            badgeLabel={status.label}
+            footer={[
+              {
+                label: debt.remaining_amount <= 0 ? 'Status' : 'Sisa hutang',
+                tone: debt.remaining_amount <= 0 ? 'good' : 'default',
+                value: debt.remaining_amount <= 0 ? 'Lunas' : moneyFormatter.format(debt.remaining_amount)
+              },
+              {
+                label: 'Jatuh tempo',
+                tone: status.label === 'Jatuh Tempo' ? 'warn' : 'default',
+                value: getDueDateLabel(debt)
+              }
+            ]}
+            icon={Landmark}
+            iconClassName="bg-primary-soft text-primary"
+            key={debt.id}
+            menuActions={[
+              { href: `/app/debts/${debt.id}`, icon: Eye, label: 'Detail' },
+              { href: `/app/debts/${debt.id}/edit`, icon: Edit, label: 'Edit' },
+              { destructive: true, icon: Trash2, label: 'Hapus', onSelect: () => onDelete(debt) }
+            ]}
+            primaryText={`${moneyFormatter.format(debt.paid_amount)} dari ${moneyFormatter.format(
+              debt.principal_amount
+            )} sudah dibayar`}
+            progress={debt.percentage}
+            progressClassName={status.progressClassName}
+            subtitle={`${debt.lender_name ?? 'Tanpa kreditur'}${
+              debt.due_date ? ` • ${dateFormatter.format(new Date(debt.due_date))}` : ''
+            }`}
+            title={debt.name}
+          />
+        );
+      })}
     </div>
   );
 }

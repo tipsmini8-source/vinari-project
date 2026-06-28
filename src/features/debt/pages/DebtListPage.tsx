@@ -1,4 +1,4 @@
-import { ArrowLeft, Plus } from 'lucide-react';
+import { CheckCircle2, Coins, Landmark, Plus } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { Link, Navigate } from 'react-router';
 
@@ -7,6 +7,9 @@ import { DebtList } from '@features/debt/components/DebtList';
 import { DebtEmptyState, DebtErrorState, DebtSkeleton } from '@features/debt/components/DebtStates';
 import { useDebts, useDeleteDebt } from '@features/debt/hooks/useDebts';
 import type { DebtWithProgress } from '@features/debt/types/debt.types';
+import { ModuleInfoTip } from '@shared/components/ModuleInfoTip';
+import { ModuleSummaryCard } from '@shared/components/ModuleSummaryCard';
+import { SectionHeaderAction } from '@shared/components/SectionHeaderAction';
 import { SectionStatusTabs } from '@shared/components/SectionStatusTabs';
 import { StatusFilterEmptyState } from '@shared/components/StatusFilterEmptyState';
 import { Button } from '@shared/ui/button';
@@ -19,6 +22,12 @@ import {
   type StatusFilterValue
 } from '@shared/utils/statusFilters';
 
+const moneyFormatter = new Intl.NumberFormat('id-ID', {
+  currency: 'IDR',
+  style: 'currency',
+  maximumFractionDigits: 0
+});
+
 export function DebtListPage() {
   const [statusFilter, setStatusFilter] = useState<StatusFilterValue>('active');
   const { loading, workspace } = useWorkspace();
@@ -30,6 +39,10 @@ export function DebtListPage() {
     () => filterByStatus(debts, statusFilter, getDebtDisplayStatus),
     [debts, statusFilter]
   );
+  const activeDebts = useMemo(() => filterByStatus(debts, 'active', getDebtDisplayStatus), [debts]);
+  const principalTotal = activeDebts.reduce((total, debt) => total + debt.principal_amount, 0);
+  const paidTotal = activeDebts.reduce((total, debt) => total + debt.paid_amount, 0);
+  const remainingTotal = activeDebts.reduce((total, debt) => total + debt.remaining_amount, 0);
 
   if (loading) {
     return <GlobalLoading />;
@@ -59,32 +72,34 @@ export function DebtListPage() {
   };
 
   return (
-    <main className="min-h-svh bg-background px-4 py-8 text-foreground">
+    <main className="min-h-svh bg-background px-4 pb-28 pt-6 text-foreground sm:py-8">
       <section className="mx-auto w-full max-w-6xl">
-        <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <Button asChild className="mb-3" size="sm" variant="ghost">
-              <Link to="/app">
-                <ArrowLeft className="size-4" />
-                Kembali
+        <SectionHeaderAction
+          action={
+            <Button asChild className="w-full rounded-full sm:w-auto">
+              <Link to="/app/debts/new">
+                <Plus className="size-4" />
+                Tambah Hutang
               </Link>
             </Button>
-            <p className="text-sm font-medium text-primary">{workspace.name}</p>
-            <h1 className="mt-1 text-3xl font-semibold tracking-normal">Hutang</h1>
-            <p className="mt-2 text-sm text-muted-foreground">
-              Catat hutang, cicilan, pembayaran, dan progress pelunasan.
-            </p>
-          </div>
+          }
+          description="Catat hutang, cicilan, pembayaran, dan progres pelunasan."
+          eyebrow={workspace.name}
+          title="Hutang"
+        />
+
+        <div className="mb-4">
+          <SectionStatusTabs options={statusFilterOptions} value={statusFilter} onChange={setStatusFilter} />
         </div>
 
-        <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <SectionStatusTabs options={statusFilterOptions} value={statusFilter} onChange={setStatusFilter} />
-          <Button asChild className="w-full rounded-full sm:w-auto">
-            <Link to="/app/debts/new">
-              <Plus className="size-4" />
-              Tambah Hutang
-            </Link>
-          </Button>
+        <div className="mb-5">
+          <ModuleSummaryCard
+            stats={[
+              { icon: Landmark, label: 'Hutang Aktif', value: moneyFormatter.format(principalTotal) },
+              { icon: CheckCircle2, label: 'Sudah Dibayar', tone: 'good', value: moneyFormatter.format(paidTotal) },
+              { icon: Coins, label: 'Sisa Hutang', tone: 'warn', value: moneyFormatter.format(remainingTotal) }
+            ]}
+          />
         </div>
 
         {debtsQuery.isLoading ? <DebtSkeleton /> : null}
@@ -111,6 +126,12 @@ export function DebtListPage() {
 
         {!debtsQuery.isLoading && !debtsQuery.isError && filteredDebts.length > 0 ? (
           <DebtList debts={filteredDebts} onDelete={handleDelete} />
+        ) : null}
+
+        {!debtsQuery.isLoading && !debtsQuery.isError ? (
+          <ModuleInfoTip>
+            Catat pembayaran secara rutin agar sisa hutang dan progres pelunasan tetap mudah dipantau.
+          </ModuleInfoTip>
         ) : null}
       </section>
     </main>

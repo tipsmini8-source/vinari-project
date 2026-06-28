@@ -1,4 +1,4 @@
-import { ArrowLeft, Plus } from 'lucide-react';
+import { CalendarClock, Coins, CreditCard, Plus } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { Link, Navigate } from 'react-router';
 
@@ -14,8 +14,11 @@ import {
   useDeleteSubscription,
   useSubscriptions
 } from '@features/recurring/hooks/useRecurring';
-import { formatRecurringDate, formatRecurringMoney } from '@features/recurring/services/recurring-formatters';
+import { formatRecurringMoney } from '@features/recurring/services/recurring-formatters';
 import type { ScheduleCycle, Subscription } from '@features/recurring/types/recurring.types';
+import { ModuleInfoTip } from '@shared/components/ModuleInfoTip';
+import { ModuleSummaryCard } from '@shared/components/ModuleSummaryCard';
+import { SectionHeaderAction } from '@shared/components/SectionHeaderAction';
 import { SectionStatusTabs } from '@shared/components/SectionStatusTabs';
 import { StatusFilterEmptyState } from '@shared/components/StatusFilterEmptyState';
 import { Button } from '@shared/ui/button';
@@ -48,6 +51,15 @@ function monthlyEquivalent(amount: number, cycle: ScheduleCycle) {
   return amount;
 }
 
+function daysUntil(date: string) {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const targetDate = new Date(date);
+  targetDate.setHours(0, 0, 0, 0);
+
+  return Math.ceil((targetDate.getTime() - today.getTime()) / 86_400_000);
+}
+
 export function SubscriptionListPage() {
   const [statusFilter, setStatusFilter] = useState<StatusFilterValue>('active');
   const { loading, workspace } = useWorkspace();
@@ -62,7 +74,7 @@ export function SubscriptionListPage() {
     [subscriptions, statusFilter]
   );
   const activeSubscriptions = subscriptions.filter((item) => item.is_active);
-  const nearestDue = activeSubscriptions[0] ?? null;
+  const dueSoonCount = activeSubscriptions.filter((item) => daysUntil(item.next_due_date) <= 7).length;
   const monthlyTotal = activeSubscriptions.reduce(
     (total, item) => total + monthlyEquivalent(item.amount, item.billing_cycle),
     0
@@ -115,47 +127,41 @@ export function SubscriptionListPage() {
   };
 
   return (
-    <main className="min-h-svh bg-background px-4 py-8 text-foreground">
+    <main className="min-h-svh bg-background px-4 pb-28 pt-6 text-foreground sm:py-8">
       <section className="mx-auto w-full max-w-6xl">
-        <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <Button asChild className="mb-3" size="sm" variant="ghost">
-              <Link to="/app">
-                <ArrowLeft className="size-4" />
-                Kembali
-              </Link>
-            </Button>
-            <p className="text-sm font-medium text-primary">{workspace.name}</p>
-            <h1 className="mt-1 text-3xl font-semibold tracking-normal">Langganan</h1>
-            <p className="mt-2 text-sm text-muted-foreground">
-              Pantau langganan rutin dan biaya bulanan tanpa reminder otomatis.
-            </p>
-          </div>
-        </div>
+        <SectionHeaderAction
+          action={
+            canManage ? (
+              <Button asChild className="w-full rounded-full sm:w-auto">
+                <Link to="/app/subscriptions/new">
+                  <Plus className="size-4" />
+                  Tambah Langganan
+                </Link>
+              </Button>
+            ) : null
+          }
+          description="Pantau langganan rutin dan biaya bulanan tanpa reminder otomatis."
+          eyebrow={workspace.name}
+          title="Langganan"
+        />
 
-        <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="mb-4">
           <SectionStatusTabs options={statusFilterOptions} value={statusFilter} onChange={setStatusFilter} />
-          {canManage ? (
-            <Button asChild className="w-full rounded-full sm:w-auto">
-              <Link to="/app/subscriptions/new">
-                <Plus className="size-4" />
-                Tambah Langganan
-              </Link>
-            </Button>
-          ) : null}
         </div>
 
-        <div className="mb-4 grid gap-3 sm:grid-cols-2">
-          <div className="rounded-md border border-border bg-card p-4 text-card-foreground shadow-sm">
-            <p className="text-sm text-muted-foreground">Total biaya bulanan</p>
-            <p className="mt-1 text-2xl font-semibold tracking-normal">{formatRecurringMoney(monthlyTotal)}</p>
-          </div>
-          <div className="rounded-md border border-border bg-card p-4 text-card-foreground shadow-sm">
-            <p className="text-sm text-muted-foreground">Jatuh tempo terdekat</p>
-            <p className="mt-1 font-semibold">
-              {nearestDue ? `${nearestDue.name} - ${formatRecurringDate(nearestDue.next_due_date)}` : 'Belum ada'}
-            </p>
-          </div>
+        <div className="mb-5">
+          <ModuleSummaryCard
+            stats={[
+              { icon: CreditCard, label: 'Langganan Aktif', value: `${activeSubscriptions.length}` },
+              { icon: Coins, label: 'Tagihan Bulanan', tone: 'warn', value: formatRecurringMoney(monthlyTotal) },
+              {
+                icon: CalendarClock,
+                label: 'Segera Jatuh Tempo',
+                tone: dueSoonCount > 0 ? 'warn' : 'good',
+                value: dueSoonCount > 0 ? `${dueSoonCount} tagihan` : 'Belum ada'
+              }
+            ]}
+          />
         </div>
 
         {subscriptionsQuery.isLoading ? <RecurringSkeleton /> : null}
@@ -197,6 +203,12 @@ export function SubscriptionListPage() {
             onDeactivate={handleDeactivate}
             onDelete={handleDelete}
           />
+        ) : null}
+
+        {!subscriptionsQuery.isLoading && !subscriptionsQuery.isError ? (
+          <ModuleInfoTip>
+            Langganan hanya dicatat sebagai pengingat biaya rutin. Vinari belum menjalankan pembayaran otomatis.
+          </ModuleInfoTip>
         ) : null}
       </section>
     </main>

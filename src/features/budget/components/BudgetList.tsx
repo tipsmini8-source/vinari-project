@@ -1,9 +1,8 @@
 import { Edit, Trash2 } from 'lucide-react';
-import { Link } from 'react-router';
 
 import type { BudgetStatus, BudgetWithProgress } from '@features/budget/types/budget.types';
-import { cn } from '@shared/lib/utils';
-import { Button } from '@shared/ui/button';
+import { CompactProgressCard } from '@shared/components/CompactProgressCard';
+import { getCategoryIcon } from '@shared/utils/icon-map';
 
 type BudgetListProps = {
   budgets: BudgetWithProgress[];
@@ -22,94 +21,64 @@ const dateFormatter = new Intl.DateTimeFormat('id-ID', {
 
 const statusLabels: Record<BudgetStatus, string> = {
   safe: 'Aman',
-  warning: 'Hampir habis',
-  over: 'Melewati batas'
+  warning: 'Peringatan',
+  over: 'Melebihi'
 };
 
 const statusClasses: Record<BudgetStatus, string> = {
-  safe: 'bg-primary-soft text-primary',
-  warning: 'bg-secondary text-foreground',
+  safe: 'bg-success/10 text-success',
+  warning: 'bg-warning/15 text-warning',
   over: 'bg-destructive/10 text-destructive'
 };
 
 const progressClasses: Record<BudgetStatus, string> = {
-  safe: 'bg-primary',
-  warning: 'bg-foreground',
+  safe: 'bg-success',
+  warning: 'bg-warning',
   over: 'bg-destructive'
 };
 
 export function BudgetList({ budgets, onDelete }: BudgetListProps) {
   return (
-    <div className="grid gap-3">
+    <div className="grid gap-3 lg:grid-cols-2">
       {budgets.map((budget) => {
-        const progressWidth = `${Math.min(budget.percentage, 100)}%`;
+        const CategoryIcon = getCategoryIcon('receipt');
+        const remainingLabel =
+          budget.remaining_amount < 0
+            ? `Melebihi ${moneyFormatter.format(Math.abs(budget.remaining_amount))}`
+            : `Sisa ${moneyFormatter.format(budget.remaining_amount)}`;
 
         return (
-          <article className="rounded-md border border-border bg-card p-4 text-card-foreground shadow-sm" key={budget.id}>
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-              <div>
-                <div className="flex flex-wrap items-center gap-2">
-                  <h2 className="font-semibold">{budget.name}</h2>
-                  <span className={cn('rounded-sm px-2 py-0.5 text-xs font-medium', statusClasses[budget.status])}>
-                    {statusLabels[budget.status]}
-                  </span>
-                </div>
-                <p className="mt-1 text-sm text-muted-foreground">
-                  {budget.category_name} - {dateFormatter.format(new Date(budget.start_date))} -{' '}
-                  {dateFormatter.format(new Date(budget.end_date))}
-                </p>
-              </div>
-
-              <div className="flex items-center justify-between gap-3 sm:flex-col sm:items-end">
-                <p className="font-semibold">{moneyFormatter.format(budget.amount)}</p>
-                <div className="flex gap-1">
-                  <Button asChild aria-label="Edit batas pengeluaran" size="icon" variant="ghost">
-                    <Link to={`/app/budgets/${budget.id}/edit`}>
-                      <Edit className="size-4" />
-                    </Link>
-                  </Button>
-                  <Button
-                    aria-label="Hapus batas pengeluaran"
-                    onClick={() => onDelete(budget)}
-                    size="icon"
-                    type="button"
-                    variant="ghost"
-                  >
-                    <Trash2 className="size-4" />
-                  </Button>
-                </div>
-              </div>
-            </div>
-
-            <div className="mt-4 space-y-3">
-              <div className="h-2 overflow-hidden rounded-full bg-secondary">
-                <div
-                  className={cn('h-full rounded-full', progressClasses[budget.status])}
-                  style={{ width: progressWidth }}
-                />
-              </div>
-              <div className="grid gap-3 text-sm sm:grid-cols-4">
-                <div>
-                  <p className="text-muted-foreground">Terpakai</p>
-                  <p className="font-medium">{moneyFormatter.format(budget.spent_amount)}</p>
-                </div>
-                <div>
-                  <p className="text-muted-foreground">Sisa</p>
-                  <p className={cn('font-medium', budget.remaining_amount < 0 ? 'text-destructive' : '')}>
-                    {moneyFormatter.format(budget.remaining_amount)}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-muted-foreground">Persentase</p>
-                  <p className="font-medium">{budget.percentage}%</p>
-                </div>
-                <div>
-                  <p className="text-muted-foreground">Peringatan</p>
-                  <p className="font-medium">{budget.alert_percentage}%</p>
-                </div>
-              </div>
-            </div>
-          </article>
+          <CompactProgressCard
+            badgeClassName={statusClasses[budget.status]}
+            badgeLabel={statusLabels[budget.status]}
+            footer={[
+              {
+                label: budget.remaining_amount < 0 ? 'Melebihi batas' : 'Sisa batas',
+                tone: budget.remaining_amount < 0 ? 'bad' : 'good',
+                value: remainingLabel
+              },
+              {
+                label: 'Periode',
+                value: `${dateFormatter.format(new Date(budget.start_date))} - ${dateFormatter.format(
+                  new Date(budget.end_date)
+                )}`
+              }
+            ]}
+            icon={CategoryIcon}
+            iconClassName="bg-success/10 text-success"
+            key={budget.id}
+            menuActions={[
+              { href: `/app/budgets/${budget.id}/edit`, icon: Edit, label: 'Edit' },
+              { destructive: true, icon: Trash2, label: 'Hapus', onSelect: () => onDelete(budget) }
+            ]}
+            primaryText={`${moneyFormatter.format(budget.spent_amount)} dari ${moneyFormatter.format(
+              budget.amount
+            )} terpakai`}
+            progress={budget.percentage}
+            progressClassName={progressClasses[budget.status]}
+            subtitle={`${budget.category_name} • ${budget.period === 'monthly' ? 'Bulanan' : budget.period}`}
+            title={budget.name}
+          />
         );
       })}
     </div>
