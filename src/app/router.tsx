@@ -26,6 +26,7 @@ import { AppMenuPage } from '@features/menu/pages/AppMenuPage';
 import { NotificationsPage } from '@features/notification';
 import { OnboardingPage } from '@features/onboarding';
 import { BillingPage, UpgradePage } from '@features/premium';
+import { FeaturesPage, LandingPage, PricingPage, PrivacyPage, PublicLayout, TermsPage } from '@features/public';
 import {
   RecurringFormPage,
   RecurringListPage,
@@ -50,8 +51,29 @@ export const router = createBrowserRouter([
     errorElement: <RouteErrorBoundary />,
     children: [
       {
-        index: true,
-        element: <Navigate replace to="/app" />
+        element: <PublicLayout />,
+        children: [
+          {
+            index: true,
+            element: <LandingPage />
+          },
+          {
+            path: 'features',
+            element: <FeaturesPage />
+          },
+          {
+            path: 'pricing',
+            element: <PricingPage />
+          },
+          {
+            path: 'privacy',
+            element: <PrivacyPage />
+          },
+          {
+            path: 'terms',
+            element: <TermsPage />
+          }
+        ]
       },
       {
         element: <PublicRoute />,
