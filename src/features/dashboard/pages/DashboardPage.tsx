@@ -16,7 +16,7 @@ import {
   WalletCards
 } from 'lucide-react';
 import type { LucideProps } from 'lucide-react';
-import type { ComponentType, CSSProperties } from 'react';
+import { useState, type ComponentType, type CSSProperties } from 'react';
 import { Link, Navigate } from 'react-router';
 
 import { useWorkspace } from '@/core/workspace';
@@ -28,9 +28,11 @@ import {
 } from '@features/dashboard/components/DashboardStates';
 import { RecentTransactions } from '@features/dashboard/components/RecentTransactions';
 import { useDashboardSummary } from '@features/dashboard/hooks/useDashboard';
+import type { DashboardSummary } from '@features/dashboard/types/dashboard.types';
 import {
   FinancialHealthEmptyState,
   FinancialHealthErrorState,
+  type FinancialHealthScore,
   FinancialHealthSkeleton,
   isFinancialHealthDataEmpty,
   useFinancialHealthScore
@@ -66,7 +68,16 @@ const featureMenu = [
   { href: '/app/menu', icon: MoreHorizontal, label: 'Lihat Semua' }
 ];
 
+type RecapPeriod = 'today' | 'week' | 'month';
+
+const recapPeriods: Array<{ label: string; value: RecapPeriod }> = [
+  { label: 'Hari Ini', value: 'today' },
+  { label: 'Minggu Ini', value: 'week' },
+  { label: 'Bulan Ini', value: 'month' }
+];
+
 export function DashboardPage() {
+  const [recapPeriod, setRecapPeriod] = useState<RecapPeriod>('month');
   const { user } = useAuth();
   const { loading, workspace } = useWorkspace();
   const dashboardQuery = useDashboardSummary(workspace?.id);
@@ -128,13 +139,14 @@ export function DashboardPage() {
                 <p className="text-sm opacity-90">Total Saldo</p>
                 {financialHealthQuery.data && !isFinancialHealthDataEmpty(financialHealthQuery.data) ? (
                   <span className="rounded-full border border-white/15 bg-white/15 px-2.5 py-1 text-xs font-medium shadow-sm backdrop-blur">
-                    {financialHealthQuery.data.status}
+                    {getMoneyCondition(financialHealthQuery.data).label}
                   </span>
                 ) : null}
               </div>
               <p className="mt-1 break-words text-4xl font-semibold tracking-normal drop-shadow-sm sm:text-5xl">
                 {moneyFormatter.format(summary?.totalWalletBalance ?? 0)}
               </p>
+              <WalletBalanceChips wallets={summary?.walletBalances ?? []} />
             </div>
           </div>
         </section>
@@ -144,40 +156,6 @@ export function DashboardPage() {
           <QuickActionButton icon={ArrowUpCircle} label="Uang Keluar" to="/app/transactions/new?type=expense" tone="expense" />
           <QuickActionButton icon={ArrowRightLeft} label="Pindah Saldo" to="/app/transactions/new?type=transfer" />
         </div>
-
-        <section className="rounded-[1.75rem] border border-border/80 bg-[linear-gradient(180deg,#FFFFFF_0%,#F8FBFF_100%)] p-4 text-card-foreground shadow-[0_18px_45px_rgba(15,23,42,0.08)] dark:bg-[linear-gradient(180deg,#0F172A_0%,#111827_100%)] sm:p-5">
-          <SectionHeader title="Fitur Keuangan" />
-          <div className="mx-auto grid max-w-3xl grid-cols-3 gap-x-2 gap-y-4 min-[380px]:grid-cols-4 sm:grid-cols-5 sm:gap-4">
-            {featureMenu.map(({ href, icon: Icon, label }) => {
-              const accent = getFeatureAccent(getFeatureAccentKey(href));
-
-              return (
-                <Link
-                  className="group flex min-w-0 flex-col items-center gap-2 rounded-2xl p-2 text-center transition-all hover:-translate-y-0.5 hover:bg-white/70 hover:shadow-sm dark:hover:bg-white/5"
-                  key={href}
-                  to={href}
-                >
-                  <span
-                    className="flex size-14 items-center justify-center rounded-2xl shadow-sm transition-transform group-hover:scale-105 sm:size-16 [background-color:var(--feature-bg)] [color:var(--feature-icon)] dark:[background-color:var(--feature-bg-dark)] dark:[color:var(--feature-icon-dark)]"
-                    style={
-                      {
-                        '--feature-bg': accent.bg,
-                        '--feature-bg-dark': accent.darkBg,
-                        '--feature-icon': accent.icon,
-                        '--feature-icon-dark': accent.darkIcon
-                      } as CSSProperties
-                    }
-                  >
-                    <Icon className="size-7 sm:size-8" />
-                  </span>
-                  <span className="min-h-8 max-w-full text-[11px] font-semibold leading-4 text-foreground sm:text-xs">
-                    {label}
-                  </span>
-                </Link>
-              );
-            })}
-          </div>
-        </section>
 
         {dashboardQuery.isLoading ? <DashboardSkeleton /> : null}
 
@@ -190,66 +168,117 @@ export function DashboardPage() {
 
         {summary ? (
           <>
+            <section className="rounded-2xl border border-border bg-card p-4 text-card-foreground shadow-sm">
+              <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <SectionHeader title="Rekap Keuangan" />
+                <div className="grid grid-cols-3 gap-1 rounded-xl bg-muted/70 p-1 text-xs font-semibold">
+                  {recapPeriods.map((period) => (
+                    <button
+                      className={
+                        recapPeriod === period.value
+                          ? 'rounded-lg bg-card px-2.5 py-2 text-foreground shadow-sm'
+                          : 'rounded-lg px-2.5 py-2 text-muted-foreground transition-colors hover:text-foreground'
+                      }
+                      key={period.value}
+                      onClick={() => setRecapPeriod(period.value)}
+                      type="button"
+                    >
+                      {period.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <FinancialRecap summary={summary} period={recapPeriod} />
+            </section>
+
             {isEmpty ? <DashboardEmptyState /> : null}
 
-            <section>
-              <SectionHeader title="Bulan Ini" />
-              <div className="rounded-2xl border border-border bg-card p-4 text-card-foreground shadow-sm">
-                <div className="grid grid-cols-3 gap-3">
-                  <MonthMiniStat label="Masuk" tone="positive" value={moneyFormatter.format(summary.monthlyIncome)} />
-                  <MonthMiniStat label="Keluar" tone="negative" value={moneyFormatter.format(summary.monthlyExpense)} />
-                  <MonthMiniStat
-                    label="Sisa"
-                    tone={summary.monthlyCashflow >= 0 ? 'positive' : 'negative'}
-                    value={moneyFormatter.format(summary.monthlyCashflow)}
-                  />
-                </div>
+            <section className="rounded-[1.75rem] border border-border/80 bg-[linear-gradient(180deg,#FFFFFF_0%,#F8FBFF_100%)] p-4 text-card-foreground shadow-[0_18px_45px_rgba(15,23,42,0.08)] dark:bg-[linear-gradient(180deg,#0F172A_0%,#111827_100%)] sm:p-5">
+              <SectionHeader title="Fitur Keuangan" />
+              <div className="mx-auto grid max-w-3xl grid-cols-3 gap-x-2 gap-y-4 min-[380px]:grid-cols-4 sm:grid-cols-5 sm:gap-4">
+                {featureMenu.map(({ href, icon: Icon, label }) => {
+                  const accent = getFeatureAccent(getFeatureAccentKey(href));
+
+                  return (
+                    <Link
+                      className="group flex min-w-0 flex-col items-center gap-2 rounded-2xl p-2 text-center transition-all hover:-translate-y-0.5 hover:bg-white/70 hover:shadow-sm dark:hover:bg-white/5"
+                      key={href}
+                      to={href}
+                    >
+                      <span
+                        className="flex size-14 items-center justify-center rounded-2xl shadow-sm transition-transform group-hover:scale-105 sm:size-16 [background-color:var(--feature-bg)] [color:var(--feature-icon)] dark:[background-color:var(--feature-bg-dark)] dark:[color:var(--feature-icon-dark)]"
+                        style={
+                          {
+                            '--feature-bg': accent.bg,
+                            '--feature-bg-dark': accent.darkBg,
+                            '--feature-icon': accent.icon,
+                            '--feature-icon-dark': accent.darkIcon
+                          } as CSSProperties
+                        }
+                      >
+                        <Icon className="size-7 sm:size-8" />
+                      </span>
+                      <span className="min-h-8 max-w-full text-[11px] font-semibold leading-4 text-foreground sm:text-xs">
+                        {label}
+                      </span>
+                    </Link>
+                  );
+                })}
               </div>
             </section>
 
             <section className="rounded-2xl border border-border bg-card p-4 text-card-foreground shadow-sm">
-              <SectionHeader title="Kondisi Keuangan" />
+              <SectionHeader title="Kondisi Uang Saat Ini" />
               {financialHealthQuery.isLoading ? <FinancialHealthSkeleton /> : null}
               {financialHealthQuery.isError ? (
                 <FinancialHealthErrorState
                   message={
                     financialHealthQuery.error instanceof Error
                       ? financialHealthQuery.error.message
-                      : 'Kondisi keuangan gagal dimuat.'
+                      : 'Kondisi uang gagal dimuat.'
                   }
                   onRetry={() => void financialHealthQuery.refetch()}
                 />
               ) : null}
               {financialHealthQuery.data && !isFinancialHealthDataEmpty(financialHealthQuery.data) ? (
-                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                  <div>
-                    <div className="flex items-center gap-3">
-                      <p className="text-4xl font-semibold tracking-normal">{financialHealthQuery.data.score}</p>
-                      <StatusBadge
-                        tone={
-                          financialHealthQuery.data.score >= 80
-                            ? 'good'
-                            : financialHealthQuery.data.score >= 60
-                              ? 'default'
-                              : financialHealthQuery.data.score >= 40
-                                ? 'warn'
-                                : 'bad'
-                        }
-                      >
-                        {financialHealthQuery.data.status}
-                      </StatusBadge>
-                    </div>
-                    <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                      {financialHealthQuery.data.primaryRecommendation}
-                    </p>
-                  </div>
-                  <Button asChild className="w-full rounded-xl sm:w-auto" variant="outline">
-                    <Link to="/app/reports">Lihat Ringkasan</Link>
-                  </Button>
-                </div>
+                <MoneyConditionCard score={financialHealthQuery.data} />
               ) : !financialHealthQuery.isLoading && !financialHealthQuery.isError ? (
                 <FinancialHealthEmptyState />
               ) : null}
+            </section>
+
+            <section>
+              <RecentTransactions transactions={summary.recentTransactions} />
+            </section>
+
+            <section>
+              <SectionHeader title="Rencana" />
+              <div className="grid gap-3 sm:grid-cols-3">
+                <PlanShortcut
+                  activeColors={activeColors}
+                  href="/app/budgets"
+                  icon={BarChart3}
+                  label="Batas Pengeluaran"
+                  meta={`${summary.activeBudgetCount} aktif`}
+                  text="Atur batas uang keluar agar tidak kebablasan."
+                />
+                <PlanShortcut
+                  activeColors={activeColors}
+                  href="/app/goals"
+                  icon={Target}
+                  label="Target Tabungan"
+                  meta={`${summary.activeGoalCount} aktif`}
+                  text="Pantau progres tabungan untuk tujuan tertentu."
+                />
+                <PlanShortcut
+                  activeColors={activeColors}
+                  href="/app/debts"
+                  icon={Landmark}
+                  label="Hutang/Cicilan"
+                  meta={moneyFormatter.format(summary.debtRemainingTotal)}
+                  text="Lihat sisa hutang dan cicilan yang perlu dibayar."
+                />
+              </div>
             </section>
 
             <section className="rounded-2xl border border-border bg-card p-4 text-card-foreground shadow-sm">
@@ -292,51 +321,158 @@ export function DashboardPage() {
               ) : null}
             </section>
 
-            <section>
-              <SectionHeader title="Rencana" />
-              <div className="grid gap-3 sm:grid-cols-3">
-                <PlanShortcut
-                  activeColors={activeColors}
-                  href="/app/budgets"
-                  icon={BarChart3}
-                  label="Batas Pengeluaran"
-                  meta={`${summary.activeBudgetCount} aktif`}
-                  text="Atur batas uang keluar agar tidak kebablasan."
-                />
-                <PlanShortcut
-                  activeColors={activeColors}
-                  href="/app/goals"
-                  icon={Target}
-                  label="Target Tabungan"
-                  meta={`${summary.activeGoalCount} aktif`}
-                  text="Pantau progres tabungan untuk tujuan tertentu."
-                />
-                <PlanShortcut
-                  activeColors={activeColors}
-                  href="/app/debts"
-                  icon={Landmark}
-                  label="Hutang/Cicilan"
-                  meta={moneyFormatter.format(summary.debtRemainingTotal)}
-                  text="Lihat sisa hutang dan cicilan yang perlu dibayar."
-                />
-              </div>
-            </section>
-
-            <section>
-              <SectionHeader
-                action={
-                  <Button asChild size="sm" variant="ghost">
-                    <Link to="/app/transactions">Lihat semua</Link>
-                  </Button>
-                }
-                title="Catatan Terakhir"
-              />
-              <RecentTransactions transactions={summary.recentTransactions} />
-            </section>
           </>
         ) : null}
       </div>
     </AppPage>
+  );
+}
+
+function WalletBalanceChips({
+  wallets
+}: {
+  wallets: Array<{
+    id: string;
+    name: string;
+    current_balance: number;
+  }>;
+}) {
+  if (wallets.length === 0) {
+    return null;
+  }
+
+  const visibleWallets = wallets.slice(0, 3);
+  const remainingWalletCount = Math.max(wallets.length - visibleWallets.length, 0);
+
+  return (
+    <div className="mt-4">
+      <p className="text-xs font-medium uppercase tracking-wide text-white/70">Saldo Dompet</p>
+      <div className="mt-2 flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+        {visibleWallets.map((wallet) => (
+          <Link
+            className="shrink-0 rounded-2xl border border-white/15 bg-white/15 px-3 py-2 text-left shadow-sm backdrop-blur transition-colors hover:bg-white/25"
+            key={wallet.id}
+            to="/app/wallets"
+          >
+            <span className="block max-w-28 truncate text-xs font-medium text-white/80">{wallet.name}</span>
+            <span className="mt-0.5 block text-sm font-semibold text-white">
+              {moneyFormatter.format(wallet.current_balance)}
+            </span>
+          </Link>
+        ))}
+        {remainingWalletCount > 0 ? (
+          <Link
+            className="flex shrink-0 items-center rounded-2xl border border-white/15 bg-white/10 px-3 py-2 text-xs font-semibold text-white/90 shadow-sm backdrop-blur transition-colors hover:bg-white/25"
+            to="/app/wallets"
+          >
+            +{remainingWalletCount} dompet lainnya
+          </Link>
+        ) : null}
+      </div>
+    </div>
+  );
+}
+
+function getRecap(summary: DashboardSummary, period: RecapPeriod) {
+  if (period === 'today') {
+    return {
+      cashflow: summary.dailyCashflow,
+      expense: summary.dailyExpense,
+      income: summary.dailyIncome
+    };
+  }
+
+  if (period === 'week') {
+    return {
+      cashflow: summary.weeklyCashflow,
+      expense: summary.weeklyExpense,
+      income: summary.weeklyIncome
+    };
+  }
+
+  return {
+    cashflow: summary.monthlyCashflow,
+    expense: summary.monthlyExpense,
+    income: summary.monthlyIncome
+  };
+}
+
+function FinancialRecap({ period, summary }: { period: RecapPeriod; summary: DashboardSummary }) {
+  const recap = getRecap(summary, period);
+
+  return (
+    <div className="grid grid-cols-3 gap-3">
+      <MonthMiniStat label="Masuk" tone="positive" value={moneyFormatter.format(recap.income)} />
+      <MonthMiniStat label="Keluar" tone="negative" value={moneyFormatter.format(recap.expense)} />
+      <MonthMiniStat
+        label="Sisa"
+        tone={recap.cashflow >= 0 ? 'positive' : 'negative'}
+        value={moneyFormatter.format(recap.cashflow)}
+      />
+    </div>
+  );
+}
+
+function getMoneyCondition(score: FinancialHealthScore) {
+  const { metrics } = score;
+
+  if (score.status === 'Berisiko') {
+    return {
+      badgeClass: 'bg-destructive/10 text-destructive',
+      description:
+        metrics.monthlyExpense > metrics.monthlyIncome
+          ? 'Uang keluar kamu sedang lebih besar daripada uang masuk.'
+          : 'Ada beberapa bagian keuangan yang perlu segera dirapikan.',
+      label: 'Berisiko',
+      suggestion: 'Mulai dari mengurangi pengeluaran yang tidak penting dan cek cicilan yang paling mendesak.'
+    };
+  }
+
+  if (score.status === 'Perlu Perhatian') {
+    return {
+      badgeClass: 'bg-warning/15 text-warning',
+      description:
+        metrics.budgetOverCount > 0
+          ? 'Ada batas pengeluaran yang sudah terlewati.'
+          : 'Keuangan kamu masih berjalan, tapi ada tanda yang perlu diperhatikan.',
+      label: 'Perlu Diperhatikan',
+      suggestion: 'Coba cek pengeluaran minggu ini dan tahan belanja yang belum penting.'
+    };
+  }
+
+  if (score.status === 'Cukup Sehat') {
+    return {
+      badgeClass: 'bg-primary-soft text-primary',
+      description: 'Keuangan kamu cukup terkendali, tetapi masih ada ruang untuk dibuat lebih kuat.',
+      label: 'Cukup Aman',
+      suggestion: 'Lanjutkan mencatat uang dan tambah dana cadangan sedikit demi sedikit.'
+    };
+  }
+
+  return {
+    badgeClass: 'bg-success/10 text-success',
+    description: 'Uang masuk, uang keluar, dan rencana keuangan kamu terlihat cukup seimbang.',
+    label: 'Aman',
+    suggestion: 'Pertahankan kebiasaan ini dan cek ringkasan secara berkala.'
+  };
+}
+
+function MoneyConditionCard({ score }: { score: FinancialHealthScore }) {
+  const condition = getMoneyCondition(score);
+
+  return (
+    <div className="space-y-3">
+      <span className={`inline-flex w-fit rounded-full px-3 py-1 text-xs font-semibold ${condition.badgeClass}`}>
+        {condition.label}
+      </span>
+      <div>
+        <p className="text-sm leading-6 text-foreground">{condition.description}</p>
+        <p className="mt-1 text-sm leading-6 text-muted-foreground">{condition.suggestion}</p>
+      </div>
+      <Button asChild className="w-full rounded-xl sm:w-auto" variant="outline">
+        <Link to="/app/reports">Lihat Ringkasan</Link>
+      </Button>
+    </div>
   );
 }
 

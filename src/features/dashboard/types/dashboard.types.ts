@@ -16,8 +16,21 @@ export type DashboardNearestDebt = {
   remaining_amount: number;
 } | null;
 
+export type DashboardWalletBalance = {
+  id: string;
+  name: string;
+  current_balance: number;
+};
+
 export type DashboardSummary = {
   totalWalletBalance: number;
+  walletBalances: DashboardWalletBalance[];
+  dailyIncome: number;
+  dailyExpense: number;
+  dailyCashflow: number;
+  weeklyIncome: number;
+  weeklyExpense: number;
+  weeklyCashflow: number;
   monthlyIncome: number;
   monthlyExpense: number;
   monthlyCashflow: number;

@@ -103,7 +103,7 @@ export const mainNavigation: NavigationGroup[] = [
 ];
 
 export const appNavigation = mainNavigation.filter((item) =>
-  ['Beranda', 'Catatan', 'Ringkasan', 'Akun'].includes(item.label)
+  ['Beranda', 'Dompet', 'Ringkasan', 'Akun'].includes(item.label)
 );
 
 export const primaryNavigation = mainNavigation.slice(0, 3);

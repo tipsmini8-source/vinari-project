@@ -50,8 +50,8 @@ export function RecentTransactions({ transactions }: RecentTransactionsProps) {
     <div className="rounded-2xl border border-border bg-card text-card-foreground shadow-sm">
       <div className="flex items-center justify-between gap-3 border-b border-border p-4">
         <div>
-          <h2 className="font-semibold">Catatan terakhir</h2>
-          <p className="text-sm text-muted-foreground">Maksimal 5 catatan terbaru.</p>
+          <h2 className="font-semibold">Transaksi Terbaru</h2>
+          <p className="text-sm text-muted-foreground">Maksimal 5 transaksi terakhir.</p>
         </div>
         <Button asChild className="rounded-xl" size="sm" variant="outline">
           <Link to="/app/transactions">Lihat semua</Link>

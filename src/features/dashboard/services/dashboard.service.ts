@@ -73,6 +73,38 @@ function getMonthRange() {
   };
 }
 
+function formatLocalDate(date: Date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+
+  return `${year}-${month}-${day}`;
+}
+
+function getTodayRange() {
+  const today = formatLocalDate(new Date());
+
+  return {
+    start: today,
+    end: today
+  };
+}
+
+function getWeekRange() {
+  const now = new Date();
+  const day = now.getDay();
+  const daysFromMonday = day === 0 ? 6 : day - 1;
+  const start = new Date(now);
+  start.setDate(now.getDate() - daysFromMonday);
+  const end = new Date(start);
+  end.setDate(start.getDate() + 6);
+
+  return {
+    start: formatLocalDate(start),
+    end: formatLocalDate(end)
+  };
+}
+
 function mapRecentTransaction(row: TransactionRow): DashboardTransaction {
   return {
     id: row.id,
@@ -103,7 +135,13 @@ export const DashboardService = {
       walletBalance.set(wallet.id, Number(wallet.initial_balance ?? 0));
     }
 
+    const todayRange = getTodayRange();
+    const weekRange = getWeekRange();
     const { end, start } = getMonthRange();
+    let dailyIncome = 0;
+    let dailyExpense = 0;
+    let weeklyIncome = 0;
+    let weeklyExpense = 0;
     let monthlyIncome = 0;
     let monthlyExpense = 0;
 
@@ -115,6 +153,14 @@ export const DashboardService = {
           walletBalance.set(transaction.wallet_id, (walletBalance.get(transaction.wallet_id) ?? 0) + amount);
         }
 
+        if (transaction.transaction_date >= todayRange.start && transaction.transaction_date <= todayRange.end) {
+          dailyIncome += amount;
+        }
+
+        if (transaction.transaction_date >= weekRange.start && transaction.transaction_date <= weekRange.end) {
+          weeklyIncome += amount;
+        }
+
         if (transaction.transaction_date >= start && transaction.transaction_date <= end) {
           monthlyIncome += amount;
         }
@@ -123,6 +169,14 @@ export const DashboardService = {
       if (transaction.type === 'expense' && transaction.wallet_id) {
         if (walletBalance.has(transaction.wallet_id)) {
           walletBalance.set(transaction.wallet_id, (walletBalance.get(transaction.wallet_id) ?? 0) - amount);
+        }
+
+        if (transaction.transaction_date >= todayRange.start && transaction.transaction_date <= todayRange.end) {
+          dailyExpense += amount;
+        }
+
+        if (transaction.transaction_date >= weekRange.start && transaction.transaction_date <= weekRange.end) {
+          weeklyExpense += amount;
         }
 
         if (transaction.transaction_date >= start && transaction.transaction_date <= end) {
@@ -146,9 +200,21 @@ export const DashboardService = {
     }
 
     const totalWalletBalance = Array.from(walletBalance.values()).reduce((total, value) => total + value, 0);
+    const walletBalances = wallets.map((wallet) => ({
+      id: wallet.id,
+      name: wallet.name,
+      current_balance: walletBalance.get(wallet.id) ?? Number(wallet.initial_balance ?? 0)
+    }));
 
     return {
       totalWalletBalance,
+      walletBalances,
+      dailyIncome,
+      dailyExpense,
+      dailyCashflow: dailyIncome - dailyExpense,
+      weeklyIncome,
+      weeklyExpense,
+      weeklyCashflow: weeklyIncome - weeklyExpense,
       monthlyIncome,
       monthlyExpense,
       monthlyCashflow: monthlyIncome - monthlyExpense,
@@ -174,7 +240,8 @@ export const DashboardService = {
       .select('id, name, initial_balance')
       .eq('workspace_id', workspaceId)
       .eq('is_archived', false)
-      .is('deleted_at', null)) as unknown as {
+      .is('deleted_at', null)
+      .order('created_at', { ascending: true })) as unknown as {
       data: WalletRow[] | null;
       error: SupabaseErrorLike | null;
     };
