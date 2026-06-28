@@ -18,6 +18,30 @@ const dateFormatter = new Intl.DateTimeFormat('id-ID', {
   dateStyle: 'full'
 });
 
+function getTypeLabel(type: string) {
+  if (type === 'income') {
+    return 'Uang Masuk';
+  }
+
+  if (type === 'expense') {
+    return 'Uang Keluar';
+  }
+
+  return 'Pindah Saldo';
+}
+
+function getEffectLabel(effect: string) {
+  if (effect === 'increase') {
+    return 'Menambah saldo';
+  }
+
+  if (effect === 'decrease') {
+    return 'Mengurangi saldo';
+  }
+
+  return 'Pindah saldo';
+}
+
 export function TransactionDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -41,7 +65,7 @@ export function TransactionDetailPage() {
   const transaction = transactionQuery.data;
 
   const handleDelete = async () => {
-    const confirmed = window.confirm(`Hapus transaksi "${transaction.title}"?`);
+    const confirmed = window.confirm(`Hapus catatan "${transaction.title}"?`);
 
     if (!confirmed) {
       return;
@@ -49,11 +73,11 @@ export function TransactionDetailPage() {
 
     try {
       await deleteTransaction.mutateAsync(transaction.id);
-      toast({ title: 'Transaksi dihapus' });
+      toast({ title: 'Catatan dihapus' });
       void navigate('/app/transactions', { replace: true });
     } catch (error) {
       toast({
-        title: 'Gagal menghapus transaksi',
+        title: 'Gagal menghapus catatan',
         description: error instanceof Error ? error.message : 'Silakan coba lagi.',
         variant: 'destructive'
       });
@@ -75,7 +99,7 @@ export function TransactionDetailPage() {
               <div>
                 <CardTitle>{transaction.title}</CardTitle>
                 <CardDescription>
-                  {dateFormatter.format(new Date(transaction.transaction_date))} - {transaction.type}
+                  {dateFormatter.format(new Date(transaction.transaction_date))} - {getTypeLabel(transaction.type)}
                 </CardDescription>
               </div>
               <div className="flex gap-2">
@@ -95,11 +119,11 @@ export function TransactionDetailPage() {
           <CardContent>
             <dl className="grid gap-3 sm:grid-cols-2">
               <div className="rounded-md border border-border p-4">
-                <dt className="text-sm text-muted-foreground">Amount</dt>
+                <dt className="text-sm text-muted-foreground">Nominal</dt>
                 <dd className="mt-1 text-2xl font-semibold">{moneyFormatter.format(transaction.amount)}</dd>
               </div>
               <div className="rounded-md border border-border p-4">
-                <dt className="text-sm text-muted-foreground">Wallet</dt>
+                <dt className="text-sm text-muted-foreground">Dompet</dt>
                 <dd className="mt-1 font-semibold">
                   {transaction.type === 'transfer'
                     ? `${transaction.wallet_name ?? '-'} ke ${transaction.destination_wallet_name ?? '-'}`
@@ -111,8 +135,8 @@ export function TransactionDetailPage() {
                 <dd className="mt-1 font-semibold">{transaction.category_name ?? '-'}</dd>
               </div>
               <div className="rounded-md border border-border p-4">
-                <dt className="text-sm text-muted-foreground">Financial effect</dt>
-                <dd className="mt-1 font-semibold">{transaction.financial_effect}</dd>
+                <dt className="text-sm text-muted-foreground">Dampak saldo</dt>
+                <dd className="mt-1 font-semibold">{getEffectLabel(transaction.financial_effect)}</dd>
               </div>
             </dl>
             {transaction.note ? (

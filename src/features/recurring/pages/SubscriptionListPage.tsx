@@ -63,7 +63,7 @@ export function SubscriptionListPage() {
   );
 
   const handleDeactivate = async (item: Subscription) => {
-    const confirmed = window.confirm(`Nonaktifkan subscription "${item.name}"?`);
+    const confirmed = window.confirm(`Nonaktifkan langganan "${item.name}"?`);
 
     if (!confirmed) {
       return;
@@ -71,10 +71,10 @@ export function SubscriptionListPage() {
 
     try {
       await deactivateSubscription.mutateAsync(item.id);
-      toast({ title: 'Subscription dinonaktifkan' });
+      toast({ title: 'Langganan dinonaktifkan' });
     } catch (error) {
       toast({
-        title: 'Gagal menonaktifkan subscription',
+        title: 'Gagal menonaktifkan langganan',
         description: error instanceof Error ? error.message : 'Silakan coba lagi.',
         variant: 'destructive'
       });
@@ -82,7 +82,7 @@ export function SubscriptionListPage() {
   };
 
   const handleDelete = async (item: Subscription) => {
-    const confirmed = window.confirm(`Hapus subscription "${item.name}"?`);
+    const confirmed = window.confirm(`Hapus langganan "${item.name}"?`);
 
     if (!confirmed) {
       return;
@@ -90,10 +90,10 @@ export function SubscriptionListPage() {
 
     try {
       await deleteSubscription.mutateAsync(item.id);
-      toast({ title: 'Subscription dihapus' });
+      toast({ title: 'Langganan dihapus' });
     } catch (error) {
       toast({
-        title: 'Gagal menghapus subscription',
+        title: 'Gagal menghapus langganan',
         description: error instanceof Error ? error.message : 'Silakan coba lagi.',
         variant: 'destructive'
       });
@@ -112,7 +112,7 @@ export function SubscriptionListPage() {
               </Link>
             </Button>
             <p className="text-sm font-medium text-primary">{workspace.name}</p>
-            <h1 className="mt-1 text-3xl font-semibold tracking-normal">Subscriptions</h1>
+            <h1 className="mt-1 text-3xl font-semibold tracking-normal">Langganan</h1>
             <p className="mt-2 text-sm text-muted-foreground">
               Pantau langganan rutin dan biaya bulanan tanpa reminder otomatis.
             </p>
@@ -121,7 +121,7 @@ export function SubscriptionListPage() {
             <Button asChild>
               <Link to="/app/subscriptions/new">
                 <Plus className="size-4" />
-                Tambah Subscription
+                Tambah Langganan
               </Link>
             </Button>
           ) : null}
@@ -153,9 +153,9 @@ export function SubscriptionListPage() {
           <SubscriptionEmptyState
             canCreate={canManage}
             createHref="/app/subscriptions/new"
-            ctaLabel="Tambah Subscription"
+            ctaLabel="Tambah Langganan"
             description="Catat tagihan rutin seperti listrik, internet, BPJS, Netflix, Canva, atau cicilan."
-            title="Belum ada subscription"
+            title="Belum ada langganan"
           />
         ) : null}
 

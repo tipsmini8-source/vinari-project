@@ -27,7 +27,7 @@ export function WalletEmptyState({ onCreate }: { onCreate: () => void }) {
       <WalletCards className="mx-auto size-10 text-muted-foreground" />
       <h2 className="mt-4 font-semibold">Belum ada dompet</h2>
       <p className="mx-auto mt-2 max-w-sm text-sm leading-6 text-muted-foreground">
-        Tambahkan dompet pertama untuk mulai menyiapkan sumber uang Vinari.
+        Tambahkan dompet seperti cash, rekening, atau e-wallet untuk mulai mencatat saldo.
       </p>
       <Button className="mt-5 rounded-xl" onClick={onCreate} type="button">
         Tambah Dompet

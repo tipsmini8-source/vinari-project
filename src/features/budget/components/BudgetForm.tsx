@@ -64,20 +64,20 @@ export function BudgetForm({ categories, defaultBudget, isSubmitting, onCancel, 
   return (
     <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
       <div className="space-y-2">
-        <Label htmlFor="name">Nama budget</Label>
+        <Label htmlFor="name">Nama batas pengeluaran</Label>
         <Input id="name" placeholder="Contoh: Belanja bulanan" {...register('name')} />
         {errors.name ? <p className="text-sm text-destructive">{errors.name.message}</p> : null}
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-2">
-          <Label htmlFor="categoryId">Kategori expense</Label>
+          <Label htmlFor="categoryId">Kategori uang keluar</Label>
           <select
             className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             id="categoryId"
             {...register('categoryId')}
           >
-            <option value="">Pilih kategori expense</option>
+            <option value="">Pilih kategori uang keluar</option>
             {categories.map((category) => (
               <option key={category.id} value={category.id}>
                 {category.name}
@@ -88,7 +88,7 @@ export function BudgetForm({ categories, defaultBudget, isSubmitting, onCancel, 
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="amount">Nominal budget</Label>
+          <Label htmlFor="amount">Nominal batas</Label>
           <Input id="amount" min="0.01" step="0.01" type="number" {...register('amount', { valueAsNumber: true })} />
           {errors.amount ? <p className="text-sm text-destructive">{errors.amount.message}</p> : null}
         </div>
@@ -108,7 +108,7 @@ export function BudgetForm({ categories, defaultBudget, isSubmitting, onCancel, 
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="alertPercentage">Alert (%)</Label>
+          <Label htmlFor="alertPercentage">Peringatan (%)</Label>
           <Input
             id="alertPercentage"
             max="100"
@@ -125,7 +125,7 @@ export function BudgetForm({ categories, defaultBudget, isSubmitting, onCancel, 
 
       <label className="flex items-center gap-3 rounded-md border border-border p-3 text-sm">
         <input className="size-4 accent-primary" type="checkbox" {...register('isActive')} />
-        Budget aktif
+        Batas pengeluaran aktif
       </label>
 
       <div className="flex justify-end gap-2 pt-2">

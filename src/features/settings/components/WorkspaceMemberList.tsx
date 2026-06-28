@@ -12,10 +12,16 @@ const dateFormatter = new Intl.DateTimeFormat('id-ID', {
 const roleOptions: WorkspaceMemberRole[] = ['owner', 'partner', 'member', 'viewer'];
 
 const roleLabels: Record<WorkspaceMemberRole, string> = {
-  member: 'Member',
-  owner: 'Owner',
+  member: 'Anggota',
+  owner: 'Pemilik',
   partner: 'Partner',
-  viewer: 'Viewer'
+  viewer: 'Lihat saja'
+};
+
+const statusLabels: Record<WorkspaceMember['status'], string> = {
+  active: 'Aktif',
+  invited: 'Diundang',
+  removed: 'Dihapus'
 };
 
 function formatDate(value: string | null | undefined) {
@@ -47,7 +53,7 @@ function roleOptionsFor(member: WorkspaceMember) {
 }
 
 function memberDisplayName(member: WorkspaceMember) {
-  return member.profile?.full_name || member.invite_email || 'Member workspace';
+  return member.profile?.full_name || member.invite_email || 'Anggota ruang keuangan';
 }
 
 export function WorkspaceMemberList({
@@ -72,7 +78,7 @@ export function WorkspaceMemberList({
   if (members.length === 0) {
     return (
       <div className="rounded-md border border-dashed border-border p-6 text-sm text-muted-foreground">
-        Belum ada anggota di workspace ini.
+        Belum ada anggota di ruang keuangan ini.
       </div>
     );
   }
@@ -108,8 +114,8 @@ export function WorkspaceMemberList({
                   <span className="rounded-full border border-primary/20 bg-primary-soft px-2 py-0.5 text-xs font-medium capitalize text-primary">
                     {roleLabels[member.role]}
                   </span>
-                  <span className={`rounded-full border px-2 py-0.5 text-xs font-medium capitalize ${statusClassName(member.status)}`}>
-                    {member.status}
+                  <span className={`rounded-full border px-2 py-0.5 text-xs font-medium ${statusClassName(member.status)}`}>
+                    {statusLabels[member.status]}
                   </span>
                 </div>
                 <p className="mt-3 text-xs text-muted-foreground">
@@ -151,7 +157,7 @@ export function WorkspaceMemberList({
                       variant="outline"
                     >
                       <Trash2 className="size-4" />
-                      Remove
+                      Hapus
                     </Button>
                   ) : null}
                 </div>

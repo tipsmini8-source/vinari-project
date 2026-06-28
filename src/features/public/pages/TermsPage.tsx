@@ -1,27 +1,27 @@
 const sections = [
   {
     title: 'Ketentuan penggunaan',
-    text: 'Dengan memakai Vinari, user setuju menggunakan aplikasi untuk kebutuhan pencatatan dan pemahaman keuangan pribadi atau keluarga.'
+    text: 'Dengan memakai Vinari, pengguna setuju menggunakan aplikasi untuk kebutuhan pencatatan dan pemahaman keuangan pribadi atau keluarga.'
   },
   {
     title: 'Tanggung jawab data',
-    text: 'User bertanggung jawab atas data yang dimasukkan ke Vinari, termasuk transaksi, dompet, target, dan hutang.'
+    text: 'Pengguna bertanggung jawab atas data yang dimasukkan ke Vinari, termasuk catatan uang, dompet, target tabungan, dan hutang/cicilan.'
   },
   {
     title: 'Alat bantu pencatatan',
-    text: 'Vinari hanya alat bantu pencatatan keuangan. Vinari bukan bank, bukan e-wallet, tidak menyimpan uang asli user, dan bukan penasihat keuangan profesional.'
+    text: 'Vinari hanya alat bantu pencatatan keuangan. Vinari bukan bank, bukan e-wallet, tidak menyimpan uang asli pengguna, dan bukan penasihat keuangan profesional.'
   },
   {
     title: 'Pembayaran premium manual',
-    text: 'Upgrade premium dilakukan manual. Bukti pembayaran akan dicek admin sebelum subscription diaktifkan.'
+    text: 'Upgrade premium dilakukan manual. Bukti pembayaran akan dicek admin sebelum paket premium diaktifkan.'
   },
   {
-    title: 'Refund policy',
-    text: 'Kebijakan refund dapat berubah dan akan diinformasikan melalui halaman ini.'
+    title: 'Kebijakan pengembalian dana',
+    text: 'Kebijakan pengembalian dana dapat berubah dan akan diinformasikan melalui halaman ini.'
   },
   {
     title: 'Larangan penyalahgunaan',
-    text: 'User dilarang menyalahgunakan aplikasi, mengganggu sistem, atau memakai Vinari untuk aktivitas yang melanggar hukum.'
+    text: 'Pengguna dilarang menyalahgunakan aplikasi, mengganggu sistem, atau memakai Vinari untuk aktivitas yang melanggar hukum.'
   },
   {
     title: 'Perubahan layanan',
@@ -29,7 +29,7 @@ const sections = [
   },
   {
     title: 'Batasan tanggung jawab',
-    text: 'Vinari tidak bertanggung jawab atas keputusan finansial yang dibuat user berdasarkan data yang dimasukkan sendiri.'
+    text: 'Vinari tidak bertanggung jawab atas keputusan keuangan yang dibuat pengguna berdasarkan data yang dimasukkan sendiri.'
   }
 ];
 
@@ -49,6 +49,16 @@ export function TermsPage() {
               <p className="mt-2 text-sm leading-7 text-muted-foreground">{section.text}</p>
             </article>
           ))}
+          <article className="rounded-2xl border border-border bg-primary-soft p-5 text-primary">
+            <h2 className="font-semibold">Bantuan</h2>
+            <p className="mt-2 text-sm leading-7">
+              Butuh bantuan? Hubungi{' '}
+              <a className="font-medium underline underline-offset-4" href="mailto:support@vinari.app">
+                support@vinari.app
+              </a>
+              .
+            </p>
+          </article>
         </div>
       </section>
     </main>

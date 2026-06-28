@@ -27,7 +27,7 @@ export function FinancialHealthDetails({ score }: { score: FinancialHealthScore 
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-xl">Financial Health Detail</CardTitle>
+        <CardTitle className="text-xl">Detail Kondisi Keuangan</CardTitle>
       </CardHeader>
       <CardContent className="space-y-5">
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
@@ -55,16 +55,16 @@ export function FinancialHealthDetails({ score }: { score: FinancialHealthScore 
 
         <div className="grid gap-3 lg:grid-cols-2">
           <div className="rounded-md border border-border p-4">
-            <h3 className="font-semibold">Metrics</h3>
+            <h3 className="font-semibold">Ringkasan angka</h3>
             <div className="mt-4 space-y-3 text-sm">
-              <DetailLine label="Income bulan ini" value={moneyFormatter.format(score.metrics.monthlyIncome)} />
-              <DetailLine label="Expense bulan ini" value={moneyFormatter.format(score.metrics.monthlyExpense)} />
-              <DetailLine label="Cashflow bulan ini" value={moneyFormatter.format(score.metrics.monthlyCashflow)} />
+              <DetailLine label="Uang masuk bulan ini" value={moneyFormatter.format(score.metrics.monthlyIncome)} />
+              <DetailLine label="Uang keluar bulan ini" value={moneyFormatter.format(score.metrics.monthlyExpense)} />
+              <DetailLine label="Selisih uang bulan ini" value={moneyFormatter.format(score.metrics.monthlyCashflow)} />
               <DetailLine label="Total hutang aktif" value={moneyFormatter.format(score.metrics.activeDebtTotal)} />
-              <DetailLine label="Rasio hutang / income" value={formatRatio(score.metrics.debtToIncomeRatio)} />
-              <DetailLine label="Saldo wallet aktif" value={moneyFormatter.format(score.metrics.totalWalletBalance)} />
+              <DetailLine label="Perbandingan hutang dan uang masuk" value={formatRatio(score.metrics.debtToIncomeRatio)} />
+              <DetailLine label="Saldo dompet aktif" value={moneyFormatter.format(score.metrics.totalWalletBalance)} />
               <DetailLine
-                label="Rata-rata expense bulanan"
+                label="Rata-rata uang keluar bulanan"
                 value={moneyFormatter.format(score.metrics.averageMonthlyExpense)}
               />
               <DetailLine label="Estimasi dana darurat" value={formatMonths(score.metrics.emergencyFundMonths)} />

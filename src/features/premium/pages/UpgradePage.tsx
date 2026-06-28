@@ -48,7 +48,7 @@ export function UpgradePage() {
     if (!selectedPaymentMethod) {
       toast({
         title: 'Pilih metode pembayaran',
-        description: 'Pilih QRIS atau metode pembayaran lain sebelum membuat request.',
+        description: 'Pilih QRIS atau metode pembayaran lain sebelum membuat permintaan upgrade.',
         variant: 'destructive'
       });
       return;
@@ -60,12 +60,12 @@ export function UpgradePage() {
         plan
       });
       toast({
-        title: 'Payment request dibuat',
-        description: 'Silakan lanjutkan pembayaran manual lalu upload bukti pembayaran.'
+        title: 'Permintaan upgrade dibuat',
+        description: 'Silakan lanjutkan pembayaran manual lalu upload bukti pembayaran. Premium aktif setelah disetujui admin.'
       });
     } catch (error) {
       toast({
-        title: 'Gagal membuat payment request',
+        title: 'Gagal membuat permintaan upgrade',
         description: error instanceof Error ? error.message : 'Silakan coba lagi.',
         variant: 'destructive'
       });
@@ -106,7 +106,7 @@ export function UpgradePage() {
             <p className="text-sm font-medium text-primary">{workspace.name}</p>
             <h1 className="mt-1 text-3xl font-semibold tracking-normal">Upgrade Premium</h1>
             <p className="mt-2 text-sm text-muted-foreground">
-              Pilih paket Premium. Pembayaran saat ini masih dicek manual oleh admin.
+              Pilih paket Premium. Pembayaran dilakukan manual via QRIS atau metode lain, lalu admin akan mengecek bukti pembayaran.
             </p>
           </div>
           <Button asChild variant="outline">

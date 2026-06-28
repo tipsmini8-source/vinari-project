@@ -27,6 +27,12 @@ const statusClasses: Record<GoalStatus, string> = {
   cancelled: 'bg-destructive/10 text-destructive'
 };
 
+const statusLabels: Record<GoalStatus, string> = {
+  active: 'Aktif',
+  achieved: 'Tercapai',
+  cancelled: 'Dibatalkan'
+};
+
 export function GoalList({ goals, onDelete }: GoalListProps) {
   return (
     <div className="grid gap-3">
@@ -36,12 +42,12 @@ export function GoalList({ goals, onDelete }: GoalListProps) {
             <div>
               <div className="flex flex-wrap items-center gap-2">
                 <h2 className="font-semibold">{goal.name}</h2>
-                <span className={cn('rounded-sm px-2 py-0.5 text-xs font-medium capitalize', statusClasses[goal.status])}>
-                  {goal.status}
+                <span className={cn('rounded-sm px-2 py-0.5 text-xs font-medium', statusClasses[goal.status])}>
+                  {statusLabels[goal.status]}
                 </span>
               </div>
               <p className="mt-1 text-sm text-muted-foreground">
-                {goal.target_date ? dateFormatter.format(new Date(goal.target_date)) : 'Tanpa target date'}
+                {goal.target_date ? dateFormatter.format(new Date(goal.target_date)) : 'Tanpa tanggal target'}
                 {goal.wallet_name ? ` - ${goal.wallet_name}` : ''}
               </p>
             </div>
@@ -49,18 +55,18 @@ export function GoalList({ goals, onDelete }: GoalListProps) {
             <div className="flex items-center justify-between gap-3 sm:flex-col sm:items-end">
               <p className="font-semibold">{moneyFormatter.format(goal.target_amount)}</p>
               <div className="flex gap-1">
-                <Button asChild aria-label="Detail goal" size="icon" variant="ghost">
+                <Button asChild aria-label="Detail target tabungan" size="icon" variant="ghost">
                   <Link to={`/app/goals/${goal.id}`}>
                     <Eye className="size-4" />
                   </Link>
                 </Button>
-                <Button asChild aria-label="Edit goal" size="icon" variant="ghost">
+                <Button asChild aria-label="Edit target tabungan" size="icon" variant="ghost">
                   <Link to={`/app/goals/${goal.id}/edit`}>
                     <Edit className="size-4" />
                   </Link>
                 </Button>
                 <Button
-                  aria-label="Hapus goal"
+                  aria-label="Hapus target tabungan"
                   onClick={() => onDelete(goal)}
                   size="icon"
                   type="button"
@@ -76,7 +82,7 @@ export function GoalList({ goals, onDelete }: GoalListProps) {
             <GoalProgress percentage={goal.percentage} status={goal.status} />
             <div className="grid gap-3 text-sm sm:grid-cols-4">
               <div>
-                <p className="text-muted-foreground">Current</p>
+                <p className="text-muted-foreground">Terkumpul</p>
                 <p className="font-medium">{moneyFormatter.format(goal.current_amount)}</p>
               </div>
               <div>
@@ -86,12 +92,12 @@ export function GoalList({ goals, onDelete }: GoalListProps) {
                 </p>
               </div>
               <div>
-                <p className="text-muted-foreground">Progress</p>
+                <p className="text-muted-foreground">Progres</p>
                 <p className="font-medium">{goal.percentage}%</p>
               </div>
               <div>
                 <p className="text-muted-foreground">Status</p>
-                <p className="font-medium capitalize">{goal.status}</p>
+                <p className="font-medium">{statusLabels[goal.status]}</p>
               </div>
             </div>
           </div>

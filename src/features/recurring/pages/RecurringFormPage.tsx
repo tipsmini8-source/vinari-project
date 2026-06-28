@@ -95,9 +95,9 @@ export function RecurringFormPage() {
         ) : (
           <Card>
             <CardHeader>
-              <CardTitle>{isEdit ? 'Edit Recurring Transaction' : 'Tambah Recurring Transaction'}</CardTitle>
+              <CardTitle>{isEdit ? 'Edit Transaksi Berulang' : 'Tambah Transaksi Berulang'}</CardTitle>
               <CardDescription>
-                Catat transaksi berulang. Auto-execute dan cron belum diaktifkan di MVP ini.
+                Catat pemasukan atau pengeluaran rutin. Vinari belum membuat catatan otomatis untuk jadwal ini.
               </CardDescription>
             </CardHeader>
             <CardContent>

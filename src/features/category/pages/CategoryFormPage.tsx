@@ -81,7 +81,7 @@ export function CategoryFormPage() {
             <CardHeader>
               <CardTitle>{isEdit ? 'Edit Kategori' : 'Tambah Kategori'}</CardTitle>
               <CardDescription>
-                Kategori aktif akan muncul di form transaksi dan kategori expense dapat dipakai untuk budget.
+                Kategori aktif akan muncul di form catatan uang. Kategori uang keluar bisa dipakai untuk batas pengeluaran.
               </CardDescription>
             </CardHeader>
             <CardContent>

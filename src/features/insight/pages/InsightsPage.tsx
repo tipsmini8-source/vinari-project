@@ -35,9 +35,9 @@ export function InsightsPage() {
             <Lightbulb className="size-5" />
             <p className="text-sm font-medium">{workspace.name}</p>
           </div>
-          <h1 className="mt-1 text-3xl font-semibold tracking-normal">Insights</h1>
+          <h1 className="mt-1 text-3xl font-semibold tracking-normal">Saran Otomatis</h1>
           <p className="mt-2 text-sm text-muted-foreground">
-            Insight otomatis berbasis rule dari transaksi, budget, goal, debt, dan wallet workspace aktif.
+            Saran sederhana dari catatan uang, batas pengeluaran, target tabungan, cicilan, dan dompet aktif.
           </p>
         </div>
 

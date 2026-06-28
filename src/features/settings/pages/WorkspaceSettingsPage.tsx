@@ -11,6 +11,19 @@ import { Button } from '@shared/ui/button';
 import { GlobalLoading } from '@shared/ui/global-loading';
 import { useToast } from '@shared/ui/use-toast';
 
+const roleLabels: Record<string, string> = {
+  member: 'Anggota',
+  owner: 'Pemilik',
+  partner: 'Partner',
+  viewer: 'Lihat saja'
+};
+
+const workspaceTypeLabels: Record<string, string> = {
+  couple: 'Pasangan',
+  family: 'Keluarga',
+  personal: 'Pribadi'
+};
+
 export function WorkspaceSettingsPage() {
   const { user } = useAuth();
   const { loading, refreshWorkspace, workspace } = useWorkspace();
@@ -36,10 +49,10 @@ export function WorkspaceSettingsPage() {
     try {
       await updateWorkspace.mutateAsync(input);
       await refreshWorkspace();
-      toast({ title: 'Workspace disimpan' });
+      toast({ title: 'Ruang keuangan disimpan' });
     } catch (error) {
       toast({
-        title: 'Gagal menyimpan workspace',
+        title: 'Gagal menyimpan ruang keuangan',
         description: error instanceof Error ? error.message : 'Silakan coba lagi.',
         variant: 'destructive'
       });
@@ -68,24 +81,24 @@ export function WorkspaceSettingsPage() {
         {workspaceQuery.data ? (
           <div className="space-y-4">
             <SettingsSectionCard
-              description="Informasi workspace aktif dan role Anda."
-              title="Workspace"
+              description="Informasi ruang keuangan aktif dan peran Anda."
+              title="Ruang Keuangan"
             >
               <div className="grid gap-3 text-sm sm:grid-cols-2">
                 <div>
-                  <p className="text-muted-foreground">Tipe workspace</p>
-                  <p className="font-medium capitalize">{workspaceQuery.data.type}</p>
+                  <p className="text-muted-foreground">Tipe ruang</p>
+                  <p className="font-medium">{workspaceTypeLabels[workspaceQuery.data.type] ?? workspaceQuery.data.type}</p>
                 </div>
                 <div>
                   <p className="text-muted-foreground">Mata uang</p>
                   <p className="font-medium">{workspaceQuery.data.currency_code}</p>
                 </div>
                 <div>
-                  <p className="text-muted-foreground">Role</p>
-                  <p className="font-medium capitalize">{workspace.role}</p>
+                  <p className="text-muted-foreground">Peran</p>
+                  <p className="font-medium">{roleLabels[workspace.role] ?? workspace.role}</p>
                 </div>
                 <div>
-                  <p className="text-muted-foreground">Jumlah member</p>
+                  <p className="text-muted-foreground">Jumlah anggota</p>
                   <p className="font-medium">{workspaceQuery.data.member_count}</p>
                 </div>
               </div>
@@ -94,10 +107,10 @@ export function WorkspaceSettingsPage() {
             <SettingsSectionCard
               description={
                 canEditWorkspace
-                  ? 'Owner dapat mengubah nama workspace.'
-                  : 'Hanya owner workspace yang dapat mengubah nama workspace.'
+                  ? 'Pemilik dapat mengubah nama ruang keuangan.'
+                  : 'Hanya pemilik ruang keuangan yang dapat mengubah nama ruang.'
               }
-              title="Nama Workspace"
+              title="Nama Ruang Keuangan"
             >
               <WorkspaceNameForm
                 canEdit={canEditWorkspace}

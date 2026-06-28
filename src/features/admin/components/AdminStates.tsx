@@ -22,7 +22,7 @@ export function AdminErrorState({ message, onRetry }: { message: string; onRetry
       <div className="flex items-start gap-3">
         <AlertCircle className="mt-0.5 size-5 text-destructive" />
         <div>
-          <h2 className="font-semibold">Admin data gagal dimuat</h2>
+          <h2 className="font-semibold">Data admin gagal dimuat</h2>
           <p className="mt-1 text-sm text-muted-foreground">{message}</p>
           <Button className="mt-4" onClick={onRetry} type="button" variant="outline">
             Coba lagi
@@ -37,9 +37,9 @@ export function AdminEmptyState() {
   return (
     <div className="rounded-md border border-dashed border-border bg-card p-8 text-center text-card-foreground">
       <Inbox className="mx-auto size-10 text-muted-foreground" />
-      <h2 className="mt-4 font-semibold">Belum ada payment request</h2>
+      <h2 className="mt-4 font-semibold">Belum ada permintaan upgrade</h2>
       <p className="mx-auto mt-2 max-w-sm text-sm leading-6 text-muted-foreground">
-        Payment request premium yang dibuat user akan muncul di halaman ini.
+        Permintaan upgrade premium yang dibuat pengguna akan muncul di halaman ini.
       </p>
     </div>
   );

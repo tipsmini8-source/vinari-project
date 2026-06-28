@@ -25,7 +25,7 @@ export function BudgetListPage() {
   }
 
   const handleDelete = async (budget: BudgetWithProgress) => {
-    const confirmed = window.confirm(`Hapus budget "${budget.name}"?`);
+    const confirmed = window.confirm(`Hapus batas pengeluaran "${budget.name}"?`);
 
     if (!confirmed) {
       return;
@@ -33,10 +33,10 @@ export function BudgetListPage() {
 
     try {
       await deleteBudget.mutateAsync(budget.id);
-      toast({ title: 'Budget dihapus' });
+      toast({ title: 'Batas pengeluaran dihapus' });
     } catch (error) {
       toast({
-        title: 'Gagal menghapus budget',
+        title: 'Gagal menghapus batas pengeluaran',
         description: error instanceof Error ? error.message : 'Silakan coba lagi.',
         variant: 'destructive'
       });
@@ -55,15 +55,15 @@ export function BudgetListPage() {
               </Link>
             </Button>
             <p className="text-sm font-medium text-primary">{workspace.name}</p>
-            <h1 className="mt-1 text-3xl font-semibold tracking-normal">Budget</h1>
+            <h1 className="mt-1 text-3xl font-semibold tracking-normal">Batas Pengeluaran</h1>
             <p className="mt-2 text-sm text-muted-foreground">
-              Pantau budget bulanan per kategori expense dan sisa penggunaannya.
+              Pantau batas bulanan untuk uang keluar dan sisa penggunaannya.
             </p>
           </div>
           <Button asChild>
             <Link to="/app/budgets/new">
               <Plus className="size-4" />
-              Tambah Budget
+              Tambah Batas
             </Link>
           </Button>
         </div>

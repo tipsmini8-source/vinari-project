@@ -91,18 +91,18 @@ export function TransactionList({ onDelete, transactions }: TransactionListProps
                 {moneyFormatter.format(transaction.amount)}
               </p>
               <div className="flex gap-1">
-                <Button asChild aria-label="Detail transaksi" size="icon" variant="ghost">
+                <Button asChild aria-label="Detail catatan uang" size="icon" variant="ghost">
                   <Link to={`/app/transactions/${transaction.id}`}>
                     <Eye className="size-4" />
                   </Link>
                 </Button>
-                <Button asChild aria-label="Edit transaksi" size="icon" variant="ghost">
+                <Button asChild aria-label="Edit catatan uang" size="icon" variant="ghost">
                   <Link to={`/app/transactions/${transaction.id}/edit`}>
                     <Edit className="size-4" />
                   </Link>
                 </Button>
                 <Button
-                  aria-label="Hapus transaksi"
+                  aria-label="Hapus catatan uang"
                   onClick={() => onDelete(transaction)}
                   size="icon"
                   type="button"

@@ -28,12 +28,12 @@ export function DebtEmptyState() {
   return (
     <div className="rounded-md border border-dashed border-border bg-card p-8 text-center">
       <Landmark className="mx-auto size-10 text-muted-foreground" />
-      <h2 className="mt-4 font-semibold">Belum ada hutang aktif</h2>
+      <h2 className="mt-4 font-semibold">Belum ada hutang atau cicilan</h2>
       <p className="mx-auto mt-2 max-w-sm text-sm leading-6 text-muted-foreground">
-        Catat hutang atau cicilan untuk memantau sisa pembayaran dan progress pelunasan.
+        Catat hutang atau cicilan agar sisa pembayaran lebih mudah dipantau.
       </p>
       <Button asChild className="mt-5">
-        <Link to="/app/debts/new">Tambah Hutang</Link>
+        <Link to="/app/debts/new">Tambah Cicilan</Link>
       </Button>
     </div>
   );

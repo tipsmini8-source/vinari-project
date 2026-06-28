@@ -29,7 +29,7 @@ export function FinancialHealthErrorState({ message, onRetry }: { message: strin
       <div className="flex items-start gap-3">
         <AlertCircle className="mt-0.5 size-5 text-destructive" />
         <div>
-          <h2 className="font-semibold">Financial health gagal dimuat</h2>
+          <h2 className="font-semibold">Kondisi keuangan gagal dimuat</h2>
           <p className="mt-1 text-sm text-muted-foreground">{message}</p>
           <Button className="mt-4" onClick={onRetry} size="sm" type="button" variant="outline">
             Coba lagi
@@ -48,7 +48,7 @@ export function FinancialHealthEmptyState() {
         <div>
           <h2 className="font-semibold">Data belum cukup</h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            Tambahkan wallet dan transaksi agar skor kesehatan finansial lebih bermakna.
+            Tambahkan dompet dan catatan uang agar kondisi keuangan lebih bermakna.
           </p>
         </div>
       </div>
@@ -69,7 +69,7 @@ export function FinancialHealthCard({
         <div>
           <div className="flex items-center gap-2">
             <Activity className="size-5 text-primary" />
-            <h2 className="font-semibold">Financial Health Score</h2>
+            <h2 className="font-semibold">Kondisi Keuangan</h2>
           </div>
           <div className="mt-4 flex items-end gap-3">
             <span className="text-4xl font-semibold">{score.score}</span>

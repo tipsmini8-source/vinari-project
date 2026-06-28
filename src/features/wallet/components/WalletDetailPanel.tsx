@@ -17,6 +17,18 @@ type WalletDetailPanelProps = {
   isLoading: boolean;
 };
 
+const walletTypeLabels: Record<string, string> = {
+  bank: 'Bank',
+  cash: 'Cash',
+  crypto: 'Crypto',
+  ewallet: 'E-Wallet',
+  gold: 'Emas',
+  investment: 'Investasi',
+  other: 'Lainnya',
+  receivable: 'Piutang',
+  saving: 'Tabungan'
+};
+
 export function WalletDetailPanel({ detail, isLoading }: WalletDetailPanelProps) {
   if (isLoading) {
     return (
@@ -34,7 +46,7 @@ export function WalletDetailPanel({ detail, isLoading }: WalletDetailPanelProps)
   if (!detail) {
     return (
       <aside className="rounded-md border border-border bg-card p-6 text-card-foreground shadow-sm">
-        <p className="text-sm text-muted-foreground">Pilih wallet untuk melihat detail.</p>
+        <p className="text-sm text-muted-foreground">Pilih dompet untuk melihat detail.</p>
       </aside>
     );
   }
@@ -50,7 +62,7 @@ export function WalletDetailPanel({ detail, isLoading }: WalletDetailPanelProps)
         </span>
         <div>
           <h2 className="font-semibold">{detail.name}</h2>
-          <p className="text-sm text-muted-foreground">{detail.wallet_type}</p>
+          <p className="text-sm text-muted-foreground">{walletTypeLabels[detail.wallet_type] ?? 'Dompet'}</p>
         </div>
       </div>
 
@@ -66,7 +78,7 @@ export function WalletDetailPanel({ detail, isLoading }: WalletDetailPanelProps)
         <div className="grid grid-cols-2 gap-3">
           <div className="rounded-md border border-border p-4">
             <ReceiptText className="mb-2 size-4 text-muted-foreground" />
-            <dt className="text-sm text-muted-foreground">Transaksi</dt>
+            <dt className="text-sm text-muted-foreground">Catatan uang</dt>
             <dd className="mt-1 font-semibold">{detail.transaction_count}</dd>
           </div>
           <div className="rounded-md border border-border p-4">

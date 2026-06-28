@@ -13,12 +13,12 @@ const walletTypes = [
   { value: 'cash', label: 'Cash' },
   { value: 'bank', label: 'Bank' },
   { value: 'ewallet', label: 'E-Wallet' },
-  { value: 'saving', label: 'Saving' },
-  { value: 'investment', label: 'Investment' },
+  { value: 'saving', label: 'Tabungan' },
+  { value: 'investment', label: 'Investasi' },
   { value: 'crypto', label: 'Crypto' },
-  { value: 'gold', label: 'Gold' },
-  { value: 'receivable', label: 'Receivable' },
-  { value: 'other', label: 'Other' }
+  { value: 'gold', label: 'Emas' },
+  { value: 'receivable', label: 'Piutang' },
+  { value: 'other', label: 'Lainnya' }
 ];
 
 const walletIcons = ['wallet', 'landmark', 'smartphone', 'piggy-bank', 'trending-up', 'coins'];
@@ -66,13 +66,13 @@ export function WalletForm({ defaultWallet, isSubmitting, onCancel, onSubmit }: 
   return (
     <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
       <div className="space-y-2">
-        <Label htmlFor="wallet-name">Nama Wallet</Label>
+        <Label htmlFor="wallet-name">Nama Dompet</Label>
         <Input id="wallet-name" placeholder="Rekening Utama" {...register('name')} />
         {errors.name ? <p className="text-sm text-destructive">{errors.name.message}</p> : null}
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="wallet-type">Tipe Wallet</Label>
+        <Label htmlFor="wallet-type">Jenis Dompet</Label>
         <select
           className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           id="wallet-type"

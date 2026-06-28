@@ -38,7 +38,7 @@ const dateFormatter = new Intl.DateTimeFormat('id-ID', {
 
 const featureLabels: Record<string, string> = {
   advanced_report: 'Ringkasan lanjutan',
-  ai_insight: 'Insight pintar',
+  ai_insight: 'Saran sederhana',
   export: 'Unduh data',
   family_workspace: 'Ruang keluarga'
 };
@@ -156,12 +156,14 @@ export function ManualPaymentInstructions({ request }: { request: PaymentRequest
         <div>
           <h2 className="font-semibold">Instruksi pembayaran manual</h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            Request upgrade sudah dibuat. Admin akan mengecek setelah bukti pembayaran diupload.
+            Pembayaran premium dilakukan manual. Silakan bayar melalui metode yang dipilih, upload bukti pembayaran,
+            lalu admin akan mengecek. Fitur premium aktif setelah pembayaran disetujui.
           </p>
           <div className="mt-4 grid gap-2 text-sm">
             <p>Paket: {request.plan_code}</p>
             <p>Nominal: {moneyFormatter.format(request.amount)}</p>
-            <p>Metode: Transfer manual</p>
+            <p>Metode: {request.method ?? 'Pembayaran manual'}</p>
+            <p>Status: {statusLabel(request.status)}</p>
             <p>Upload bukti pembayaran tersedia di halaman ini atau Pembayaran.</p>
           </div>
         </div>
@@ -223,7 +225,7 @@ export function PaymentRequestList({ onUploadProof, onViewProof, requests }: Pay
                   Bukti sudah diupload
                 </p>
               ) : (
-                <p className="mt-2 text-sm text-muted-foreground">Bukti belum diupload</p>
+                <p className="mt-2 text-sm text-muted-foreground">Bukti pembayaran belum diupload</p>
               )}
             </div>
             <div className="flex flex-col gap-2 sm:items-end">

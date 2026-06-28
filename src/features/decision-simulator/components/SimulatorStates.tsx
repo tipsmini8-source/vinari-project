@@ -41,7 +41,7 @@ export function SimulatorEmptyState() {
       <Calculator className="mx-auto size-10 text-muted-foreground" />
       <h2 className="mt-4 font-semibold">Data belum cukup</h2>
       <p className="mx-auto mt-2 max-w-sm text-sm leading-6 text-muted-foreground">
-        Tambahkan wallet aktif dan transaksi agar simulasi keputusan lebih bermakna.
+        Tambahkan dompet aktif dan catatan uang agar simulasi keputusan lebih bermakna.
       </p>
     </div>
   );

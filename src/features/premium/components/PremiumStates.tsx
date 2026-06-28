@@ -26,7 +26,7 @@ export function PremiumErrorState({ message, onRetry }: { message: string; onRet
       <div className="flex items-start gap-3">
         <AlertCircle className="mt-0.5 size-5 text-destructive" />
         <div>
-          <h2 className="font-semibold">Billing gagal dimuat</h2>
+          <h2 className="font-semibold">Pembayaran gagal dimuat</h2>
           <p className="mt-1 text-sm text-muted-foreground">{message}</p>
           <Button className="mt-4" onClick={onRetry} type="button" variant="outline">
             Coba lagi
@@ -41,9 +41,9 @@ export function PremiumEmptyRequests() {
   return (
     <div className="rounded-md border border-dashed border-border bg-card p-8 text-center text-card-foreground">
       <Sparkles className="mx-auto size-10 text-muted-foreground" />
-      <h2 className="mt-4 font-semibold">Belum ada payment request</h2>
+      <h2 className="mt-4 font-semibold">Belum ada permintaan upgrade</h2>
       <p className="mx-auto mt-2 max-w-sm text-sm leading-6 text-muted-foreground">
-        Request upgrade yang dibuat dari halaman Upgrade akan muncul di sini.
+        Permintaan upgrade yang dibuat dari halaman Upgrade akan muncul di sini.
       </p>
     </div>
   );

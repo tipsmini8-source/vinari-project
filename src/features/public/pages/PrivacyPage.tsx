@@ -4,11 +4,11 @@ import type { ReactNode } from 'react';
 const sections = [
   {
     title: 'Data yang disimpan',
-    text: 'Vinari menyimpan data akun, workspace, dompet, transaksi, kategori, target, hutang/cicilan, dan pembayaran premium agar fitur aplikasi bisa berjalan.'
+    text: 'Vinari menyimpan data akun, ruang keuangan, dompet, catatan uang, kategori, target tabungan, hutang/cicilan, dan pembayaran premium agar aplikasi bisa berjalan.'
   },
   {
     title: 'Penggunaan data',
-    text: 'Data digunakan untuk menjalankan fitur seperti dashboard, laporan, budget, goal, debt, premium, dan pengaturan workspace.'
+    text: 'Data digunakan untuk menjalankan fitur seperti ringkasan utama, laporan, batas pengeluaran, target tabungan, cicilan, premium, dan pengaturan ruang keuangan.'
   },
   {
     title: 'Data tidak dijual',
@@ -16,15 +16,15 @@ const sections = [
   },
   {
     title: 'Keamanan akun',
-    text: 'User bertanggung jawab menjaga keamanan email, password, dan akses akun.'
+    text: 'Pengguna bertanggung jawab menjaga keamanan email, password, dan akses akun.'
   },
   {
     title: 'Bukan lembaga keuangan',
-    text: 'Vinari bukan bank, e-wallet, atau lembaga keuangan. Vinari tidak menyimpan uang asli user.'
+    text: 'Vinari bukan bank, e-wallet, atau lembaga keuangan. Vinari tidak menyimpan uang asli pengguna.'
   },
   {
     title: 'Tanggung jawab keputusan',
-    text: 'Vinari hanya alat bantu pencatatan. Keputusan finansial tetap menjadi tanggung jawab user.'
+    text: 'Vinari hanya alat bantu pencatatan. Keputusan keuangan tetap menjadi tanggung jawab pengguna.'
   }
 ];
 
@@ -47,7 +47,7 @@ export function PrivacyPage() {
           <div>
             <h2 className="font-semibold">Kontak support</h2>
             <p className="mt-2 text-sm leading-7">
-              Untuk pertanyaan privasi, hubungi{' '}
+              Butuh bantuan? Hubungi{' '}
               <a className="font-medium underline underline-offset-4" href="mailto:support@vinari.app">
                 support@vinari.app
               </a>

@@ -23,7 +23,7 @@ const dateFormatter = new Intl.DateTimeFormat('id-ID', {
 const statusLabels: Record<BudgetStatus, string> = {
   safe: 'Aman',
   warning: 'Hampir habis',
-  over: 'Over budget'
+  over: 'Melewati batas'
 };
 
 const statusClasses: Record<BudgetStatus, string> = {
@@ -63,13 +63,13 @@ export function BudgetList({ budgets, onDelete }: BudgetListProps) {
               <div className="flex items-center justify-between gap-3 sm:flex-col sm:items-end">
                 <p className="font-semibold">{moneyFormatter.format(budget.amount)}</p>
                 <div className="flex gap-1">
-                  <Button asChild aria-label="Edit budget" size="icon" variant="ghost">
+                  <Button asChild aria-label="Edit batas pengeluaran" size="icon" variant="ghost">
                     <Link to={`/app/budgets/${budget.id}/edit`}>
                       <Edit className="size-4" />
                     </Link>
                   </Button>
                   <Button
-                    aria-label="Hapus budget"
+                    aria-label="Hapus batas pengeluaran"
                     onClick={() => onDelete(budget)}
                     size="icon"
                     type="button"
@@ -104,7 +104,7 @@ export function BudgetList({ budgets, onDelete }: BudgetListProps) {
                   <p className="font-medium">{budget.percentage}%</p>
                 </div>
                 <div>
-                  <p className="text-muted-foreground">Alert</p>
+                  <p className="text-muted-foreground">Peringatan</p>
                   <p className="font-medium">{budget.alert_percentage}%</p>
                 </div>
               </div>

@@ -51,16 +51,16 @@ export function SubscriptionFormPage() {
     try {
       if (isEdit && id) {
         await updateSubscription.mutateAsync({ subscriptionId: id, input });
-        toast({ title: 'Subscription diperbarui' });
+        toast({ title: 'Langganan diperbarui' });
       } else {
         await createSubscription.mutateAsync(input);
-        toast({ title: 'Subscription dibuat' });
+        toast({ title: 'Langganan dibuat' });
       }
 
       void navigate('/app/subscriptions');
     } catch (error) {
       toast({
-        title: isEdit ? 'Gagal mengubah subscription' : 'Gagal membuat subscription',
+        title: isEdit ? 'Gagal mengubah langganan' : 'Gagal membuat langganan',
         description: error instanceof Error ? error.message : 'Silakan coba lagi.',
         variant: 'destructive'
       });
@@ -95,7 +95,7 @@ export function SubscriptionFormPage() {
         ) : (
           <Card>
             <CardHeader>
-              <CardTitle>{isEdit ? 'Edit Subscription' : 'Tambah Subscription'}</CardTitle>
+              <CardTitle>{isEdit ? 'Edit Langganan' : 'Tambah Langganan'}</CardTitle>
               <CardDescription>
                 Catat biaya rutin seperti internet, BPJS, Netflix, Canva, listrik, atau cicilan.
               </CardDescription>

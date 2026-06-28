@@ -63,6 +63,12 @@ function SidebarGroup({ group }: { group: NavigationGroup }) {
 
 export function AppSidebar() {
   const { workspace } = useWorkspace();
+  const roleLabels: Record<string, string> = {
+    member: 'Anggota',
+    owner: 'Pemilik',
+    partner: 'Partner',
+    viewer: 'Lihat saja'
+  };
 
   return (
     <aside className="fixed inset-y-0 left-0 z-30 hidden w-72 border-r border-border bg-card lg:flex lg:flex-col">
@@ -81,7 +87,7 @@ export function AppSidebar() {
           <p className="text-xs font-medium text-muted-foreground">Ruang Keuangan</p>
           <p className="mt-1 truncate text-sm font-semibold">{workspace?.name ?? 'Vinari'}</p>
           <p className="mt-1 text-xs text-muted-foreground">
-            {workspace?.role ? `${workspace.role} - ${workspace.currency_code}` : 'Ruang aktif'}
+            {workspace?.role ? `${roleLabels[workspace.role] ?? workspace.role} - ${workspace.currency_code}` : 'Ruang aktif'}
           </p>
         </div>
       </div>

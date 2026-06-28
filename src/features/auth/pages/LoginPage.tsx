@@ -43,7 +43,7 @@ export function LoginPage() {
 
   return (
     <AuthFormCard
-      description="Masuk untuk melanjutkan ke workspace Vinari."
+      description="Masuk untuk melanjutkan ke ruang keuangan Vinari."
       footer={
         <>
           Belum punya akun?{' '}

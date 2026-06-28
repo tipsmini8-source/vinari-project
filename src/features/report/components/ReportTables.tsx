@@ -55,16 +55,16 @@ export function WalletSummaryTable({ wallets }: { wallets: ReportWalletSummary[]
   return (
     <div className="rounded-md border border-border bg-card text-card-foreground shadow-sm">
       <div className="border-b border-border p-4">
-        <h2 className="font-semibold">Wallet Summary</h2>
+        <h2 className="font-semibold">Ringkasan Dompet</h2>
       </div>
       {wallets.length === 0 ? (
-        <p className="p-4 text-sm text-muted-foreground">Belum ada wallet aktif.</p>
+        <p className="p-4 text-sm text-muted-foreground">Belum ada dompet aktif.</p>
       ) : (
         <div className="overflow-x-auto">
           <table className="w-full min-w-[360px] text-left text-sm">
             <thead className="border-b border-border text-muted-foreground">
               <tr>
-                <th className="p-4 font-medium">Wallet</th>
+                <th className="p-4 font-medium">Dompet</th>
                 <th className="p-4 text-right font-medium">Saldo saat ini</th>
               </tr>
             </thead>

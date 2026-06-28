@@ -25,12 +25,12 @@ export function TransactionEmptyState() {
   return (
     <div className="rounded-md border border-dashed border-border bg-card p-8 text-center">
       <ReceiptText className="mx-auto size-10 text-muted-foreground" />
-      <h2 className="mt-4 font-semibold">Belum ada transaksi</h2>
+      <h2 className="mt-4 font-semibold">Belum ada catatan uang</h2>
       <p className="mx-auto mt-2 max-w-sm text-sm leading-6 text-muted-foreground">
-        Catat pemasukan, pengeluaran, atau transfer pertama untuk mulai melihat riwayat transaksi.
+        Mulai dengan mencatat uang masuk, uang keluar, atau pindah saldo pertama.
       </p>
       <Button asChild className="mt-5">
-        <Link to="/app/transactions/new">Tambah Transaksi</Link>
+        <Link to="/app/transactions/new">Tambah Catatan</Link>
       </Button>
     </div>
   );
@@ -42,7 +42,7 @@ export function TransactionErrorState({ message, onRetry }: { message: string; o
       <div className="flex items-start gap-3">
         <AlertCircle className="mt-0.5 size-5 text-destructive" />
         <div>
-          <h2 className="font-semibold">Transaksi gagal dimuat</h2>
+          <h2 className="font-semibold">Catatan uang gagal dimuat</h2>
           <p className="mt-1 text-sm text-muted-foreground">{message}</p>
           <Button className="mt-4" onClick={onRetry} type="button" variant="outline">
             Coba lagi

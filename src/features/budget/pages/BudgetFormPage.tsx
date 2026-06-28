@@ -37,16 +37,16 @@ export function BudgetFormPage() {
     try {
       if (isEdit && id) {
         await updateBudget.mutateAsync({ budgetId: id, input });
-        toast({ title: 'Budget diperbarui' });
+        toast({ title: 'Batas pengeluaran diperbarui' });
       } else {
         await createBudget.mutateAsync(input);
-        toast({ title: 'Budget dibuat' });
+        toast({ title: 'Batas pengeluaran dibuat' });
       }
 
       void navigate('/app/budgets');
     } catch (error) {
       toast({
-        title: isEdit ? 'Gagal mengubah budget' : 'Gagal membuat budget',
+        title: isEdit ? 'Gagal mengubah batas pengeluaran' : 'Gagal membuat batas pengeluaran',
         description: error instanceof Error ? error.message : 'Silakan coba lagi.',
         variant: 'destructive'
       });
@@ -64,9 +64,9 @@ export function BudgetFormPage() {
         </Button>
         <Card>
           <CardHeader>
-            <CardTitle>{isEdit ? 'Edit Budget' : 'Tambah Budget'}</CardTitle>
+            <CardTitle>{isEdit ? 'Edit Batas Pengeluaran' : 'Tambah Batas Pengeluaran'}</CardTitle>
             <CardDescription>
-              Buat budget bulanan untuk kategori expense dan tentukan batas alert pemakaian.
+              Buat batas bulanan untuk kategori uang keluar dan tentukan pengingat pemakaian.
             </CardDescription>
           </CardHeader>
           <CardContent>

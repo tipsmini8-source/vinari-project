@@ -35,6 +35,11 @@ const typeClasses = {
   expense: 'bg-destructive/10 text-destructive'
 };
 
+const typeLabels = {
+  income: 'Uang Masuk',
+  expense: 'Uang Keluar'
+};
+
 function StatusBadge({ isActive }: { isActive: boolean }) {
   return (
     <span
@@ -63,12 +68,12 @@ export function RecurringTransactionList({
               <div className="flex flex-wrap items-center gap-2">
                 <h2 className="font-semibold">{item.title}</h2>
                 <StatusBadge isActive={item.is_active} />
-                <span className={cn('rounded-sm px-2 py-0.5 text-xs font-medium capitalize', typeClasses[item.type])}>
-                  {item.type}
+                <span className={cn('rounded-sm px-2 py-0.5 text-xs font-medium', typeClasses[item.type])}>
+                  {typeLabels[item.type]}
                 </span>
               </div>
               <p className="mt-1 text-sm text-muted-foreground">
-                {item.category_name ?? 'Tanpa kategori'} - {item.wallet_name ?? 'Tanpa wallet'}
+                {item.category_name ?? 'Tanpa kategori'} - {item.wallet_name ?? 'Tanpa dompet'}
               </p>
             </div>
 
@@ -112,7 +117,7 @@ export function RecurringTransactionList({
               <p className="font-medium">{cycleLabels[item.frequency]}</p>
             </div>
             <div>
-              <p className="text-muted-foreground">Next run</p>
+              <p className="text-muted-foreground">Tanggal berikutnya</p>
               <p className="font-medium">{formatRecurringDate(item.next_run_date)}</p>
             </div>
             <div>
@@ -141,7 +146,7 @@ export function SubscriptionList({ canManage, items, onDeactivate, onDelete }: S
                 </span>
               </div>
               <p className="mt-1 text-sm text-muted-foreground">
-                {item.category_name ?? 'Tanpa kategori'} - {item.wallet_name ?? 'Tanpa wallet'}
+                {item.category_name ?? 'Tanpa kategori'} - {item.wallet_name ?? 'Tanpa dompet'}
               </p>
             </div>
 
@@ -149,14 +154,14 @@ export function SubscriptionList({ canManage, items, onDeactivate, onDelete }: S
               <p className="font-semibold">{formatRecurringMoney(item.amount)}</p>
               {canManage ? (
                 <div className="flex gap-1">
-                  <Button asChild aria-label="Edit subscription" size="icon" variant="ghost">
+                  <Button asChild aria-label="Edit langganan" size="icon" variant="ghost">
                     <Link to={`/app/subscriptions/${item.id}/edit`}>
                       <Edit className="size-4" />
                     </Link>
                   </Button>
                   {item.is_active ? (
                     <Button
-                      aria-label="Nonaktifkan subscription"
+                      aria-label="Nonaktifkan langganan"
                       onClick={() => onDeactivate(item)}
                       size="icon"
                       type="button"
@@ -166,7 +171,7 @@ export function SubscriptionList({ canManage, items, onDeactivate, onDelete }: S
                     </Button>
                   ) : null}
                   <Button
-                    aria-label="Hapus subscription"
+                    aria-label="Hapus langganan"
                     onClick={() => onDelete(item)}
                     size="icon"
                     type="button"
@@ -181,11 +186,11 @@ export function SubscriptionList({ canManage, items, onDeactivate, onDelete }: S
 
           <div className="mt-4 grid gap-3 text-sm sm:grid-cols-3">
             <div>
-              <p className="text-muted-foreground">Billing cycle</p>
+              <p className="text-muted-foreground">Siklus tagihan</p>
               <p className="font-medium">{cycleLabels[item.billing_cycle]}</p>
             </div>
             <div>
-              <p className="text-muted-foreground">Next due</p>
+              <p className="text-muted-foreground">Jatuh tempo berikutnya</p>
               <p className="font-medium">{formatRecurringDate(item.next_due_date)}</p>
             </div>
             <div>

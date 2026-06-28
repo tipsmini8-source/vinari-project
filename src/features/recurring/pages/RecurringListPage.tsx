@@ -88,16 +88,16 @@ export function RecurringListPage() {
               </Link>
             </Button>
             <p className="text-sm font-medium text-primary">{workspace.name}</p>
-            <h1 className="mt-1 text-3xl font-semibold tracking-normal">Recurring Transactions</h1>
+            <h1 className="mt-1 text-3xl font-semibold tracking-normal">Transaksi Berulang</h1>
             <p className="mt-2 text-sm text-muted-foreground">
-              Catat transaksi income atau expense yang berulang tanpa auto-execute.
+              Catat uang masuk atau uang keluar rutin tanpa membuat catatan otomatis.
             </p>
           </div>
           {canManage ? (
             <Button asChild>
               <Link to="/app/recurring/new">
                 <Plus className="size-4" />
-                Tambah Recurring
+                Tambah Rutin
               </Link>
             </Button>
           ) : null}
@@ -125,7 +125,7 @@ export function RecurringListPage() {
           <RecurringEmptyState
             canCreate={canManage}
             createHref="/app/recurring/new"
-            ctaLabel="Tambah Recurring"
+            ctaLabel="Tambah Rutin"
             description="Buat catatan transaksi rutin seperti gaji, iuran, atau pengeluaran bulanan."
             title="Belum ada transaksi berulang"
           />

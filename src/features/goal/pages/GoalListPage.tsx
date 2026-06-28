@@ -25,7 +25,7 @@ export function GoalListPage() {
   }
 
   const handleDelete = async (goal: GoalWithProgress) => {
-    const confirmed = window.confirm(`Hapus goal "${goal.name}"?`);
+    const confirmed = window.confirm(`Hapus target tabungan "${goal.name}"?`);
 
     if (!confirmed) {
       return;
@@ -33,10 +33,10 @@ export function GoalListPage() {
 
     try {
       await deleteGoal.mutateAsync(goal.id);
-      toast({ title: 'Goal dihapus' });
+      toast({ title: 'Target tabungan dihapus' });
     } catch (error) {
       toast({
-        title: 'Gagal menghapus goal',
+        title: 'Gagal menghapus target tabungan',
         description: error instanceof Error ? error.message : 'Silakan coba lagi.',
         variant: 'destructive'
       });
@@ -55,7 +55,7 @@ export function GoalListPage() {
               </Link>
             </Button>
             <p className="text-sm font-medium text-primary">{workspace.name}</p>
-            <h1 className="mt-1 text-3xl font-semibold tracking-normal">Goal</h1>
+            <h1 className="mt-1 text-3xl font-semibold tracking-normal">Target Tabungan</h1>
             <p className="mt-2 text-sm text-muted-foreground">
               Kelola target keuangan dan pantau kontribusi tabungan.
             </p>
@@ -63,7 +63,7 @@ export function GoalListPage() {
           <Button asChild>
             <Link to="/app/goals/new">
               <Plus className="size-4" />
-              Tambah Goal
+              Tambah Target
             </Link>
           </Button>
         </div>

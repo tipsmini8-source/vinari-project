@@ -17,7 +17,7 @@ import { Button } from '@shared/ui/button';
 import { useToast } from '@shared/ui/use-toast';
 
 const filters: Array<{ label: string; value: AdminPaymentStatus }> = [
-  { label: 'Pending', value: 'pending' },
+  { label: 'Menunggu Dicek', value: 'pending' },
   { label: 'Disetujui', value: 'approved' },
   { label: 'Ditolak', value: 'rejected' },
   { label: 'Semua', value: 'all' }
@@ -34,7 +34,7 @@ export function AdminPaymentsPage() {
   const isMutating = approvePayment.isPending || rejectPayment.isPending;
 
   const handleApprove = async (request: AdminPaymentRequest) => {
-    const confirmed = window.confirm(`Setujui payment request ${request.plan_code}?`);
+    const confirmed = window.confirm(`Setujui permintaan upgrade ${request.plan_code}?`);
 
     if (!confirmed) {
       return;
@@ -42,10 +42,10 @@ export function AdminPaymentsPage() {
 
     try {
       await approvePayment.mutateAsync(request.id);
-      toast({ title: 'Payment request disetujui' });
+      toast({ title: 'Permintaan upgrade disetujui' });
     } catch (error) {
       toast({
-        title: 'Gagal menyetujui payment request',
+        title: 'Gagal menyetujui permintaan upgrade',
         description: error instanceof Error ? error.message : 'Silakan coba lagi.',
         variant: 'destructive'
       });
@@ -64,10 +64,10 @@ export function AdminPaymentsPage() {
         paymentRequestId: request.id,
         reason
       });
-      toast({ title: 'Payment request ditolak' });
+      toast({ title: 'Permintaan upgrade ditolak' });
     } catch (error) {
       toast({
-        title: 'Gagal menolak payment request',
+        title: 'Gagal menolak permintaan upgrade',
         description: error instanceof Error ? error.message : 'Silakan coba lagi.',
         variant: 'destructive'
       });
@@ -86,7 +86,7 @@ export function AdminPaymentsPage() {
               </Link>
             </Button>
             <p className="text-sm font-medium text-primary">Vinari Admin</p>
-            <h1 className="mt-1 text-3xl font-semibold tracking-normal">Payment Request</h1>
+            <h1 className="mt-1 text-3xl font-semibold tracking-normal">Permintaan Upgrade</h1>
             <p className="mt-2 text-sm text-muted-foreground">
               Review dan setujui atau tolak pembayaran premium manual.
             </p>

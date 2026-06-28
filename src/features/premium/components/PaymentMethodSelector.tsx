@@ -34,7 +34,9 @@ export function PaymentMethodSelector({ methods, onSelect, selectedMethodId }: P
         <QrCode className="mt-0.5 size-5 text-primary" />
         <div>
           <h2 className="font-semibold">Pilih metode pembayaran</h2>
-          <p className="mt-1 text-sm text-muted-foreground">Metode yang dipilih akan tersimpan di payment request.</p>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Metode yang dipilih akan tersimpan di permintaan upgrade.
+          </p>
         </div>
       </div>
 

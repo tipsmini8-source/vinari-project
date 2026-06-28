@@ -19,6 +19,18 @@ const moneyFormatter = new Intl.NumberFormat('id-ID', {
   maximumFractionDigits: 0
 });
 
+const walletTypeLabels: Record<string, string> = {
+  bank: 'Bank',
+  cash: 'Cash',
+  crypto: 'Crypto',
+  ewallet: 'E-Wallet',
+  gold: 'Emas',
+  investment: 'Investasi',
+  other: 'Lainnya',
+  receivable: 'Piutang',
+  saving: 'Tabungan'
+};
+
 export function WalletList({
   onArchive,
   onDelete,
@@ -54,7 +66,9 @@ export function WalletList({
                     </span>
                   ) : null}
                 </span>
-                <span className="mt-1 block text-sm text-muted-foreground">{wallet.wallet_type}</span>
+                <span className="mt-1 block text-sm text-muted-foreground">
+                  {walletTypeLabels[wallet.wallet_type] ?? 'Dompet'}
+                </span>
                 <span className="mt-2 block text-sm font-medium">{moneyFormatter.format(wallet.current_balance)}</span>
                 <span className="mt-0.5 block text-xs text-muted-foreground">Saldo saat ini</span>
               </span>

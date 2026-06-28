@@ -37,16 +37,16 @@ export function GoalFormPage() {
     try {
       if (isEdit && id) {
         await updateGoal.mutateAsync({ goalId: id, input });
-        toast({ title: 'Goal diperbarui' });
+        toast({ title: 'Target tabungan diperbarui' });
       } else {
         await createGoal.mutateAsync(input);
-        toast({ title: 'Goal dibuat' });
+        toast({ title: 'Target tabungan dibuat' });
       }
 
       void navigate('/app/goals');
     } catch (error) {
       toast({
-        title: isEdit ? 'Gagal mengubah goal' : 'Gagal membuat goal',
+        title: isEdit ? 'Gagal mengubah target tabungan' : 'Gagal membuat target tabungan',
         description: error instanceof Error ? error.message : 'Silakan coba lagi.',
         variant: 'destructive'
       });
@@ -64,9 +64,9 @@ export function GoalFormPage() {
         </Button>
         <Card>
           <CardHeader>
-            <CardTitle>{isEdit ? 'Edit Goal' : 'Tambah Goal'}</CardTitle>
+            <CardTitle>{isEdit ? 'Edit Target Tabungan' : 'Tambah Target Tabungan'}</CardTitle>
             <CardDescription>
-              Buat target keuangan, pilih wallet tabungan, dan atur nominal awal jika sudah ada saldo.
+              Buat target keuangan, pilih dompet tabungan, dan isi nominal awal jika sudah ada saldo.
             </CardDescription>
           </CardHeader>
           <CardContent>

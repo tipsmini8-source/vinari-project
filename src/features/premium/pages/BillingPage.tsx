@@ -74,10 +74,13 @@ export function BillingPage() {
             </Button>
             <p className="text-sm font-medium text-primary">{workspace.name}</p>
             <h1 className="mt-1 text-3xl font-semibold tracking-normal">Pembayaran</h1>
-            <p className="mt-2 text-sm text-muted-foreground">
-              Lihat paket aktif, status pembayaran, dan riwayat request upgrade.
-            </p>
-          </div>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Lihat paket aktif, status pembayaran, dan riwayat request upgrade.
+          </p>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Butuh bantuan? Hubungi support@vinari.app
+          </p>
+        </div>
           <Button asChild>
             <Link to="/app/upgrade">Upgrade</Link>
           </Button>

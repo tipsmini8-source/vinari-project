@@ -92,7 +92,7 @@ export function TransactionForm({
       : selectedType === 'transfer'
         ? 'Dari dompet mana?'
         : 'Dibayar dari dompet mana?';
-  const categoryLabel = selectedType === 'income' ? 'Masuk kategori apa?' : 'Masuk kategori apa?';
+  const categoryLabel = selectedType === 'income' ? 'Masuk kategori apa?' : 'Keluar kategori apa?';
 
   return (
     <form className="space-y-5" onSubmit={handleSubmit(onSubmit)}>

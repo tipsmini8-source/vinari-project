@@ -85,10 +85,10 @@ export function ReportPage() {
     try {
       const csv = await exportReport.mutateAsync(filters);
       downloadCSV(`vinari-report-${new Date().toISOString().slice(0, 10)}.csv`, csv);
-      toast({ title: 'Export report selesai' });
+      toast({ title: 'Unduh laporan selesai' });
     } catch (error) {
       toast({
-        title: 'Gagal export report',
+        title: 'Gagal mengunduh laporan',
         description: error instanceof Error ? error.message : 'Silakan coba lagi.',
         variant: 'destructive'
       });
@@ -107,9 +107,9 @@ export function ReportPage() {
               </Link>
             </Button>
             <p className="text-sm font-medium text-primary">{workspace.name}</p>
-            <h1 className="mt-1 text-3xl font-semibold tracking-normal">Reports</h1>
+            <h1 className="mt-1 text-3xl font-semibold tracking-normal">Laporan</h1>
             <p className="mt-2 text-sm text-muted-foreground">
-              Laporan dasar transaksi, budget, goal, debt, dan wallet untuk periode pilihan.
+              Laporan dasar catatan uang, batas pengeluaran, target tabungan, cicilan, dan dompet untuk periode pilihan.
             </p>
           </div>
           <Button
@@ -125,7 +125,7 @@ export function ReportPage() {
             ) : (
               <Lock className="size-4" />
             )}
-            Export Report CSV
+            Unduh Laporan CSV
           </Button>
         </div>
 
@@ -170,25 +170,25 @@ export function ReportPage() {
               <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
                 <ReportSummaryCard
                   icon={ArrowDownCircle}
-                  label="Total income"
+                  label="Total uang masuk"
                   tone="positive"
                   value={moneyFormatter.format(report.monthly.totalIncome)}
                 />
                 <ReportSummaryCard
                   icon={ArrowUpCircle}
-                  label="Total expense"
+                  label="Total uang keluar"
                   tone="negative"
                   value={moneyFormatter.format(report.monthly.totalExpense)}
                 />
                 <ReportSummaryCard
                   icon={ArrowRightLeft}
-                  label="Cashflow"
+                  label="Selisih uang"
                   tone={report.monthly.cashflow >= 0 ? 'positive' : 'negative'}
                   value={moneyFormatter.format(report.monthly.cashflow)}
                 />
                 <ReportSummaryCard
                   icon={BarChart3}
-                  label="Saving rate"
+                  label="Rasio menabung"
                   tone={report.monthly.savingRate >= 0 ? 'positive' : 'negative'}
                   value={`${report.monthly.savingRate}%`}
                 />
@@ -199,14 +199,14 @@ export function ReportPage() {
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2 text-xl">
                       <BarChart3 className="size-5" />
-                      Budget Summary
+                      Batas Pengeluaran
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-3 text-sm">
-                    <ReportLine label="Budget aktif" value={String(report.budget.activeBudgetCount)} />
-                    <ReportLine label="Total budget" value={moneyFormatter.format(report.budget.totalBudget)} />
+                    <ReportLine label="Batas aktif" value={String(report.budget.activeBudgetCount)} />
+                    <ReportLine label="Total batas" value={moneyFormatter.format(report.budget.totalBudget)} />
                     <ReportLine label="Total terpakai" value={moneyFormatter.format(report.budget.totalUsed)} />
-                    <ReportLine label="Over budget" value={String(report.budget.overBudgetCount)} />
+                    <ReportLine label="Melewati batas" value={String(report.budget.overBudgetCount)} />
                   </CardContent>
                 </Card>
 
@@ -214,11 +214,11 @@ export function ReportPage() {
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2 text-xl">
                       <Target className="size-5" />
-                      Goal Summary
+                      Target Tabungan
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-3 text-sm">
-                    <ReportLine label="Goal aktif" value={String(report.goal.activeGoalCount)} />
+                    <ReportLine label="Target aktif" value={String(report.goal.activeGoalCount)} />
                     <ReportLine label="Total target" value={moneyFormatter.format(report.goal.totalTarget)} />
                     <ReportLine label="Terkumpul" value={moneyFormatter.format(report.goal.totalCollected)} />
                     <ReportLine label="Progress rata-rata" value={`${report.goal.averageProgress}%`} />
@@ -235,7 +235,7 @@ export function ReportPage() {
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2 text-xl">
                       <Landmark className="size-5" />
-                      Debt Summary
+                      Cicilan
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-3 text-sm">

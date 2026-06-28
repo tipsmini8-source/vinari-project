@@ -21,7 +21,7 @@ export function GoalContributionHistory({ contributions }: GoalContributionHisto
     return (
       <div className="rounded-md border border-dashed border-border p-6 text-center">
         <CalendarDays className="mx-auto size-8 text-muted-foreground" />
-        <p className="mt-3 text-sm text-muted-foreground">Belum ada kontribusi untuk goal ini.</p>
+        <p className="mt-3 text-sm text-muted-foreground">Belum ada tabungan masuk untuk target ini.</p>
       </div>
     );
   }

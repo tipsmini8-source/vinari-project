@@ -38,7 +38,7 @@ export function RegisterPage() {
       if (session) {
         toast({
           title: 'Registrasi berhasil',
-          description: 'Akun siap digunakan. Mari lanjut setup workspace.'
+          description: 'Akun siap digunakan. Mari lanjut siapkan ruang keuangan.'
         });
         void navigate('/app', { replace: true });
         return;

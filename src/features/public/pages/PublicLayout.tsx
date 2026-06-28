@@ -24,6 +24,9 @@ export function PublicLayout() {
               V
             </span>
             <span>Vinari</span>
+            <span className="rounded-full border border-primary/20 bg-primary-soft px-2 py-0.5 text-[11px] font-semibold text-primary">
+              Beta
+            </span>
           </Link>
 
           <div className="hidden items-center gap-1 md:flex">
@@ -93,10 +96,27 @@ export function PublicLayout() {
       <footer className="border-t border-border bg-white/75 dark:bg-card/60">
         <div className="mx-auto grid w-full max-w-6xl gap-6 px-4 py-8 sm:px-6 md:grid-cols-[1fr_auto] lg:px-8">
           <div>
-            <Link className="font-semibold" to="/">Vinari</Link>
+            <div className="flex flex-wrap items-center gap-2">
+              <Link className="font-semibold" to="/">Vinari</Link>
+              <span className="rounded-full border border-primary/20 bg-primary-soft px-2 py-0.5 text-[11px] font-semibold text-primary">
+                Vinari Beta v1.0
+              </span>
+            </div>
             <p className="mt-2 max-w-md text-sm leading-6 text-muted-foreground">
               Vinari membantu mencatat dan memahami uang harian dengan cara sederhana.
             </p>
+            <p className="mt-2 text-sm text-muted-foreground">
+              Butuh bantuan? Hubungi{' '}
+              <a className="font-medium text-primary hover:underline" href="mailto:support@vinari.app">
+                support@vinari.app
+              </a>
+            </p>
+            <a
+              className="mt-3 inline-flex text-sm font-medium text-primary hover:underline"
+              href="mailto:support@vinari.app?subject=Masukan%20Vinari%20Beta"
+            >
+              Kirim Masukan
+            </a>
           </div>
           <div className="flex flex-wrap gap-x-4 gap-y-2 text-sm font-medium text-muted-foreground">
             {navItems.map((item) => (

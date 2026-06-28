@@ -47,11 +47,11 @@ const groups: Array<{
     title: 'Ringkasan & Insight',
     description: 'Lihat kondisi uang tanpa laporan yang rumit.',
     items: [
-      { icon: BarChart3, title: 'Ringkasan Bulanan', text: 'Lihat pemasukan, pengeluaran, dan cashflow dalam periode tertentu.' },
-      { icon: Brain, title: 'Kondisi Keuangan', text: 'Cek skor sederhana untuk memahami kesehatan finansial.' },
-      { icon: Lightbulb, title: 'Insight', text: 'Dapatkan saran berbasis aturan dari data keuanganmu.' },
+      { icon: BarChart3, title: 'Ringkasan Bulanan', text: 'Lihat uang masuk, uang keluar, dan selisih uang dalam periode tertentu.' },
+      { icon: Brain, title: 'Kondisi Keuangan', text: 'Cek penilaian sederhana untuk memahami kondisi uangmu.' },
+      { icon: Lightbulb, title: 'Saran Otomatis', text: 'Dapatkan saran sederhana dari catatan keuanganmu.' },
       { icon: ShieldCheck, title: 'Simulator Keputusan', text: 'Coba dampak keputusan besar sebelum benar-benar dilakukan.' },
-      { icon: Download, title: 'Export CSV', text: 'Export transaksi dan laporan sederhana untuk kebutuhan pribadi.' }
+      { icon: Download, title: 'Unduh CSV', text: 'Unduh catatan uang dan laporan sederhana untuk kebutuhan pribadi.' }
     ]
   },
   {
@@ -60,8 +60,8 @@ const groups: Array<{
     items: [
       { icon: CreditCard, title: 'Upgrade Premium', text: 'Buka fitur tambahan dengan proses upgrade manual.' },
       { icon: CreditCard, title: 'Pembayaran Manual QRIS', text: 'Upload bukti pembayaran lalu tunggu approval admin.' },
-      { icon: Users, title: 'Anggota Workspace', text: 'Kelola keuangan bersama pasangan atau keluarga.' },
-      { icon: ShieldCheck, title: 'Admin Approval', text: 'Pembayaran premium dicek manual oleh admin Vinari.' }
+      { icon: Users, title: 'Anggota Keluarga', text: 'Kelola keuangan bersama pasangan atau keluarga.' },
+      { icon: ShieldCheck, title: 'Pengecekan Admin', text: 'Pembayaran premium dicek manual oleh admin Vinari.' }
     ]
   }
 ];

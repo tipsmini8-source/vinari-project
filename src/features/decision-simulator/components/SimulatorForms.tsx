@@ -70,7 +70,7 @@ export function ExpenseSimulationForm({
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="walletId">Wallet terdampak</Label>
+          <Label htmlFor="walletId">Dompet terdampak</Label>
           <select className={selectClassName} id="walletId" {...register('walletId')}>
             {snapshot.wallets.map((wallet) => (
               <option key={wallet.id} value={wallet.id}>
@@ -240,7 +240,7 @@ export function GoalSavingSimulationForm({
     <form className="rounded-md border border-border bg-card p-5 shadow-sm" onSubmit={handleSubmit(onSubmit)}>
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-2">
-          <Label htmlFor="goalId">Goal</Label>
+          <Label htmlFor="goalId">Target tabungan</Label>
           <select className={selectClassName} id="goalId" {...register('goalId')}>
             {snapshot.goals.map((goal) => (
               <option key={goal.id} value={goal.id}>

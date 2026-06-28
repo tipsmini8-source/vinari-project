@@ -67,7 +67,7 @@ export function ProfileForm({
           {errors.fullName ? <p className="text-sm text-destructive">{errors.fullName.message}</p> : null}
         </div>
         <div className="space-y-2">
-          <Label htmlFor="avatarUrl">Avatar URL</Label>
+          <Label htmlFor="avatarUrl">URL avatar</Label>
           <Input id="avatarUrl" placeholder="https://..." {...register('avatarUrl')} />
           {errors.avatarUrl ? <p className="text-sm text-destructive">{errors.avatarUrl.message}</p> : null}
         </div>
@@ -75,17 +75,17 @@ export function ProfileForm({
 
       <div className="grid gap-4 sm:grid-cols-3">
         <div className="space-y-2">
-          <Label htmlFor="timezone">Timezone</Label>
+          <Label htmlFor="timezone">Zona waktu</Label>
           <Input id="timezone" placeholder="Asia/Jakarta" {...register('timezone')} />
           {errors.timezone ? <p className="text-sm text-destructive">{errors.timezone.message}</p> : null}
         </div>
         <div className="space-y-2">
-          <Label htmlFor="locale">Locale</Label>
+          <Label htmlFor="locale">Bahasa/region</Label>
           <Input id="locale" placeholder="id-ID" {...register('locale')} />
           {errors.locale ? <p className="text-sm text-destructive">{errors.locale.message}</p> : null}
         </div>
         <div className="space-y-2">
-          <Label htmlFor="currencyCode">Currency</Label>
+          <Label htmlFor="currencyCode">Mata uang</Label>
           <Input id="currencyCode" maxLength={3} placeholder="IDR" {...register('currencyCode')} />
           {errors.currencyCode ? <p className="text-sm text-destructive">{errors.currencyCode.message}</p> : null}
         </div>
@@ -145,11 +145,11 @@ export function PreferencesForm({
       <input type="hidden" {...register('appTemplate')} />
       <div className="grid gap-4 sm:grid-cols-3">
         <div className="space-y-2">
-          <Label htmlFor="theme">Theme</Label>
+          <Label htmlFor="theme">Tema</Label>
           <select className={selectClassName} id="theme" {...register('theme')}>
-            <option value="system">System</option>
-            <option value="light">Light</option>
-            <option value="dark">Dark</option>
+            <option value="system">Ikuti perangkat</option>
+            <option value="light">Terang</option>
+            <option value="dark">Gelap</option>
           </select>
           {errors.theme ? <p className="text-sm text-destructive">{errors.theme.message}</p> : null}
         </div>
@@ -235,7 +235,7 @@ export function WorkspaceNameForm({
   return (
     <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
       <div className="space-y-2">
-        <Label htmlFor="workspaceName">Nama workspace</Label>
+        <Label htmlFor="workspaceName">Nama ruang keuangan</Label>
         <Input id="workspaceName" readOnly={!canEdit} {...register('name')} />
         {errors.name ? <p className="text-sm text-destructive">{errors.name.message}</p> : null}
       </div>
@@ -243,7 +243,7 @@ export function WorkspaceNameForm({
       {canEdit ? (
         <Button disabled={isSubmitting} type="submit">
           {isSubmitting ? <Loader2 className="size-4 animate-spin" /> : null}
-          Simpan Workspace
+          Simpan Ruang
         </Button>
       ) : null}
     </form>

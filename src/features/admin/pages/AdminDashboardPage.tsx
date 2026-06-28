@@ -30,13 +30,13 @@ export function AdminDashboardPage() {
             <Button asChild>
               <Link to="/admin/payments">
                 <CreditCard className="size-4" />
-                Payment Requests
+                Permintaan Upgrade
               </Link>
             </Button>
             <Button asChild variant="outline">
               <Link to="/admin/payment-methods">
                 <QrCode className="size-4" />
-                Payment Methods
+                Metode Pembayaran
               </Link>
             </Button>
           </div>
@@ -55,19 +55,19 @@ export function AdminDashboardPage() {
           <div className="grid gap-3 md:grid-cols-3">
             <Card>
               <CardHeader>
-                <CardDescription>Pending</CardDescription>
+                <CardDescription>Menunggu Dicek</CardDescription>
                 <CardTitle>{statsQuery.data.pending}</CardTitle>
               </CardHeader>
             </Card>
             <Card>
               <CardHeader>
-                <CardDescription>Approved</CardDescription>
+                <CardDescription>Disetujui</CardDescription>
                 <CardTitle>{statsQuery.data.approved}</CardTitle>
               </CardHeader>
             </Card>
             <Card>
               <CardHeader>
-                <CardDescription>Rejected</CardDescription>
+                <CardDescription>Ditolak</CardDescription>
                 <CardTitle>{statsQuery.data.rejected}</CardTitle>
               </CardHeader>
             </Card>
@@ -80,7 +80,7 @@ export function AdminDashboardPage() {
             <div>
               <h2 className="font-semibold">Approval manual</h2>
               <p className="mt-1 text-sm text-muted-foreground">
-                Approve akan mengaktifkan subscription workspace selama 30 hari melalui RPC database.
+                Persetujuan akan mengaktifkan paket premium ruang keuangan selama 30 hari.
               </p>
             </div>
           </div>

@@ -66,13 +66,13 @@ export function GoalContributionForm({ isSubmitting, onSubmit, wallets }: GoalCo
 
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-2">
-          <Label htmlFor="walletId">Wallet</Label>
+          <Label htmlFor="walletId">Dompet</Label>
           <select
             className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             id="walletId"
             {...register('walletId')}
           >
-            <option value="">Tanpa wallet</option>
+            <option value="">Tanpa dompet</option>
             {wallets.map((wallet) => (
               <option key={wallet.id} value={wallet.id}>
                 {wallet.name}

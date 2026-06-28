@@ -28,12 +28,12 @@ export function BudgetEmptyState() {
   return (
     <div className="rounded-md border border-dashed border-border bg-card p-8 text-center">
       <WalletCards className="mx-auto size-10 text-muted-foreground" />
-      <h2 className="mt-4 font-semibold">Belum ada budget aktif</h2>
+      <h2 className="mt-4 font-semibold">Belum ada batas pengeluaran</h2>
       <p className="mx-auto mt-2 max-w-sm text-sm leading-6 text-muted-foreground">
-        Buat budget bulanan per kategori expense untuk memantau pemakaian dan sisa dana.
+        Buat batas uang keluar bulanan agar pemakaian setiap kategori lebih mudah dipantau.
       </p>
       <Button asChild className="mt-5">
-        <Link to="/app/budgets/new">Tambah Budget</Link>
+        <Link to="/app/budgets/new">Tambah Batas</Link>
       </Button>
     </div>
   );
@@ -45,7 +45,7 @@ export function BudgetErrorState({ message, onRetry }: { message: string; onRetr
       <div className="flex items-start gap-3">
         <AlertCircle className="mt-0.5 size-5 text-destructive" />
         <div>
-          <h2 className="font-semibold">Budget gagal dimuat</h2>
+          <h2 className="font-semibold">Batas pengeluaran gagal dimuat</h2>
           <p className="mt-1 text-sm text-muted-foreground">{message}</p>
           <Button className="mt-4" onClick={onRetry} type="button" variant="outline">
             Coba lagi

@@ -46,7 +46,7 @@ const groups = [
     title: 'Ringkasan',
     items: [
       { href: '/app/reports', icon: FileText, label: 'Ringkasan' },
-      { href: '/app/insights', icon: Lightbulb, label: 'Insight' },
+      { href: '/app/insights', icon: Lightbulb, label: 'Saran' },
       { href: '/app/simulator', icon: Calculator, label: 'Simulator' }
     ]
   },
@@ -62,7 +62,7 @@ const groups = [
     items: [
       { href: '/app/settings/profile', icon: UserCircle, label: 'Profil' },
       { href: '/app/settings/preferences', icon: Settings, label: 'Preferensi' },
-      { href: '/app/settings/workspace', icon: WalletCards, label: 'Workspace' },
+      { href: '/app/settings/workspace', icon: WalletCards, label: 'Ruang Keuangan' },
       { href: '/app/settings/members', icon: Users, label: 'Anggota' }
     ]
   }

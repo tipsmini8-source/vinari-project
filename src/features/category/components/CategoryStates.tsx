@@ -28,7 +28,7 @@ export function CategoryEmptyState({ canCreate }: { canCreate: boolean }) {
       <Tags className="mx-auto size-10 text-muted-foreground" />
       <h2 className="mt-4 font-semibold">Belum ada kategori aktif</h2>
       <p className="mx-auto mt-2 max-w-sm text-sm leading-6 text-muted-foreground">
-        Tambahkan kategori untuk merapikan transaksi, budget, dan laporan keuangan.
+        Tambahkan kategori untuk merapikan catatan uang, batas pengeluaran, dan laporan keuangan.
       </p>
       {canCreate ? (
         <Button asChild className="mt-5">

@@ -139,9 +139,9 @@ export function DecisionSimulatorPage() {
             <Calculator className="size-5" />
             <p className="text-sm font-medium">{workspace.name}</p>
           </div>
-          <h1 className="mt-1 text-3xl font-semibold tracking-normal">Decision Simulator</h1>
+          <h1 className="mt-1 text-3xl font-semibold tracking-normal">Simulasi Keputusan</h1>
           <p className="mt-2 text-sm text-muted-foreground">
-            Simulasikan keputusan finansial tanpa mengubah data asli workspace.
+            Coba lihat dampak keputusan uang tanpa mengubah catatan asli.
           </p>
         </div>
 
@@ -194,15 +194,15 @@ export function DecisionSimulatorPage() {
                       value={moneyFormatter.format(expenseSimulation.data.estimatedBalanceAfter)}
                     />
                     <ResultMetric
-                      label="Dampak cashflow bulan ini"
+                      label="Dampak selisih uang bulan ini"
                       value={moneyFormatter.format(expenseSimulation.data.cashflowImpactThisMonth)}
                     />
                     <ResultMetric
-                      label="Health score awal"
+                      label="Kondisi keuangan awal"
                       value={`${expenseSimulation.data.financialHealthBefore}/100`}
                     />
                     <ResultMetric
-                      label="Health score simulasi"
+                      label="Kondisi keuangan simulasi"
                       value={`${expenseSimulation.data.financialHealthAfter}/100`}
                     />
                   </SimulationResultCard>
@@ -224,11 +224,14 @@ export function DecisionSimulatorPage() {
                       value={moneyFormatter.format(debtSimulation.data.additionalMonthlyObligation)}
                     />
                     <ResultMetric
-                      label="Estimasi debt ratio"
+                      label="Perbandingan cicilan dan uang masuk"
                       value={formatRatio(debtSimulation.data.estimatedDebtRatio)}
                     />
-                    <ResultMetric label="Health score awal" value={`${debtSimulation.data.financialHealthBefore}/100`} />
-                    <ResultMetric label="Health score simulasi" value={`${debtSimulation.data.financialHealthAfter}/100`} />
+                    <ResultMetric label="Kondisi keuangan awal" value={`${debtSimulation.data.financialHealthBefore}/100`} />
+                    <ResultMetric
+                      label="Kondisi keuangan simulasi"
+                      value={`${debtSimulation.data.financialHealthAfter}/100`}
+                    />
                   </SimulationResultCard>
                 ) : null}
               </>
@@ -238,12 +241,12 @@ export function DecisionSimulatorPage() {
               <>
                 {snapshot.goals.length === 0 ? (
                   <div className="rounded-md border border-dashed border-border bg-card p-6 text-card-foreground">
-                    <h2 className="font-semibold">Belum ada goal aktif</h2>
+                    <h2 className="font-semibold">Belum ada target tabungan aktif</h2>
                     <p className="mt-1 text-sm text-muted-foreground">
-                      Buat goal terlebih dahulu untuk mensimulasikan tambahan tabungan.
+                      Buat target tabungan terlebih dahulu untuk mencoba simulasi tambahan tabungan.
                     </p>
                     <Button asChild className="mt-4" size="sm">
-                      <Link to="/app/goals/new">Buat Goal</Link>
+                      <Link to="/app/goals/new">Buat Target</Link>
                     </Button>
                   </div>
                 ) : (
@@ -273,7 +276,7 @@ export function DecisionSimulatorPage() {
                       value={formatMonths(goalSimulation.data.estimatedMonthsFaster)}
                     />
                     <ResultMetric
-                      label="Dampak cashflow"
+                      label="Dampak selisih uang"
                       value={moneyFormatter.format(goalSimulation.data.cashflowImpact)}
                     />
                   </SimulationResultCard>

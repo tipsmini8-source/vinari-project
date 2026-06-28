@@ -53,14 +53,14 @@ export function GoalForm({ defaultGoal, isSubmitting, onCancel, onSubmit, wallet
   return (
     <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
       <div className="space-y-2">
-        <Label htmlFor="name">Nama goal</Label>
+        <Label htmlFor="name">Nama target tabungan</Label>
         <Input id="name" placeholder="Contoh: Dana darurat" {...register('name')} />
         {errors.name ? <p className="text-sm text-destructive">{errors.name.message}</p> : null}
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-2">
-          <Label htmlFor="targetAmount">Target amount</Label>
+          <Label htmlFor="targetAmount">Nominal target</Label>
           <Input
             id="targetAmount"
             min="0.01"
@@ -72,7 +72,7 @@ export function GoalForm({ defaultGoal, isSubmitting, onCancel, onSubmit, wallet
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="currentAmount">Current amount</Label>
+          <Label htmlFor="currentAmount">Sudah terkumpul</Label>
           <Input
             id="currentAmount"
             min="0"
@@ -86,19 +86,19 @@ export function GoalForm({ defaultGoal, isSubmitting, onCancel, onSubmit, wallet
 
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-2">
-          <Label htmlFor="targetDate">Target date</Label>
+          <Label htmlFor="targetDate">Tanggal target</Label>
           <Input id="targetDate" type="date" {...register('targetDate')} />
           {errors.targetDate ? <p className="text-sm text-destructive">{errors.targetDate.message}</p> : null}
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="walletId">Wallet tabungan</Label>
+          <Label htmlFor="walletId">Dompet tabungan</Label>
           <select
             className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             id="walletId"
             {...register('walletId')}
           >
-            <option value="">Tanpa wallet khusus</option>
+            <option value="">Tanpa dompet khusus</option>
             {wallets.map((wallet) => (
               <option key={wallet.id} value={wallet.id}>
                 {wallet.name}
@@ -117,9 +117,9 @@ export function GoalForm({ defaultGoal, isSubmitting, onCancel, onSubmit, wallet
             id="status"
             {...register('status')}
           >
-            <option value="active">Active</option>
-            <option value="achieved">Achieved</option>
-            <option value="cancelled">Cancelled</option>
+            <option value="active">Aktif</option>
+            <option value="achieved">Tercapai</option>
+            <option value="cancelled">Dibatalkan</option>
           </select>
           {errors.status ? <p className="text-sm text-destructive">{errors.status.message}</p> : null}
         </div>

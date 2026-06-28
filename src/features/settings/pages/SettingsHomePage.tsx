@@ -1,4 +1,4 @@
-import { ArrowLeft, Bell, Briefcase, CreditCard, LogOut, Palette, Shield, User, Users } from 'lucide-react';
+import { ArrowLeft, Bell, Briefcase, CreditCard, LifeBuoy, LogOut, Palette, Shield, User, Users } from 'lucide-react';
 import { Link, Navigate, useNavigate } from 'react-router';
 
 import { useWorkspace } from '@/core/workspace';
@@ -10,25 +10,25 @@ import { useToast } from '@shared/ui/use-toast';
 
 const settingsMenu = [
   {
-    description: 'Nama, avatar, timezone, locale, dan currency.',
+    description: 'Nama, avatar, zona waktu, bahasa, dan mata uang.',
     href: '/app/settings/profile',
     icon: User,
     title: 'Profil'
   },
   {
-    description: 'Theme, bahasa, format tanggal, dan notifikasi.',
+    description: 'Tema, bahasa, format tanggal, dan notifikasi.',
     href: '/app/settings/preferences',
     icon: Palette,
     title: 'Preferensi'
   },
   {
-    description: 'Info workspace aktif, role, dan member.',
+    description: 'Info ruang keuangan aktif, peran, dan anggota.',
     href: '/app/settings/workspace',
     icon: Briefcase,
-    title: 'Workspace'
+    title: 'Ruang Keuangan'
   },
   {
-    description: 'Invite, role, status, dan akses anggota workspace.',
+    description: 'Undangan, peran, status, dan akses anggota.',
     href: '/app/settings/members',
     icon: Users,
     title: 'Anggota'
@@ -40,10 +40,10 @@ const settingsMenu = [
     title: 'Keamanan'
   },
   {
-    description: 'Plan aktif, subscription, dan payment request.',
+    description: 'Paket aktif, pembayaran, dan permintaan upgrade.',
     href: '/app/billing',
     icon: CreditCard,
-    title: 'Billing'
+    title: 'Pembayaran'
   }
 ];
 
@@ -90,10 +90,11 @@ export function SettingsHomePage() {
             </Link>
           </Button>
           <p className="text-sm font-medium text-primary">{workspace.name}</p>
-          <h1 className="mt-1 text-3xl font-semibold tracking-normal">Settings</h1>
+          <h1 className="mt-1 text-3xl font-semibold tracking-normal">Pengaturan</h1>
           <p className="mt-2 text-sm text-muted-foreground">
-            Kelola profil, preferensi aplikasi, workspace, dan keamanan akun.
+            Kelola profil, preferensi aplikasi, ruang keuangan, dan keamanan akun.
           </p>
+          <p className="mt-2 text-xs font-medium text-primary">Vinari Beta v1.0</p>
         </div>
 
         <div className="grid gap-3 md:grid-cols-2">
@@ -135,6 +136,23 @@ export function SettingsHomePage() {
             <p className="text-sm text-muted-foreground">
               Perubahan preferensi tersimpan di akun dan dapat digunakan oleh modul Vinari lain.
             </p>
+          </div>
+        </div>
+
+        <div className="mt-4 rounded-md border border-border bg-card p-4 text-card-foreground shadow-sm">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-start gap-3">
+              <LifeBuoy className="mt-0.5 size-5 text-primary" />
+              <div>
+                <h2 className="font-semibold">Bantuan beta</h2>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Butuh bantuan? Hubungi support@vinari.app
+                </p>
+              </div>
+            </div>
+            <Button asChild className="w-full sm:w-auto" variant="outline">
+              <a href="mailto:support@vinari.app?subject=Masukan%20Vinari%20Beta">Kirim Masukan</a>
+            </Button>
           </div>
         </div>
       </section>

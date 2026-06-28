@@ -100,8 +100,8 @@ export function RecurringTransactionForm({
         <div className="space-y-2">
           <Label htmlFor="type">Tipe</Label>
           <select className={selectClassName} id="type" {...register('type')}>
-            <option value="income">Income</option>
-            <option value="expense">Expense</option>
+            <option value="income">Uang Masuk</option>
+            <option value="expense">Uang Keluar</option>
           </select>
           {errors.type ? <p className="text-sm text-destructive">{errors.type.message}</p> : null}
         </div>
@@ -132,7 +132,7 @@ export function RecurringTransactionForm({
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="nextRunDate">Next run</Label>
+          <Label htmlFor="nextRunDate">Tanggal berikutnya</Label>
           <Input id="nextRunDate" type="date" {...register('nextRunDate')} />
           {errors.nextRunDate ? <p className="text-sm text-destructive">{errors.nextRunDate.message}</p> : null}
         </div>
@@ -140,9 +140,9 @@ export function RecurringTransactionForm({
 
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-2">
-          <Label htmlFor="walletId">Wallet</Label>
+          <Label htmlFor="walletId">Dompet</Label>
           <select className={selectClassName} id="walletId" {...register('walletId')}>
-            <option value="">Pilih wallet</option>
+            <option value="">Pilih dompet</option>
             {wallets.map((wallet) => (
               <option key={wallet.id} value={wallet.id}>
                 {wallet.name}
@@ -182,7 +182,7 @@ export function RecurringTransactionForm({
 
       <label className="flex items-center gap-3 rounded-md border border-border p-3 text-sm">
         <input className="size-4 accent-primary" type="checkbox" {...register('isActive')} />
-        Recurring aktif
+        Transaksi berulang aktif
       </label>
 
       <div className="space-y-2">
@@ -249,7 +249,7 @@ export function SubscriptionForm({
     <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-2">
-          <Label htmlFor="name">Nama subscription</Label>
+          <Label htmlFor="name">Nama langganan</Label>
           <Input id="name" placeholder="Contoh: Internet rumah" {...register('name')} />
           {errors.name ? <p className="text-sm text-destructive">{errors.name.message}</p> : null}
         </div>
@@ -263,7 +263,7 @@ export function SubscriptionForm({
 
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-2">
-          <Label htmlFor="billingCycle">Billing cycle</Label>
+          <Label htmlFor="billingCycle">Siklus tagihan</Label>
           <select className={selectClassName} id="billingCycle" {...register('billingCycle')}>
             <option value="daily">Harian</option>
             <option value="weekly">Mingguan</option>
@@ -274,7 +274,7 @@ export function SubscriptionForm({
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="nextDueDate">Next due</Label>
+          <Label htmlFor="nextDueDate">Jatuh tempo berikutnya</Label>
           <Input id="nextDueDate" type="date" {...register('nextDueDate')} />
           {errors.nextDueDate ? <p className="text-sm text-destructive">{errors.nextDueDate.message}</p> : null}
         </div>
@@ -282,9 +282,9 @@ export function SubscriptionForm({
 
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-2">
-          <Label htmlFor="subscriptionWalletId">Wallet</Label>
+          <Label htmlFor="subscriptionWalletId">Dompet</Label>
           <select className={selectClassName} id="subscriptionWalletId" {...register('walletId')}>
-            <option value="">Tanpa wallet</option>
+            <option value="">Tanpa dompet</option>
             {wallets.map((wallet) => (
               <option key={wallet.id} value={wallet.id}>
                 {wallet.name}
@@ -294,7 +294,7 @@ export function SubscriptionForm({
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="subscriptionCategoryId">Kategori expense</Label>
+          <Label htmlFor="subscriptionCategoryId">Kategori uang keluar</Label>
           <select className={selectClassName} id="subscriptionCategoryId" {...register('categoryId')}>
             <option value="">Tanpa kategori</option>
             {expenseCategories.map((category) => (
@@ -308,7 +308,7 @@ export function SubscriptionForm({
 
       <label className="flex items-center gap-3 rounded-md border border-border p-3 text-sm">
         <input className="size-4 accent-primary" type="checkbox" {...register('isActive')} />
-        Subscription aktif
+        Langganan aktif
       </label>
 
       <div className="space-y-2">

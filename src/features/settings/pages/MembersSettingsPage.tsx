@@ -71,9 +71,9 @@ export function MembersSettingsPage() {
 
           <div className="mb-6">
             <p className="text-sm font-medium text-primary">{user.email}</p>
-            <h1 className="mt-1 text-3xl font-semibold tracking-normal">Undangan Workspace</h1>
+            <h1 className="mt-1 text-3xl font-semibold tracking-normal">Undangan Ruang Keuangan</h1>
             <p className="mt-2 text-sm text-muted-foreground">
-              Terima undangan workspace yang dikirim ke email akun ini.
+              Terima undangan ruang keuangan yang dikirim ke email akun ini.
             </p>
           </div>
 
@@ -88,7 +88,7 @@ export function MembersSettingsPage() {
 
           {!invitationsQuery.isLoading && !invitationsQuery.isError ? (
             <SettingsSectionCard
-              description="Jika email akun cocok dengan undangan, Anda bisa menerima akses workspace."
+              description="Jika email akun cocok dengan undangan, Anda bisa menerima akses ruang keuangan."
               title="Undangan Saya"
             >
               <WorkspaceMemberList
@@ -139,10 +139,10 @@ export function MembersSettingsPage() {
     try {
       await updateRole.mutateAsync({ memberId: member.id, role });
       await refreshWorkspace();
-      toast({ title: 'Role member diperbarui' });
+      toast({ title: 'Peran anggota diperbarui' });
     } catch (error) {
       toast({
-        title: 'Gagal mengubah role',
+        title: 'Gagal mengubah peran',
         description: error instanceof Error ? error.message : 'Silakan coba lagi.',
         variant: 'destructive'
       });
@@ -150,7 +150,7 @@ export function MembersSettingsPage() {
   };
 
   const handleRemove = async (member: WorkspaceMember) => {
-    const confirmed = window.confirm(`Remove member "${member.profile?.full_name || member.invite_email || member.id}"?`);
+    const confirmed = window.confirm(`Hapus anggota "${member.profile?.full_name || member.invite_email || member.id}"?`);
 
     if (!confirmed) {
       return;
@@ -159,10 +159,10 @@ export function MembersSettingsPage() {
     try {
       await removeMember.mutateAsync(member.id);
       await refreshWorkspace();
-      toast({ title: 'Member diremove' });
+      toast({ title: 'Anggota dihapus' });
     } catch (error) {
       toast({
-        title: 'Gagal remove member',
+        title: 'Gagal menghapus anggota',
         description: error instanceof Error ? error.message : 'Silakan coba lagi.',
         variant: 'destructive'
       });
@@ -191,9 +191,9 @@ export function MembersSettingsPage() {
               </span>
             ) : null}
           </div>
-          <h1 className="mt-1 text-3xl font-semibold tracking-normal">Anggota Workspace</h1>
+          <h1 className="mt-1 text-3xl font-semibold tracking-normal">Anggota Ruang Keuangan</h1>
           <p className="mt-2 text-sm text-muted-foreground">
-            Kelola anggota keluarga atau tim yang bisa mengakses workspace aktif.
+            Kelola anggota keluarga atau tim yang bisa mengakses ruang keuangan aktif.
           </p>
         </div>
 
@@ -209,12 +209,12 @@ export function MembersSettingsPage() {
         {!membersQuery.isLoading && !membersQuery.isError ? (
           <div className="space-y-4">
             <SettingsSectionCard
-              description={`${memberCount}/${maxMembers ?? 'Unlimited'} slot member terpakai.`}
-              title="Invite Member"
+              description={`${memberCount}/${maxMembers ?? 'Tanpa batas'} slot anggota terpakai.`}
+              title="Undang Anggota"
             >
               {!manageable ? (
                 <div className="rounded-md border border-border bg-background p-4 text-sm text-muted-foreground">
-                  Hanya owner workspace yang bisa mengundang dan mengelola anggota.
+                  Hanya pemilik ruang keuangan yang bisa mengundang dan mengelola anggota.
                 </div>
               ) : null}
 
@@ -223,10 +223,10 @@ export function MembersSettingsPage() {
                   <div className="flex items-start gap-3">
                     <Lock className="mt-0.5 size-5 text-warning" />
                     <div>
-                      <h2 className="font-semibold text-warning">Limit member tercapai</h2>
+                      <h2 className="font-semibold text-warning">Limit anggota tercapai</h2>
                       <p className="mt-1 text-sm text-muted-foreground">
-                        Plan saat ini membatasi workspace ke {maxMembers} member. Upgrade ke Premium Family untuk
-                        menambah hingga 5 member.
+                        Paket saat ini membatasi ruang keuangan ke {maxMembers} anggota. Upgrade ke Premium Family untuk
+                        menambah hingga 5 anggota.
                       </p>
                       <Button asChild className="mt-4" size="sm">
                         <Link to="/app/upgrade">Upgrade</Link>
@@ -246,12 +246,12 @@ export function MembersSettingsPage() {
             </SettingsSectionCard>
 
             <SettingsSectionCard
-              description="Anggota aktif, undangan yang belum diterima, dan member yang sudah diremove."
+              description="Anggota aktif, undangan yang belum diterima, dan anggota yang sudah dihapus."
               title="Daftar Anggota"
             >
               <div className="mb-4 flex items-center gap-2 text-sm text-muted-foreground">
                 <Users className="size-4" />
-                <span>{members.length} record member</span>
+                <span>{members.length} data anggota</span>
               </div>
               <WorkspaceMemberList
                 actionDisabled={actionPending}

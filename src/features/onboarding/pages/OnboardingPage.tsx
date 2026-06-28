@@ -24,17 +24,17 @@ const usageOptions: Array<{ value: UsageType; label: string; description: string
   {
     value: 'personal',
     label: 'Personal',
-    description: 'Untuk mengelola keuangan pribadi.'
+    description: 'Untuk mencatat uang pribadi sehari-hari.'
   },
   {
     value: 'couple',
-    label: 'Couple',
-    description: 'Untuk pasangan yang ingin berbagi visibilitas keuangan.'
+    label: 'Pasangan',
+    description: 'Untuk pasangan yang ingin melihat catatan uang bersama.'
   },
   {
     value: 'family',
-    label: 'Family',
-    description: 'Untuk keluarga dengan kebutuhan kolaborasi lebih luas.'
+    label: 'Keluarga',
+    description: 'Untuk keluarga kecil yang ingin mengelola uang bersama.'
   }
 ];
 
@@ -42,27 +42,27 @@ const walletTypes = [
   { value: 'cash', label: 'Cash' },
   { value: 'bank', label: 'Bank' },
   { value: 'ewallet', label: 'E-Wallet' },
-  { value: 'saving', label: 'Saving' },
-  { value: 'investment', label: 'Investment' },
-  { value: 'other', label: 'Other' }
+  { value: 'saving', label: 'Tabungan' },
+  { value: 'investment', label: 'Investasi' },
+  { value: 'other', label: 'Lainnya' }
 ];
 
 const stepCopy = [
   {
     title: 'Selamat datang di Vinari',
-    description: 'Mari siapkan workspace, kategori, dan wallet pertama Anda dalam beberapa langkah.'
+    description: 'Mari siapkan ruang keuangan dan dompet utama untuk mulai mencatat uang harian.'
   },
   {
     title: 'Pilih tipe penggunaan',
-    description: 'Pilihan ini membantu Vinari menyiapkan konteks workspace awal.'
+    description: 'Pilihan ini membantu Vinari menyesuaikan ruang keuangan awal.'
   },
   {
-    title: 'Buat workspace',
-    description: 'Workspace adalah ruang utama untuk data keuangan Anda.'
+    title: 'Buat ruang keuangan',
+    description: 'Ruang keuangan adalah tempat semua catatan uang, dompet, dan rencana disimpan.'
   },
   {
-    title: 'Buat wallet pertama',
-    description: 'Wallet pertama menjadi titik awal pencatatan saldo dan transaksi nanti.'
+    title: 'Buat dompet utama',
+    description: 'Dompet utama bisa berupa cash, rekening, atau e-wallet yang paling sering dipakai.'
   },
   {
     title: 'Selesai',
@@ -140,7 +140,7 @@ export function OnboardingPage() {
       await refreshWorkspace();
       toast({
         title: 'Onboarding selesai',
-        description: 'Workspace, wallet, dan kategori default sudah dibuat.'
+        description: 'Ruang keuangan, dompet utama, dan kategori bawaan sudah dibuat.'
       });
       void navigate('/app', { replace: true });
     } catch (error) {
@@ -165,8 +165,8 @@ export function OnboardingPage() {
             <div className="flex items-start gap-3 rounded-md border border-border bg-secondary/40 p-4">
               <CheckCircle2 className="mt-0.5 size-5 text-primary" />
               <p className="text-sm leading-6 text-muted-foreground">
-                Setup ini hanya membuat data awal: workspace, membership owner, wallet pertama, dan
-                kategori default Indonesia.
+                Vinari hanya membantu mencatat dan memahami uang. Vinari bukan bank atau e-wallet,
+                dan tidak menyimpan uang asli Anda.
               </p>
             </div>
           </div>
@@ -196,13 +196,13 @@ export function OnboardingPage() {
           <div className="space-y-4">
             <FormTextField
               error={errors.workspaceName}
-              label="Nama workspace"
+              label="Nama ruang keuangan"
               placeholder="Keuangan Keluarga"
               registration={register('workspaceName')}
             />
             <FormTextField
               error={errors.currencyCode}
-              label="Currency default"
+              label="Mata uang utama"
               placeholder="IDR"
               registration={register('currencyCode')}
             />
@@ -213,12 +213,12 @@ export function OnboardingPage() {
           <div className="space-y-4">
             <FormTextField
               error={errors.walletName}
-              label="Nama wallet"
+              label="Nama dompet utama"
               placeholder="Rekening Utama"
               registration={register('walletName')}
             />
             <div className="space-y-2">
-              <Label htmlFor="walletType">Tipe wallet</Label>
+              <Label htmlFor="walletType">Jenis dompet</Label>
               <select
                 className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 id="walletType"
@@ -234,6 +234,9 @@ export function OnboardingPage() {
             </div>
             <div className="space-y-2">
               <Label htmlFor="initialBalance">Saldo awal</Label>
+              <p className="text-xs leading-5 text-muted-foreground">
+                Masukkan saldo yang saat ini ada di dompet ini. Ini hanya catatan, bukan uang yang disimpan di Vinari.
+              </p>
               <Input
                 id="initialBalance"
                 min="0"
@@ -255,15 +258,15 @@ export function OnboardingPage() {
               <span className="font-medium capitalize">{getValues('usageType')}</span>
             </div>
             <div className="flex justify-between gap-4">
-              <span className="text-muted-foreground">Workspace</span>
+              <span className="text-muted-foreground">Ruang keuangan</span>
               <span className="font-medium">{getValues('workspaceName')}</span>
             </div>
             <div className="flex justify-between gap-4">
-              <span className="text-muted-foreground">Currency</span>
+              <span className="text-muted-foreground">Mata uang</span>
               <span className="font-medium">{getValues('currencyCode')}</span>
             </div>
             <div className="flex justify-between gap-4">
-              <span className="text-muted-foreground">Wallet</span>
+              <span className="text-muted-foreground">Dompet utama</span>
               <span className="font-medium">{getValues('walletName')}</span>
             </div>
           </div>

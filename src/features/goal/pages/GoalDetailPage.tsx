@@ -30,6 +30,12 @@ const dateFormatter = new Intl.DateTimeFormat('id-ID', {
   dateStyle: 'medium'
 });
 
+const statusLabels = {
+  active: 'Aktif',
+  achieved: 'Tercapai',
+  cancelled: 'Dibatalkan'
+};
+
 export function GoalDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -73,7 +79,7 @@ export function GoalDetailPage() {
       return;
     }
 
-    const confirmed = window.confirm(`Hapus goal "${goal.name}"?`);
+    const confirmed = window.confirm(`Hapus target tabungan "${goal.name}"?`);
 
     if (!confirmed) {
       return;
@@ -81,11 +87,11 @@ export function GoalDetailPage() {
 
     try {
       await deleteGoal.mutateAsync(goal.id);
-      toast({ title: 'Goal dihapus' });
+      toast({ title: 'Target tabungan dihapus' });
       void navigate('/app/goals');
     } catch (error) {
       toast({
-        title: 'Gagal menghapus goal',
+        title: 'Gagal menghapus target tabungan',
         description: error instanceof Error ? error.message : 'Silakan coba lagi.',
         variant: 'destructive'
       });
@@ -121,17 +127,23 @@ export function GoalDetailPage() {
                       <p className="text-sm font-medium text-primary">{workspace.name}</p>
                       <CardTitle className="mt-1">{goal.name}</CardTitle>
                       <p className="mt-2 text-sm text-muted-foreground">
-                        {goal.target_date ? dateFormatter.format(new Date(goal.target_date)) : 'Tanpa target date'}
+                        {goal.target_date ? dateFormatter.format(new Date(goal.target_date)) : 'Tanpa tanggal target'}
                         {goal.wallet_name ? ` - ${goal.wallet_name}` : ''}
                       </p>
                     </div>
                     <div className="flex gap-1">
-                      <Button asChild aria-label="Edit goal" size="icon" variant="ghost">
+                      <Button asChild aria-label="Edit target tabungan" size="icon" variant="ghost">
                         <Link to={`/app/goals/${goal.id}/edit`}>
                           <Edit className="size-4" />
                         </Link>
                       </Button>
-                      <Button aria-label="Hapus goal" onClick={handleDelete} size="icon" type="button" variant="ghost">
+                      <Button
+                        aria-label="Hapus target tabungan"
+                        onClick={handleDelete}
+                        size="icon"
+                        type="button"
+                        variant="ghost"
+                      >
                         <Trash2 className="size-4" />
                       </Button>
                     </div>
@@ -141,11 +153,11 @@ export function GoalDetailPage() {
                   <GoalProgress percentage={goal.percentage} status={goal.status} />
                   <div className="grid gap-3 text-sm sm:grid-cols-4">
                     <div>
-                      <p className="text-muted-foreground">Target amount</p>
+                      <p className="text-muted-foreground">Nominal target</p>
                       <p className="font-medium">{moneyFormatter.format(goal.target_amount)}</p>
                     </div>
                     <div>
-                      <p className="text-muted-foreground">Current amount</p>
+                      <p className="text-muted-foreground">Terkumpul</p>
                       <p className="font-medium">{moneyFormatter.format(goal.current_amount)}</p>
                     </div>
                     <div>
@@ -155,20 +167,20 @@ export function GoalDetailPage() {
                       </p>
                     </div>
                     <div>
-                      <p className="text-muted-foreground">Progress</p>
+                      <p className="text-muted-foreground">Progres</p>
                       <p className="font-medium">{goal.percentage}%</p>
                     </div>
                   </div>
                   <div className="rounded-md border border-border p-3 text-sm">
                     <p className="text-muted-foreground">Status</p>
-                    <p className="mt-1 font-medium capitalize">{goal.status}</p>
+                    <p className="mt-1 font-medium">{statusLabels[goal.status]}</p>
                   </div>
                 </CardContent>
               </Card>
 
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-xl">Contribution History</CardTitle>
+                  <CardTitle className="text-xl">Riwayat Tabungan</CardTitle>
                 </CardHeader>
                 <CardContent>
                   {contributionsQuery.isLoading ? <GoalSkeleton /> : null}

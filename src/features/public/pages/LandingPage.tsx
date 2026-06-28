@@ -66,12 +66,12 @@ const features = [
   },
   {
     icon: Lightbulb,
-    title: 'Insight & Simulator',
+    title: 'Saran & Simulasi',
     text: 'Dapatkan saran sederhana dan coba simulasi sebelum mengambil keputusan.'
   },
   {
     icon: Users,
-    title: 'Family Workspace',
+    title: 'Ruang Keluarga',
     text: 'Kelola keuangan bersama pasangan atau keluarga.'
   }
 ];
@@ -87,13 +87,13 @@ const plans = [
     name: 'Premium Personal',
     price: 'Rp19.000/bulan',
     description: 'Untuk pengguna pribadi yang ingin fitur lebih lengkap.',
-    features: ['Semua fitur Free', 'Export data', 'Insight lebih lengkap', 'Simulator keputusan', 'Fitur premium personal']
+    features: ['Semua fitur Free', 'Unduh data', 'Saran lebih lengkap', 'Simulator keputusan', 'Fitur premium personal']
   },
   {
     name: 'Premium Family',
     price: 'Rp39.000/bulan',
     description: 'Untuk pasangan atau keluarga kecil.',
-    features: ['Semua fitur Premium Personal', 'Anggota workspace', 'Kelola keuangan bersama', 'Cocok untuk keluarga']
+    features: ['Semua fitur Premium Personal', 'Anggota keluarga', 'Kelola keuangan bersama', 'Cocok untuk keluarga']
   }
 ];
 

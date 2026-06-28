@@ -27,7 +27,7 @@ export function InsightEmptyState() {
       <Lightbulb className="mx-auto size-10 text-muted-foreground" />
       <h2 className="mt-4 font-semibold">Belum ada insight</h2>
       <p className="mx-auto mt-2 max-w-sm text-sm leading-6 text-muted-foreground">
-        Tambahkan transaksi, budget, goal, atau debt agar Vinari bisa memberikan insight berbasis rule.
+        Tambahkan catatan uang, batas pengeluaran, target tabungan, atau cicilan agar Vinari bisa memberi saran sederhana.
       </p>
     </div>
   );

@@ -44,7 +44,7 @@ function statusLabel(status: string) {
     return 'Ditolak';
   }
 
-  return 'Pending';
+  return 'Menunggu Dicek';
 }
 
 export function AdminPaymentList({
@@ -67,7 +67,7 @@ export function AdminPaymentList({
                 </span>
               </div>
               <div className="mt-3 grid gap-2 text-sm text-muted-foreground sm:grid-cols-2 xl:grid-cols-3">
-                <p className="break-all">Workspace: {request.workspace_id}</p>
+                <p className="break-all">Ruang keuangan: {request.workspace_id}</p>
                 <p className="break-all">User: {request.user_id}</p>
                 <p>Metode: {request.method ?? '-'}</p>
                 <p>Nominal: {moneyFormatter.format(request.amount)}</p>
@@ -84,7 +84,7 @@ export function AdminPaymentList({
                 </p>
               </div>
               {request.rejected_reason ? (
-                <p className="mt-3 text-sm text-destructive">Alasan reject: {request.rejected_reason}</p>
+                <p className="mt-3 text-sm text-destructive">Alasan ditolak: {request.rejected_reason}</p>
               ) : null}
             </div>
 
