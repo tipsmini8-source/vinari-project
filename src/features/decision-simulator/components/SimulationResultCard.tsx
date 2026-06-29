@@ -35,14 +35,14 @@ export function SimulationResultCard({
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">Langkah 3</p>
-          <h2 className="mt-1 text-3xl font-semibold tracking-normal">{status}</h2>
+          <h2 className="mt-1 text-xl font-semibold">Hasil Simulasi</h2>
+          <p className={cn('mt-3 inline-flex rounded-full border px-3 py-1 text-sm font-semibold', statusClassName[status])}>
+            {status}
+          </p>
           <p className="mt-2 text-sm leading-6 text-muted-foreground">
             {statusMessage[status]} Keputusan: <span className="font-semibold text-foreground">{title}</span>.
           </p>
         </div>
-        <span className={cn('w-fit rounded-full border px-3 py-1 text-sm font-semibold', statusClassName[status])}>
-          {status}
-        </span>
       </div>
 
       <div className="mt-5 rounded-3xl bg-muted/45 p-4 text-sm leading-6 text-muted-foreground">

@@ -1,4 +1,4 @@
-import { ArrowLeft, Calculator, CreditCard, PiggyBank, WalletCards } from 'lucide-react';
+import { ArrowLeft, Calculator, CheckCircle2, CreditCard, PiggyBank, WalletCards } from 'lucide-react';
 import { useState } from 'react';
 import { Link, Navigate } from 'react-router';
 
@@ -41,16 +41,17 @@ const moneyFormatter = new Intl.NumberFormat('id-ID', {
   style: 'currency'
 });
 
-const percentFormatter = new Intl.NumberFormat('id-ID', {
-  maximumFractionDigits: 0,
-  style: 'percent'
-});
-
 const dateFormatter = new Intl.DateTimeFormat('id-ID', {
   dateStyle: 'medium'
 });
 
 const tabs: Array<{ description: string; icon: typeof WalletCards; label: string; value: SimulatorTab }> = [
+  {
+    description: 'Simulasi untuk pembelian besar atau pengeluaran sekali bayar.',
+    icon: WalletCards,
+    label: 'Pengeluaran Besar',
+    value: 'expense'
+  },
   {
     description: 'Hitung cicilan, bunga, dan perkiraan waktu lunas.',
     icon: CreditCard,
@@ -58,15 +59,9 @@ const tabs: Array<{ description: string; icon: typeof WalletCards; label: string
     value: 'debt'
   },
   {
-    description: 'Cek dampak beli barang mahal, renovasi, atau liburan.',
-    icon: WalletCards,
-    label: 'Pengeluaran Besar',
-    value: 'expense'
-  },
-  {
-    description: 'Lihat apakah target bisa lebih cepat tercapai.',
+    description: 'Simulasi menambah tabungan rutin atau satu kali.',
     icon: PiggyBank,
-    label: 'Tambah Tabungan',
+    label: 'Tambah Tabungan Target',
     value: 'goal'
   }
 ];
@@ -83,28 +78,6 @@ function formatMonths(value: number | null) {
   return `${value} bulan`;
 }
 
-function formatRatio(value: number | null) {
-  if (value === null) {
-    return 'Belum ada data';
-  }
-
-  return percentFormatter.format(value);
-}
-
-function formatSafeMonths(totalBalance: number, averageExpense: number) {
-  if (averageExpense <= 0) {
-    return '-';
-  }
-
-  return `${(totalBalance / averageExpense).toLocaleString('id-ID', {
-    maximumFractionDigits: 1
-  })} bulan`;
-}
-
-function formatMaybeMoney(value: number, hasData = true) {
-  return hasData ? moneyFormatter.format(value) : '-';
-}
-
 function formatDate(value: string) {
   const date = new Date(value);
 
@@ -113,6 +86,17 @@ function formatDate(value: string) {
   }
 
   return dateFormatter.format(date);
+}
+
+function estimateDateFromMonths(months: number | null) {
+  if (months === null) {
+    return 'Belum bisa dihitung';
+  }
+
+  const date = new Date();
+  date.setMonth(date.getMonth() + months);
+
+  return formatDate(date.toISOString().slice(0, 10));
 }
 
 export function DecisionSimulatorPage() {
@@ -124,8 +108,8 @@ export function DecisionSimulatorPage() {
   const expenseSimulation = useSimulateExpense(snapshot);
   const debtSimulation = useSimulateDebt(snapshot);
   const goalSimulation = useSimulateGoalSaving(snapshot);
-  const hasIncomeData = (snapshot?.monthlyIncome ?? 0) > 0 || (snapshot?.averageMonthlyIncome ?? 0) > 0;
-  const safeRoom = snapshot ? Math.max(snapshot.monthlyIncome - snapshot.monthlyExpense - snapshot.activeInstallmentMonthly, 0) : 0;
+  const hasResult = Boolean(expenseSimulation.data || debtSimulation.data || goalSimulation.data);
+  const activeStep = hasResult ? 3 : 2;
 
   if (loading) {
     return <GlobalLoading />;
@@ -200,10 +184,10 @@ export function DecisionSimulatorPage() {
                 <p className="text-sm font-medium text-primary">{workspace.name}</p>
                 <h1 className="mt-1 text-3xl font-semibold tracking-normal sm:text-4xl">Simulasi Keputusan</h1>
                 <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
-                  Bantu kamu melihat akibat keputusan uang secara detail dan mudah dipahami.
+                  Lihat dulu dampaknya sebelum ambil keputusan uang.
                 </p>
                 <p className="mt-3 inline-flex rounded-full bg-background/80 px-3 py-1 text-xs font-medium text-muted-foreground ring-1 ring-border">
-                  Simulasi ini tidak mengubah catatan asli.
+                  Simulasi ini hanya perkiraan dan tidak mengubah catatan asli.
                 </p>
               </div>
             </div>
@@ -223,19 +207,21 @@ export function DecisionSimulatorPage() {
 
         {snapshot && snapshot.wallets.length > 0 ? (
           <div className="space-y-5">
+            <StepIndicator activeStep={activeStep} />
+
             <div className="rounded-3xl border border-border bg-card p-4 shadow-sm">
               <div className="mb-4">
                 <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">Langkah 1</p>
                 <h2 className="mt-1 font-semibold">Pilih jenis simulasi</h2>
               </div>
-              <div className="grid gap-3 md:grid-cols-3">
+              <div className="-mx-4 flex gap-3 overflow-x-auto px-4 pb-1 md:mx-0 md:grid md:grid-cols-3 md:overflow-visible md:px-0">
                 {tabs.map((tab) => {
                   const Icon = tab.icon;
 
                   return (
                     <button
                       className={cn(
-                        'rounded-3xl border p-4 text-left transition hover:-translate-y-0.5 hover:shadow-md',
+                        'relative min-w-[250px] rounded-3xl border p-4 text-left transition hover:-translate-y-0.5 hover:shadow-md md:min-w-0',
                         activeTab === tab.value
                           ? 'border-primary/30 bg-primary/10 text-foreground'
                           : 'border-border bg-background text-muted-foreground'
@@ -244,6 +230,11 @@ export function DecisionSimulatorPage() {
                       onClick={() => handleTabChange(tab.value)}
                       type="button"
                     >
+                      {activeTab === tab.value ? (
+                        <span className="absolute right-3 top-3 rounded-full bg-primary text-primary-foreground">
+                          <CheckCircle2 className="size-5" />
+                        </span>
+                      ) : null}
                       <span
                         className={cn(
                           'flex size-11 items-center justify-center rounded-2xl',
@@ -258,26 +249,6 @@ export function DecisionSimulatorPage() {
                   );
                 })}
               </div>
-            </div>
-
-            <section className="rounded-3xl border border-border bg-card p-4 shadow-sm">
-              <div className="mb-4">
-                <h2 className="font-semibold">Ringkasan Kondisi Sekarang</h2>
-                <p className="mt-1 text-sm text-muted-foreground">
-                  Beberapa angka akan lebih akurat setelah kamu mencatat pemasukan dan pengeluaran.
-                </p>
-              </div>
-              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-                <MiniSnapshot label="Saldo Aman" value={formatSafeMonths(snapshot.totalBalance, snapshot.averageMonthlyExpense)} />
-                <MiniSnapshot label="Cicilan Aktif" value={`${moneyFormatter.format(snapshot.activeInstallmentMonthly)} / bulan`} />
-                <MiniSnapshot label="Pemasukan Bulan Ini" value={formatMaybeMoney(snapshot.monthlyIncome, hasIncomeData)} />
-                <MiniSnapshot label="Ruang Aman" value={`${formatMaybeMoney(safeRoom, hasIncomeData)} / bulan`} />
-              </div>
-            </section>
-
-            <div className="rounded-3xl border border-dashed border-primary/20 bg-primary/10 p-4 text-sm leading-6 text-muted-foreground">
-              <span className="font-semibold text-foreground">Alurnya sederhana:</span> pilih jenis simulasi, isi data,
-              lalu lihat apakah keputusan ini masih aman, masih bisa, perlu dipikir lagi, atau berisiko.
             </div>
 
             {activeTab === 'expense' ? (
@@ -353,20 +324,20 @@ export function DecisionSimulatorPage() {
                       value={moneyFormatter.format(debtSimulation.data.calculation.paymentPerPeriod)}
                     />
                     <ResultMetric
+                      label="Total bunga"
+                      value={moneyFormatter.format(debtSimulation.data.calculation.totalInterest)}
+                    />
+                    <ResultMetric
                       label="Estimasi lunas"
                       value={formatDate(debtSimulation.data.calculation.payoffDate)}
                     />
                     <ResultMetric
-                      label="Cicilan bulanan setelah simulasi"
-                      value={moneyFormatter.format(debtSimulation.data.impact.totalInstallmentAfter)}
+                      label="Cicilan bulanan setara"
+                      value={moneyFormatter.format(debtSimulation.data.calculation.monthlyEquivalentPayment)}
                     />
                     <ResultMetric
                       label="Sisa uang bulanan"
                       value={moneyFormatter.format(debtSimulation.data.impact.monthlyMoneyLeftAfter)}
-                    />
-                    <ResultMetric
-                      label="Porsi cicilan dari pemasukan"
-                      value={formatRatio(debtSimulation.data.impact.installmentToIncomeRatio)}
                     />
                   </SimulationResultCard>
                 ) : null}
@@ -420,6 +391,10 @@ export function DecisionSimulatorPage() {
                       value={formatMonths(goalSimulation.data.estimatedMonthsFaster)}
                     />
                     <ResultMetric
+                      label="Estimasi tanggal tercapai"
+                      value={estimateDateFromMonths(goalSimulation.data.monthsToTargetAfter)}
+                    />
+                    <ResultMetric
                       label="Dampak uang bulanan"
                       value={moneyFormatter.format(goalSimulation.data.monthlyImpact * -1)}
                     />
@@ -441,11 +416,40 @@ export function DecisionSimulatorPage() {
   );
 }
 
-function MiniSnapshot({ label, value }: { label: string; value: string }) {
+function StepIndicator({ activeStep }: { activeStep: number }) {
+  const steps = [
+    { label: 'Pilih', value: 1 },
+    { label: 'Isi Detail', value: 2 },
+    { label: 'Hasil', value: 3 }
+  ];
+
   return (
-    <div className="rounded-3xl border border-border bg-card p-4 shadow-sm">
-      <p className="text-xs text-muted-foreground">{label}</p>
-      <p className="mt-1 text-lg font-semibold">{value}</p>
+    <div className="rounded-3xl border border-border bg-card p-3 shadow-sm">
+      <div className="grid grid-cols-3 gap-2">
+        {steps.map((step) => {
+          const active = activeStep >= step.value;
+
+          return (
+            <div
+              className={cn(
+                'flex min-w-0 items-center justify-center gap-2 rounded-2xl px-2 py-2 text-xs font-semibold sm:text-sm',
+                active ? 'bg-primary/10 text-primary' : 'bg-muted/50 text-muted-foreground'
+              )}
+              key={step.value}
+            >
+              <span
+                className={cn(
+                  'flex size-7 shrink-0 items-center justify-center rounded-full text-xs',
+                  active ? 'bg-primary text-primary-foreground' : 'bg-background text-muted-foreground'
+                )}
+              >
+                {step.value}
+              </span>
+              <span className="truncate">{step.label}</span>
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }

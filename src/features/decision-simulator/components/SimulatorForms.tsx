@@ -16,6 +16,7 @@ import type {
 import { Button } from '@shared/ui/button';
 import { Input } from '@shared/ui/input';
 import { Label } from '@shared/ui/label';
+import { cn } from '@shared/lib/utils';
 
 const selectClassName =
   'flex h-12 w-full rounded-xl border border-input bg-background px-3 py-2 text-base text-foreground shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-70';
@@ -49,7 +50,7 @@ function FormShell({
   children,
   description,
   isSubmitting,
-  submitLabel = 'Lihat Dampak',
+  submitLabel = 'Hitung Simulasi',
   title
 }: {
   children: React.ReactNode;
@@ -193,14 +194,28 @@ function InstallmentFields({
       >
         <div className="grid gap-4">
           <div className="grid gap-2 sm:grid-cols-2">
-            <label className="rounded-2xl border border-border bg-muted/30 p-3">
+            <label
+              className={cn(
+                'rounded-2xl border p-3 transition-colors',
+                calculationMode === 'by_tenor'
+                  ? 'border-primary/40 bg-primary/10 text-foreground'
+                  : 'border-border bg-muted/30'
+              )}
+            >
               <input className="sr-only" type="radio" value="by_tenor" {...register('calculationMode')} />
               <span className="block font-semibold">Hitung cicilan</span>
               <span className="mt-1 block text-sm text-muted-foreground">
-                Saya tahu lama cicilan, Vinari hitungkan bayar per periode.
+                Saya tahu lama cicilannya, Vinari hitungkan bayar per periode.
               </span>
             </label>
-            <label className="rounded-2xl border border-border bg-muted/30 p-3">
+            <label
+              className={cn(
+                'rounded-2xl border p-3 transition-colors',
+                calculationMode === 'by_payment'
+                  ? 'border-primary/40 bg-primary/10 text-foreground'
+                  : 'border-border bg-muted/30'
+              )}
+            >
               <input className="sr-only" type="radio" value="by_payment" {...register('calculationMode')} />
               <span className="block font-semibold">Hitung lama lunas</span>
               <span className="mt-1 block text-sm text-muted-foreground">
@@ -286,9 +301,9 @@ export function ExpenseSimulationForm({
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <FormShell
-        description="Isi nominal dan cara bayarnya. Kalau pilih cicilan, Vinari akan menghitung bunga, cicilan, dan dampaknya."
+        description="Masukkan rencana pengeluaranmu."
         isSubmitting={isSubmitting}
-        title="Isi detail pengeluaran"
+        title="Detail Pengeluaran Besar"
       >
         <FormStepSection
           description="Isi nama, nominal, dompet, dan tanggal rencana."
@@ -379,9 +394,9 @@ export function DebtSimulationForm({
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <FormShell
-        description="Masukkan harga barang atau total hutang, lalu pilih apakah kamu ingin menghitung cicilan atau lama lunas."
+        description="Masukkan rencana cicilanmu."
         isSubmitting={isSubmitting}
-        title="Isi detail cicilan baru"
+        title="Detail Cicilan / Hutang Baru"
       >
         <FormStepSection
           description="Masukkan nama cicilan, total hutang, dan kapan cicilan mulai dihitung."
@@ -452,9 +467,9 @@ export function GoalSavingSimulationForm({
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <FormShell
-        description="Simulasikan tambahan tabungan tanpa mengubah saldo atau progres target asli."
+        description="Simulasikan tambahan tabungan rutin atau satu kali."
         isSubmitting={isSubmitting || snapshot.goals.length === 0}
-        title="Isi detail tambahan tabungan"
+        title="Detail Tambah Tabungan"
       >
         <FormStepSection
           description="Pilih target dan rencana tambahan tabungan."
