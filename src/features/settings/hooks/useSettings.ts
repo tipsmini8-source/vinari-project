@@ -11,6 +11,7 @@ import type {
 
 export const settingsKeys = {
   invitations: (email: string | undefined) => ['settings-invitations', email] as const,
+  pendingInvitations: (workspaceId: string | undefined) => ['settings-pending-invitations', workspaceId] as const,
   members: (workspaceId: string | undefined) => ['settings-members', workspaceId] as const,
   preferences: (userId: string | undefined) => ['settings-preferences', userId] as const,
   profile: (userId: string | undefined) => ['settings-profile', userId] as const,
@@ -138,6 +139,20 @@ export function useWorkspaceInvitations(email: string | undefined) {
   });
 }
 
+export function usePendingWorkspaceInvitations(workspaceId: string | undefined) {
+  return useQuery({
+    enabled: Boolean(workspaceId),
+    queryKey: settingsKeys.pendingInvitations(workspaceId),
+    queryFn: () => {
+      if (!workspaceId) {
+        throw new Error('Workspace aktif tidak ditemukan.');
+      }
+
+      return SettingsService.getPendingWorkspaceInvitations(workspaceId);
+    }
+  });
+}
+
 export function useInviteWorkspaceMember(workspaceId: string | undefined) {
   const queryClient = useQueryClient();
 
@@ -153,6 +168,79 @@ export function useInviteWorkspaceMember(workspaceId: string | undefined) {
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: settingsKeys.members(workspaceId) }),
         queryClient.invalidateQueries({ queryKey: settingsKeys.workspace(workspaceId) })
+      ]);
+    }
+  });
+}
+
+export function useCreateWorkspaceInvitation(workspaceId: string | undefined, currentUserId: string | undefined) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (input: MemberInviteSubmitInput) => {
+      if (!workspaceId) {
+        throw new Error('Workspace aktif tidak ditemukan.');
+      }
+
+      if (!currentUserId) {
+        throw new Error('User aktif tidak ditemukan.');
+      }
+
+      return SettingsService.createWorkspaceInvitation(workspaceId, currentUserId, input);
+    },
+    onSuccess: async () => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: settingsKeys.pendingInvitations(workspaceId) }),
+        queryClient.invalidateQueries({ queryKey: settingsKeys.workspace(workspaceId) })
+      ]);
+    }
+  });
+}
+
+export function useCancelWorkspaceInvitation(workspaceId: string | undefined) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (invitationId: string) => {
+      if (!workspaceId) {
+        throw new Error('Workspace aktif tidak ditemukan.');
+      }
+
+      return SettingsService.cancelWorkspaceInvitation(workspaceId, invitationId);
+    },
+    onSuccess: async () => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: settingsKeys.pendingInvitations(workspaceId) }),
+        queryClient.invalidateQueries({ queryKey: settingsKeys.workspace(workspaceId) })
+      ]);
+    }
+  });
+}
+
+export function useInvitationByToken(token: string | undefined) {
+  return useQuery({
+    enabled: Boolean(token),
+    queryKey: ['workspace-invitation-token', token] as const,
+    queryFn: () => {
+      if (!token) {
+        throw new Error('Token undangan tidak ditemukan.');
+      }
+
+      return SettingsService.getInvitationByToken(token);
+    }
+  });
+}
+
+export function useAcceptWorkspaceInvitationByToken() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (token: string) => SettingsService.acceptWorkspaceInvitationByToken(token),
+    onSuccess: async () => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['workspace-invitation-token'] }),
+        queryClient.invalidateQueries({ queryKey: ['workspace'] }),
+        queryClient.invalidateQueries({ queryKey: ['settings-members'] })
       ]);
     }
   });

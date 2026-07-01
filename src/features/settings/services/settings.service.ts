@@ -5,6 +5,9 @@ import type {
   ProfileSubmitInput,
   UserPreferences,
   UserProfile,
+  PublicWorkspaceInvitation,
+  WorkspaceInvitation,
+  WorkspaceInvitationStatus,
   WorkspaceMember,
   WorkspaceMemberProfile,
   WorkspaceMemberRole,
@@ -20,6 +23,8 @@ type SupabaseErrorLike = {
 
 const workspaceMemberSelect =
   'id, workspace_id, user_id, invite_email, role, status, invited_at, accepted_at, created_at, profile:profiles!workspace_members_user_id_fkey(id, full_name, avatar_url)';
+const workspaceInvitationSelect =
+  'id, workspace_id, email, role, token, status, invited_by, accepted_by, expires_at, accepted_at, cancelled_at, created_at, updated_at';
 
 function assertSupabaseSuccess(error: SupabaseErrorLike | null, fallbackMessage: string) {
   if (error) {
@@ -135,6 +140,14 @@ function asWorkspaceMemberStatus(value: unknown): WorkspaceMemberStatus {
   return 'active';
 }
 
+function asWorkspaceInvitationStatus(value: unknown): WorkspaceInvitationStatus {
+  if (value === 'pending' || value === 'accepted' || value === 'cancelled' || value === 'expired') {
+    return value;
+  }
+
+  return 'pending';
+}
+
 function normalizeRelation<T>(value: T | T[] | null | undefined): T | null {
   if (Array.isArray(value)) {
     return value[0] ?? null;
@@ -163,6 +176,77 @@ function mapWorkspaceMember(row: Record<string, unknown>): WorkspaceMember {
         }
       : null
   };
+}
+
+function mapWorkspaceInvitation(row: Record<string, unknown>): WorkspaceInvitation {
+  return {
+    id: asString(row.id),
+    workspace_id: asString(row.workspace_id),
+    email: asString(row.email),
+    role: asWorkspaceMemberRole(row.role),
+    token: asString(row.token),
+    status: asWorkspaceInvitationStatus(row.status),
+    invited_by: asOptionalString(row.invited_by),
+    accepted_by: asOptionalString(row.accepted_by),
+    expires_at: asString(row.expires_at),
+    accepted_at: asOptionalString(row.accepted_at),
+    cancelled_at: asOptionalString(row.cancelled_at),
+    created_at: asString(row.created_at),
+    updated_at: asString(row.updated_at)
+  };
+}
+
+function mapPublicWorkspaceInvitation(row: Record<string, unknown>): PublicWorkspaceInvitation {
+  return {
+    invitation_id: asString(row.invitation_id),
+    workspace_id: asString(row.workspace_id),
+    workspace_name: asString(row.workspace_name),
+    email: asString(row.email),
+    role: asWorkspaceMemberRole(row.role),
+    status: asWorkspaceInvitationStatus(row.status),
+    expires_at: asString(row.expires_at)
+  };
+}
+
+function createInviteToken() {
+  const bytes = new Uint8Array(24);
+  window.crypto.getRandomValues(bytes);
+
+  return Array.from(bytes, (byte) => byte.toString(16).padStart(2, '0')).join('');
+}
+
+function mapInvitationError(error: unknown, fallbackMessage: string) {
+  if (!(error instanceof Error)) {
+    return new Error(fallbackMessage);
+  }
+
+  const message = error.message.toLowerCase();
+
+  if (message.includes('duplicate key') || message.includes('workspace_invitations_workspace_email_pending_idx')) {
+    return new Error('Undangan untuk email ini masih menunggu.');
+  }
+
+  if (message.includes('undangan tidak ditemukan')) {
+    return new Error('Undangan tidak ditemukan.');
+  }
+
+  if (message.includes('kedaluwarsa')) {
+    return new Error('Undangan sudah kedaluwarsa.');
+  }
+
+  if (message.includes('sudah diterima')) {
+    return new Error('Undangan sudah diterima.');
+  }
+
+  if (message.includes('email')) {
+    return new Error('Email akun kamu berbeda dari email undangan.');
+  }
+
+  if (message.includes('sudah menjadi anggota')) {
+    return new Error('Kamu sudah menjadi anggota workspace ini.');
+  }
+
+  return new Error(error.message || fallbackMessage);
 }
 
 async function getWorkspaceMember(workspaceId: string, memberId: string): Promise<WorkspaceMember> {
@@ -201,14 +285,22 @@ async function getOwnerCount(workspaceId: string): Promise<number> {
 }
 
 async function assertMemberLimitAvailable(workspaceId: string) {
-  const { count, error: countError } = await supabase
+  const { count: activeMemberCount, error: countError } = await supabase
     .from('workspace_members')
     .select('id', { count: 'exact', head: true })
     .eq('workspace_id', workspaceId)
-    .in('status', ['active', 'invited'])
+    .eq('status', 'active')
     .is('deleted_at', null);
 
   assertSupabaseSuccess(countError, 'Gagal mengecek limit member.');
+
+  const { count: pendingInvitationCount, error: invitationCountError } = await supabase
+    .from('workspace_invitations')
+    .select('id', { count: 'exact', head: true })
+    .eq('workspace_id', workspaceId)
+    .eq('status', 'pending');
+
+  assertSupabaseSuccess(invitationCountError, 'Gagal mengecek limit undangan.');
 
   const { data: subscription, error: subscriptionError } = (await supabase
     .from('workspace_subscriptions')
@@ -238,7 +330,9 @@ async function assertMemberLimitAvailable(workspaceId: string) {
 
   const maxMembers = plan ? asNumberOrNull(plan.max_members) : 1;
 
-  if (maxMembers !== null && (count ?? 0) >= maxMembers) {
+  const usedSlots = (activeMemberCount ?? 0) + (pendingInvitationCount ?? 0);
+
+  if (maxMembers !== null && usedSlots >= maxMembers) {
     throw new Error('Limit member plan sudah tercapai. Upgrade ke Premium Family untuk menambah anggota.');
   }
 }
@@ -422,6 +516,7 @@ export const SettingsService = {
       .from('workspace_members')
       .select(workspaceMemberSelect)
       .eq('workspace_id', workspaceId)
+      .in('status', ['active', 'removed'])
       .is('deleted_at', null)
       .order('created_at', { ascending: true })) as unknown as {
       data: Record<string, unknown>[] | null;
@@ -481,6 +576,107 @@ export const SettingsService = {
     }
 
     return mapWorkspaceMember(data);
+  },
+
+  async getPendingWorkspaceInvitations(workspaceId: string): Promise<WorkspaceInvitation[]> {
+    const { data, error } = (await supabase
+      .from('workspace_invitations')
+      .select(workspaceInvitationSelect)
+      .eq('workspace_id', workspaceId)
+      .eq('status', 'pending')
+      .order('created_at', { ascending: false })) as unknown as {
+      data: Record<string, unknown>[] | null;
+      error: SupabaseErrorLike | null;
+    };
+
+    assertSupabaseSuccess(error, 'Gagal mengambil undangan menunggu.');
+
+    return (data ?? []).map(mapWorkspaceInvitation);
+  },
+
+  async createWorkspaceInvitation(
+    workspaceId: string,
+    currentUserId: string,
+    input: MemberInviteSubmitInput
+  ): Promise<WorkspaceInvitation> {
+    await assertMemberLimitAvailable(workspaceId);
+
+    const normalizedEmail = input.email.trim().toLowerCase();
+    const token = createInviteToken();
+
+    const { data, error } = (await supabase
+      .from('workspace_invitations')
+      .insert({
+        workspace_id: workspaceId,
+        email: normalizedEmail,
+        role: input.role,
+        token,
+        status: 'pending',
+        invited_by: currentUserId,
+        expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()
+      })
+      .select(workspaceInvitationSelect)
+      .single()) as unknown as {
+      data: Record<string, unknown> | null;
+      error: SupabaseErrorLike | null;
+    };
+
+    if (error) {
+      throw mapInvitationError(new Error(error.message), 'Gagal membuat link undangan.');
+    }
+
+    if (!data) {
+      throw new Error('Undangan tidak berhasil dibuat.');
+    }
+
+    return mapWorkspaceInvitation(data);
+  },
+
+  async cancelWorkspaceInvitation(workspaceId: string, invitationId: string): Promise<void> {
+    const { error } = await supabase
+      .from('workspace_invitations')
+      .update({
+        status: 'cancelled',
+        cancelled_at: new Date().toISOString()
+      })
+      .eq('workspace_id', workspaceId)
+      .eq('id', invitationId);
+
+    assertSupabaseSuccess(error, 'Gagal membatalkan undangan.');
+  },
+
+  async getInvitationByToken(token: string): Promise<PublicWorkspaceInvitation | null> {
+    const { data, error } = (await supabase.rpc('get_invitation_by_token', {
+      invite_token: token
+    })) as unknown as {
+      data: Record<string, unknown>[] | null;
+      error: SupabaseErrorLike | null;
+    };
+
+    assertSupabaseSuccess(error, 'Gagal mengambil undangan.');
+
+    const invitation = data?.[0];
+
+    return invitation ? mapPublicWorkspaceInvitation(invitation) : null;
+  },
+
+  async acceptWorkspaceInvitationByToken(token: string): Promise<string> {
+    const { data, error } = (await supabase.rpc('accept_workspace_invitation', {
+      invite_token: token
+    })) as unknown as {
+      data: string | null;
+      error: SupabaseErrorLike | null;
+    };
+
+    if (error) {
+      throw mapInvitationError(new Error(error.message), 'Gagal menerima undangan. Coba lagi.');
+    }
+
+    if (!data) {
+      throw new Error('Gagal menerima undangan. Coba lagi.');
+    }
+
+    return data;
   },
 
   async updateWorkspaceMemberRole(

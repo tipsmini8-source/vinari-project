@@ -26,7 +26,7 @@ import { AppMenuPage } from '@features/menu/pages/AppMenuPage';
 import { NotificationsPage } from '@features/notification';
 import { OnboardingPage } from '@features/onboarding';
 import { BillingPage, UpgradePage } from '@features/premium';
-import { FeaturesPage, LandingPage, PricingPage, PrivacyPage, PublicLayout, TermsPage } from '@features/public';
+import { FeaturesPage, InvitePage, LandingPage, PricingPage, PrivacyPage, PublicLayout, TermsPage } from '@features/public';
 import {
   RecurringFormPage,
   RecurringListPage,
@@ -75,6 +75,10 @@ export const router = createBrowserRouter([
             element: <TermsPage />
           }
         ]
+      },
+      {
+        path: 'invite/:token',
+        element: <InvitePage />
       },
       {
         element: <PublicRoute />,

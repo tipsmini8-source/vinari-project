@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { CheckCircle2, Loader2 } from 'lucide-react';
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router';
+import { Link, useNavigate, useSearchParams } from 'react-router';
 import { useForm } from 'react-hook-form';
 
 import { AuthFormCard } from '@features/auth/components/AuthFormCard';
@@ -15,6 +15,7 @@ import { useToast } from '@shared/ui/use-toast';
 export function RegisterPage() {
   const [registered, setRegistered] = useState(false);
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { register: registerUser } = useAuth();
   const { toast } = useToast();
   const {
@@ -31,6 +32,9 @@ export function RegisterPage() {
     }
   });
 
+  const inviteToken = searchParams.get('invite');
+  const loginPath = inviteToken ? `/login?invite=${inviteToken}` : '/login';
+
   const onSubmit = handleSubmit(async (values) => {
     try {
       const session = await registerUser(values);
@@ -40,7 +44,7 @@ export function RegisterPage() {
           title: 'Registrasi berhasil',
           description: 'Akun siap digunakan. Mari lanjut siapkan ruang keuangan.'
         });
-        void navigate('/app', { replace: true });
+        void navigate(inviteToken ? `/invite/${inviteToken}` : '/app', { replace: true });
         return;
       }
 
@@ -63,7 +67,7 @@ export function RegisterPage() {
       <AuthFormCard
         description="Silakan cek email Anda untuk melakukan verifikasi akun."
         footer={
-          <Link className="font-medium text-primary hover:underline" to="/login">
+          <Link className="font-medium text-primary hover:underline" to={loginPath}>
             Kembali ke login
           </Link>
         }
@@ -86,7 +90,7 @@ export function RegisterPage() {
       footer={
         <>
           Sudah punya akun?{' '}
-          <Link className="font-medium text-primary hover:underline" to="/login">
+          <Link className="font-medium text-primary hover:underline" to={loginPath}>
             Masuk
           </Link>
         </>

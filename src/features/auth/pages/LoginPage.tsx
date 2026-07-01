@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Link, useNavigate } from 'react-router';
+import { Link, useNavigate, useSearchParams } from 'react-router';
 import { Loader2 } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 
@@ -13,6 +13,7 @@ import { useToast } from '@shared/ui/use-toast';
 
 export function LoginPage() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { login } = useAuth();
   const { toast } = useToast();
   const {
@@ -27,11 +28,14 @@ export function LoginPage() {
     }
   });
 
+  const inviteToken = searchParams.get('invite');
+  const registerPath = inviteToken ? `/register?invite=${inviteToken}` : '/register';
+
   const onSubmit = handleSubmit(async (values) => {
     try {
       await login(values);
       toast({ title: 'Berhasil masuk', description: 'Selamat datang kembali di Vinari.' });
-      void navigate('/app', { replace: true });
+      void navigate(inviteToken ? `/invite/${inviteToken}` : '/app', { replace: true });
     } catch (error) {
       toast({
         title: 'Login gagal',
@@ -47,7 +51,7 @@ export function LoginPage() {
       footer={
         <>
           Belum punya akun?{' '}
-          <Link className="font-medium text-primary hover:underline" to="/register">
+          <Link className="font-medium text-primary hover:underline" to={registerPath}>
             Daftar
           </Link>
         </>

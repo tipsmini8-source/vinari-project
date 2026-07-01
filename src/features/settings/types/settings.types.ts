@@ -39,6 +39,7 @@ export type WorkspaceSettings = {
 
 export type WorkspaceMemberRole = 'owner' | 'partner' | 'member' | 'viewer';
 export type WorkspaceMemberStatus = 'active' | 'invited' | 'removed';
+export type WorkspaceInvitationStatus = 'pending' | 'accepted' | 'cancelled' | 'expired';
 
 export type WorkspaceMemberProfile = {
   full_name: string | null;
@@ -56,6 +57,32 @@ export type WorkspaceMember = {
   accepted_at: string | null;
   created_at: string;
   profile: WorkspaceMemberProfile | null;
+};
+
+export type WorkspaceInvitation = {
+  id: string;
+  workspace_id: string;
+  email: string;
+  role: WorkspaceMemberRole;
+  token: string;
+  status: WorkspaceInvitationStatus;
+  invited_by: string | null;
+  accepted_by: string | null;
+  expires_at: string;
+  accepted_at: string | null;
+  cancelled_at: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export type PublicWorkspaceInvitation = {
+  invitation_id: string;
+  workspace_id: string;
+  workspace_name: string;
+  email: string;
+  role: WorkspaceMemberRole;
+  status: WorkspaceInvitationStatus;
+  expires_at: string;
 };
 
 export type ProfileSubmitInput = ProfileFormInput;
