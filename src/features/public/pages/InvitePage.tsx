@@ -46,7 +46,7 @@ export function InvitePage() {
   const { token } = useParams();
   const navigate = useNavigate();
   const { loading: authLoading, user } = useAuth();
-  const { refreshWorkspace } = useWorkspace();
+  const { refreshWorkspace, setActiveWorkspace } = useWorkspace();
   const { toast } = useToast();
   const invitationQuery = useInvitationByToken(token);
   const acceptInvitation = useAcceptWorkspaceInvitationByToken();
@@ -62,9 +62,10 @@ export function InvitePage() {
     }
 
     try {
-      await acceptInvitation.mutateAsync(token);
+      const workspaceId = await acceptInvitation.mutateAsync(token);
       await refreshWorkspace();
-      toast({ title: 'Undangan berhasil diterima.' });
+      await setActiveWorkspace(workspaceId);
+      toast({ title: 'Berhasil bergabung ke ruang keuangan.' });
       void navigate('/app', { replace: true });
     } catch (error) {
       toast({

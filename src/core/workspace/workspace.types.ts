@@ -7,7 +7,9 @@ export type Workspace = {
 
 export type WorkspaceContextValue = {
   workspace: Workspace | null;
+  workspaces: Workspace[];
   loading: boolean;
   error: Error | null;
   refreshWorkspace: () => Promise<void>;
+  setActiveWorkspace: (workspaceId: string) => Promise<void>;
 };

@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
-import { workspaceKeys } from '@/core/workspace';
+import { WorkspaceService, workspaceKeys } from '@/core/workspace';
 import { OnboardingService } from '@features/onboarding/services/onboarding.service';
 import type { OnboardingInput } from '@features/onboarding/types/onboarding.types';
 
@@ -29,8 +29,10 @@ export function useCreateOnboarding(userId: string | undefined) {
 
       return OnboardingService.createInitialData(userId, input);
     },
-    onSuccess: async () => {
+    onSuccess: async (workspace) => {
+      WorkspaceService.setStoredActiveWorkspaceId(workspace.id);
       await queryClient.invalidateQueries({ queryKey: ['active-workspace', userId] });
+      await queryClient.invalidateQueries({ queryKey: workspaceKeys.list(userId) });
       await queryClient.invalidateQueries({ queryKey: workspaceKeys.active(userId) });
     }
   });
